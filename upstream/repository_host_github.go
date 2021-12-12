@@ -26,6 +26,13 @@ func (r *GithubRepository) GetOwner() string {
 	return r.Owner.GetLogin()
 }
 
+func (r *GithubRepository) GetDescription() string {
+	if r.Description == nil {
+		return ""
+	}
+	return *r.Description
+}
+
 type GithubClient struct {
 	client *github.Client
 }

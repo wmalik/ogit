@@ -5,8 +5,9 @@ import (
 )
 
 type MockRepository struct {
-	Owner string
-	Name  string
+	Owner       string
+	Name        string
+	Description string
 }
 
 func (r *MockRepository) GetName() string {
@@ -15,6 +16,10 @@ func (r *MockRepository) GetName() string {
 
 func (r *MockRepository) GetOwner() string {
 	return r.Owner
+}
+
+func (r *MockRepository) GetDescription() string {
+	return r.Description
 }
 
 type MockClient struct {
