@@ -7,5 +7,6 @@ require (
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.17.0
+	github.com/tcnksm/go-gitconfig v0.1.2
 	goji.io/v3 v3.0.0
 )
