@@ -19,6 +19,13 @@ func (r *GithubRepository) GetName() string {
 	return *r.Name
 }
 
+func (r *GithubRepository) GetOwner() string {
+	if r.Owner == nil {
+		return ""
+	}
+	return r.Owner.GetLogin()
+}
+
 type GithubClient struct {
 	client *github.Client
 }
