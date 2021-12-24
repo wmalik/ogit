@@ -1,8 +1,6 @@
 package browser
 
 import (
-	"ogit/service"
-
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -19,7 +17,8 @@ var (
 )
 
 type model struct {
-	list list.Model
+	list  list.Model
+	fetch bool
 }
 
 type repoListItem struct {
@@ -37,34 +36,24 @@ func (m model) Init() tea.Cmd {
 	return tea.EnterAltScreen
 }
 
-func NewModel(repos service.Repositories) model {
-	// Setup initial state
-	items := make([]list.Item, len(repos))
-	for i := 0; i < len(repos); i++ {
-		items[i] = repoListItem{
-			title:       repos[i].Owner + "/" + repos[i].Name,
-			description: repos[i].Description,
-			browserURL:  repos[i].BrowserURL,
-			cloneURL:    repos[i].CloneURL,
-		}
-	}
-
-	// Setup
-	delegate := repoListItemDelegate()
-	reposList := list.NewModel(items, delegate, 0, 0)
+func NewModel() model {
+	// Start with an empty list of items
+	reposList := list.NewModel([]list.Item{}, repoListItemDelegate(), 0, 0)
 	reposList.Title = "Repositories"
 	reposList.Styles.Title = titleStyle
 	reposList.AdditionalFullHelpKeys = func() []key.Binding {
 		return []key.Binding{
 			key.NewBinding(
-				key.WithKeys("H"),
+				key.WithKeys("H", "R"),
 				key.WithHelp("H", "toggle help"),
+				key.WithHelp("R", "Refresh list"),
 			),
 		}
 	}
 
 	return model{
-		list: reposList,
+		list:  reposList,
+		fetch: true,
 	}
 }
 
