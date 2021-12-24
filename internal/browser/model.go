@@ -20,7 +20,6 @@ var (
 
 type model struct {
 	list list.Model
-	keys *listKeyMap
 }
 
 type repoListItem struct {
@@ -39,10 +38,6 @@ func (m model) Init() tea.Cmd {
 }
 
 func NewModel(repos service.Repositories) model {
-	var (
-		listKeys = newListKeyMap()
-	)
-
 	// Setup initial state
 	items := make([]list.Item, len(repos))
 	for i := 0; i < len(repos); i++ {
@@ -61,13 +56,15 @@ func NewModel(repos service.Repositories) model {
 	reposList.Styles.Title = titleStyle
 	reposList.AdditionalFullHelpKeys = func() []key.Binding {
 		return []key.Binding{
-			listKeys.toggleHelpMenu,
+			key.NewBinding(
+				key.WithKeys("H"),
+				key.WithHelp("H", "toggle help"),
+			),
 		}
 	}
 
 	return model{
 		list: reposList,
-		keys: listKeys,
 	}
 }
 
@@ -77,21 +74,14 @@ func (i repoListItem) FilterValue() string { return i.title + i.description }
 func (i repoListItem) BrowserURL() string  { return i.browserURL }
 func (i repoListItem) CloneURL() string    { return i.cloneURL }
 
-func newListKeyMap() *listKeyMap {
-	return &listKeyMap{
-		toggleHelpMenu: key.NewBinding(
-			key.WithKeys("H"),
-			key.WithHelp("H", "toggle help"),
-		),
-	}
-}
-
 func repoListItemDelegate() list.DefaultDelegate {
 	keyBinding := key.NewBinding(
 		key.WithKeys("enter"),
 		key.WithHelp("enter", "choose"),
 		key.WithKeys("o"),
 		key.WithHelp("o", "open in firefox"),
+		key.WithKeys("c"),
+		key.WithHelp("c", "clone repository"),
 	)
 
 	d := list.NewDefaultDelegate()
