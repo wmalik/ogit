@@ -8,4 +8,8 @@ type RepositoryHostClient interface {
 
 type HostRepository interface {
 	GetName() string
+	GetOwner() string
+	GetDescription() string
+	GetBrowserURL() string
+	GetCloneURL() string
 }

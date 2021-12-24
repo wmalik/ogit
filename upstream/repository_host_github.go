@@ -19,6 +19,36 @@ func (r *GithubRepository) GetName() string {
 	return *r.Name
 }
 
+func (r *GithubRepository) GetOwner() string {
+	if r.Owner == nil {
+		return ""
+	}
+	return r.Owner.GetLogin()
+}
+
+func (r *GithubRepository) GetDescription() string {
+	if r.Description == nil {
+		return ""
+	}
+	return *r.Description
+}
+
+func (r *GithubRepository) GetBrowserURL() string {
+	if r.GetHTMLURL() == "" {
+		return ""
+	}
+
+	return r.GetHTMLURL()
+}
+
+func (r *GithubRepository) GetCloneURL() string {
+	if r.Repository.GetCloneURL() == "" {
+		return ""
+	}
+
+	return r.Repository.GetCloneURL()
+}
+
 type GithubClient struct {
 	client *github.Client
 }
