@@ -45,7 +45,7 @@ func (c *MockClient) WithRepositories(repos []MockRepository) *MockClient {
 	return c
 }
 
-func (c *MockClient) GetRepositories(ctx context.Context, owners []string) []HostRepository {
+func (c *MockClient) GetRepositories(ctx context.Context, owners []string) ([]HostRepository, error) {
 	inputOwners := map[string]struct{}{}
 	for _, owner := range owners {
 		inputOwners[owner] = struct{}{}
@@ -56,5 +56,5 @@ func (c *MockClient) GetRepositories(ctx context.Context, owners []string) []Hos
 			res = append(res, &c.repositories[i])
 		}
 	}
-	return res
+	return res, nil
 }

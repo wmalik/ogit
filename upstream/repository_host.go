@@ -3,7 +3,7 @@ package upstream
 import "context"
 
 type RepositoryHostClient interface {
-	GetRepositories(ctx context.Context, owners []string) []HostRepository
+	GetRepositories(ctx context.Context, owners []string) ([]HostRepository, error)
 }
 
 type HostRepository interface {
