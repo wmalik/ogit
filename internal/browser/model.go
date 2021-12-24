@@ -1,24 +1,19 @@
 package browser
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
-)
-
-var (
-	appStyle = lipgloss.NewStyle().Padding(1, 2)
-
-	titleStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("#FFFDF5")).
-			Background(lipgloss.Color("#25A065")).
-			Padding(0, 1)
 )
 
 type model struct {
-	list  list.Model
-	fetch bool
+	list         list.Model
+	fetch        bool
+	orgs         []string
+	cloneDirPath string
 }
 
 type repoListItem struct {
@@ -36,10 +31,10 @@ func (m model) Init() tea.Cmd {
 	return tea.EnterAltScreen
 }
 
-func NewModel() model {
+func NewModel(orgs []string, cloneDirPath string) model {
 	// Start with an empty list of items
 	reposList := list.NewModel([]list.Item{}, repoListItemDelegate(), 0, 0)
-	reposList.Title = "Repositories"
+	reposList.Title = fmt.Sprintf("[Repositories] [%s] [%s]", strings.Join(orgs, " "), cloneDirPath)
 	reposList.Styles.Title = titleStyle
 	reposList.AdditionalFullHelpKeys = func() []key.Binding {
 		return []key.Binding{
@@ -52,8 +47,10 @@ func NewModel() model {
 	}
 
 	return model{
-		list:  reposList,
-		fetch: true,
+		list:         reposList,
+		fetch:        true,
+		orgs:         orgs,
+		cloneDirPath: cloneDirPath,
 	}
 }
 

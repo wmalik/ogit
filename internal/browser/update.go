@@ -6,14 +6,11 @@ import (
 	"log"
 	"ogit/service"
 	"ogit/upstream"
-	"strings"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 	"github.com/google/go-github/github"
-	"github.com/tcnksm/go-gitconfig"
 )
 
 type doneFetchRepoList struct {
@@ -34,14 +31,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, m.list.StartSpinner())
 		log.Println("inside fetch")
 		fetchReposListCmd := func() tea.Msg {
-			orgs, err := orgsFromGitConfig()
-			if err != nil {
-				log.Fatalln(err)
-			}
-			log.Println("Using orgs", orgs)
-
 			s := service.NewRepositoryService(upstream.NewGithubClient(github.NewClient(nil)))
-			repos, err := s.GetRepositoriesByOwners(context.Background(), orgs)
+			repos, err := s.GetRepositoriesByOwners(context.Background(), m.orgs)
 			if err != nil {
 				log.Println(err)
 				return errorFetchRepoList{err}
@@ -69,13 +60,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 
-		m.list.NewStatusMessage(fmt.Sprintf("Fetched %d repos", len(repoListItems)))
+		m.list.NewStatusMessage(statusMessageStyle(fmt.Sprintf("Fetched %d repos", len(repoListItems))))
 		m.list.SetItems(repoListItems)
 		m.list.StopSpinner()
 
 	case errorFetchRepoList:
 		m.list.StopSpinner()
-		cmds = append(cmds, m.list.NewStatusMessage(errorFetchRepoList(msg).Error()))
+		cmds = append(cmds, m.list.NewStatusMessage(statusMessageStyle(errorFetchRepoList(msg).Error())))
 
 	case tea.WindowSizeMsg:
 		topGap, rightGap, bottomGap, leftGap := appStyle.GetPadding()
@@ -112,9 +103,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func delegateUpdateFunc(binding key.Binding) func(msg tea.Msg, m *list.Model) tea.Cmd {
-	statusMessageStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.AdaptiveColor{Light: "#04B575", Dark: "#04B575"}).
-		Render
 
 	return func(msg tea.Msg, m *list.Model) tea.Cmd {
 		var title, browserURL, cloneURL string
@@ -144,23 +132,4 @@ func delegateUpdateFunc(binding key.Binding) func(msg tea.Msg, m *list.Model) te
 
 		return nil
 	}
-}
-
-// orgsFromGitConfig loads the value of ogit.orgs from ~/.gitconfig
-func orgsFromGitConfig() ([]string, error) {
-	orgsRaw, err := gitconfig.Entire("ogit.orgs")
-	if err != nil {
-		return nil, fmt.Errorf("unable to read git config: %s", err)
-	}
-
-	if orgsRaw == "" {
-		return nil, fmt.Errorf("Please configure ogit.orgs in your ~/.gitconfig")
-	}
-
-	orgs := []string{}
-	for _, org := range strings.Split(orgsRaw, ",") {
-		orgs = append(orgs, strings.TrimSpace(org))
-	}
-
-	return orgs, nil
 }
