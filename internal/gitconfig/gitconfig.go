@@ -3,8 +3,6 @@ package gitconfig
 import (
 	"errors"
 	"fmt"
-	"os"
-	"path"
 	"strings"
 
 	"github.com/tcnksm/go-gitconfig"
@@ -62,25 +60,8 @@ func getCloneDirPath() (*string, error) {
 	var err error
 	cloneDirPath, err = gitconfig.Entire("ogit.clonedirpath")
 	if err != nil {
-		if err.Error() != "the key `ogit.clonedirpath` is not found" {
-			return nil, fmt.Errorf("unable to read ogit.clonedirpath from git config: %s", err)
-		}
+		return nil, fmt.Errorf("missing ogit.clonedirpath in git config: %s", err)
 	}
 
-	if cloneDirPath == "" {
-
-		homeDir, err := os.UserHomeDir()
-		if err != nil {
-			return nil, err
-		}
-
-		cloneDirPath = path.Join(homeDir, "ogit")
-
-		if err := os.MkdirAll(cloneDirPath, os.ModeDir); err != nil {
-			if !strings.HasSuffix(err.Error(), "file exists") {
-				return nil, err
-			}
-		}
-	}
 	return &cloneDirPath, nil
 }
