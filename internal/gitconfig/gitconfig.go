@@ -1,6 +1,7 @@
 package gitconfig
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -41,11 +42,11 @@ func (c GitConfig) CloneDirPath() string {
 func getOrgs() ([]string, error) {
 	orgsRaw, err := gitconfig.Entire("ogit.orgs")
 	if err != nil {
-		return nil, fmt.Errorf("unable to read ogit.orgs from git config: %s", err)
+		return nil, fmt.Errorf("missing manadatory config in git config: %s", err)
 	}
 
 	if orgsRaw == "" {
-		return nil, fmt.Errorf("missing ogit.orgs in git config")
+		return nil, errors.New("blank ogit.orgs in git config")
 	}
 
 	orgs := []string{}
