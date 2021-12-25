@@ -9,18 +9,16 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+// The state of browser
 type model struct {
-	list         list.Model
-	fetch        bool
-	orgs         []string
+	// the list of repositories
+	list list.Model
+	// whether the list should be fetched from remote
+	fetch bool
+	// the list of github organisations
+	orgs []string
+	// the path on disk where repositories should be cloned
 	cloneDirPath string
-}
-
-type repoListItem struct {
-	title       string
-	description string
-	browserURL  string
-	cloneURL    string
 }
 
 type listKeyMap struct {
@@ -52,6 +50,13 @@ func NewModel(orgs []string, cloneDirPath string) model {
 		orgs:         orgs,
 		cloneDirPath: cloneDirPath,
 	}
+}
+
+type repoListItem struct {
+	title       string
+	description string
+	browserURL  string
+	cloneURL    string
 }
 
 func (i repoListItem) Title() string       { return i.title }
