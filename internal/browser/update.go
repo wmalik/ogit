@@ -2,10 +2,14 @@ package browser
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
+	"ogit/internal/gitutils"
 	"ogit/service"
 	"ogit/upstream"
+	"path"
+	"time"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
@@ -24,12 +28,13 @@ type errorFetchRepoList struct{ err error }
 func (e errorFetchRepoList) Error() string { return e.err.Error() }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	log.Printf("Update(%+v)\n", msg)
 	var cmds []tea.Cmd
 
 	if m.fetch {
 		m.fetch = false
 		cmds = append(cmds, m.list.StartSpinner())
-		log.Println("inside fetch")
+
 		fetchReposListCmd := func() tea.Msg {
 			s := service.NewRepositoryService(upstream.NewGithubClient(github.NewClient(nil)))
 			repos, err := s.GetRepositoriesByOwners(context.Background(), m.orgs)
@@ -54,6 +59,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			log.Println("Adding repo", repos[i].Name)
 			repoListItems[i] = repoListItem{
 				title:       repos[i].Owner + "/" + repos[i].Name,
+				owner:       repos[i].Owner,
+				name:        repos[i].Name,
 				description: repos[i].Description,
 				browserURL:  repos[i].BrowserURL,
 				cloneURL:    repos[i].CloneURL,
@@ -66,7 +73,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case errorFetchRepoList:
 		m.list.StopSpinner()
-		cmds = append(cmds, m.list.NewStatusMessage(statusMessageStyle(errorFetchRepoList(msg).Error())))
+		m.list.StatusMessageLifetime = time.Second * 10
+		cmds = append(cmds, m.list.NewStatusMessage(statusError(errorFetchRepoList(msg).Error())))
 
 	case tea.WindowSizeMsg:
 		topGap, rightGap, bottomGap, leftGap := appStyle.GetPadding()
@@ -93,7 +101,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
-	log.Println("finishing update")
 	// This will also call the delegate's update function
 	newListModel, cmd := m.list.Update(msg)
 	m.list = newListModel
@@ -102,20 +109,47 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, tea.Batch(cmds...)
 }
 
-func delegateUpdateFunc(binding key.Binding) func(msg tea.Msg, m *list.Model) tea.Cmd {
-
+func delegateUpdateFunc(binding key.Binding, cloneDirPath string) func(msg tea.Msg, m *list.Model) tea.Cmd {
 	return func(msg tea.Msg, m *list.Model) tea.Cmd {
-		var title, browserURL, cloneURL string
+		log.Printf("delegateUpdateFunc(%+v)\n", msg)
 
-		if i, ok := m.SelectedItem().(repoListItem); ok {
-			title = i.Title()
-			browserURL = i.BrowserURL()
-			cloneURL = i.CloneURL()
+		var title, owner, name, browserURL, cloneURL string
+
+		selectedItem := m.SelectedItem()
+		selectedRepoListItem, ok := selectedItem.(repoListItem)
+		if ok {
+			title = selectedRepoListItem.Title()
+			owner = selectedRepoListItem.Owner()
+			name = selectedRepoListItem.Name()
+			browserURL = selectedRepoListItem.BrowserURL()
+			cloneURL = selectedRepoListItem.CloneURL()
 		} else {
 			return nil
 		}
 
 		switch msg := msg.(type) {
+		case doneCloneToDisk:
+			m.StopSpinner()
+
+			done := doneCloneToDisk(msg)
+			clonedItem := done.item
+			clonedItemIndex := done.index
+			clonedItem.title = statusMessageStyle(clonedItem.Title())
+			clonedItem.description = statusMessageStyle(clonedItem.Description())
+			log.Println(done.repo.LastCommit())
+
+			return tea.Batch(
+				m.NewStatusMessage(statusMessageStyle("Cloned "+done.repo.String())),
+				m.SetItem(clonedItemIndex, clonedItem),
+			)
+
+		case errCloneToDisk:
+			m.StopSpinner()
+			if errors.Is(errCloneToDisk(msg).err, gitutils.ErrRepoAlreadyCloned) {
+				return m.NewStatusMessage(statusError(errCloneToDisk(msg).err.Error()))
+			}
+			return m.NewStatusMessage(statusError(errCloneToDisk(msg).err.Error()))
+
 		case tea.KeyMsg:
 			switch msg.Type {
 			case tea.KeyEnter:
@@ -125,11 +159,38 @@ func delegateUpdateFunc(binding key.Binding) func(msg tea.Msg, m *list.Model) te
 				case "o":
 					return m.NewStatusMessage(statusMessageStyle("Opening in firefox: " + browserURL))
 				case "c":
-					return m.NewStatusMessage(statusMessageStyle("Cloning " + cloneURL))
+
+					cloneToDiskCmd := func() tea.Msg {
+						progress := log.Default().Writer()
+						diskPath := path.Join(cloneDirPath, owner, name)
+						repoOnDisk, err := gitutils.CloneToDisk(context.Background(), cloneURL, diskPath, progress)
+						if err != nil {
+							log.Println(err)
+							return errCloneToDisk{err: err}
+						}
+
+						return doneCloneToDisk{index: m.Index(), item: selectedRepoListItem, repo: repoOnDisk}
+					}
+					return tea.Batch(
+						m.StartSpinner(),
+						cloneToDiskCmd,
+						m.SetItem(m.Index(), selectedRepoListItem),
+					)
+
 				}
 			}
 		}
 
 		return nil
 	}
+}
+
+type errCloneToDisk struct {
+	err error
+}
+
+type doneCloneToDisk struct {
+	index int
+	item  repoListItem
+	repo  *gitutils.Repository
 }

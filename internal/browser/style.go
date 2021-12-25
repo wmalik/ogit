@@ -14,3 +14,9 @@ func statusMessageStyle(str string) string {
 		Foreground(lipgloss.AdaptiveColor{Light: "#04B575", Dark: "#04B575"}).
 		Render(str)
 }
+
+func statusError(str string) string {
+	return lipgloss.NewStyle().
+		Foreground(lipgloss.AdaptiveColor{Light: "#eb4f34", Dark: "#eb4f34"}).
+		Render(str)
+}
