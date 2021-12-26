@@ -119,6 +119,7 @@ func delegateUpdateFunc(binding key.Binding, cloneDirPath string) func(msg tea.M
 	return func(msg tea.Msg, m *list.Model) tea.Cmd {
 		log.Println("Updating delegate UI")
 
+		var cmds []tea.Cmd
 		var title, owner, name, browserURL, cloneURL string
 
 		selectedItem := m.SelectedItem()
@@ -130,6 +131,9 @@ func delegateUpdateFunc(binding key.Binding, cloneDirPath string) func(msg tea.M
 			name = selectedRepoListItem.Name()
 			browserURL = selectedRepoListItem.BrowserURL()
 			cloneURL = selectedRepoListItem.CloneURL()
+			lastCommit, _ := selectedRepoListItem.LastCommitInfo(cloneDirPath)
+			cmds = append(cmds, m.NewStatusMessage(lastCommit))
+
 		} else {
 			return nil
 		}
@@ -188,7 +192,7 @@ func delegateUpdateFunc(binding key.Binding, cloneDirPath string) func(msg tea.M
 			}
 		}
 
-		return nil
+		return tea.Batch(cmds...)
 	}
 }
 

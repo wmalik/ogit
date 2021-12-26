@@ -4,6 +4,8 @@ import "github.com/charmbracelet/lipgloss"
 
 var appStyle = lipgloss.NewStyle().Align(lipgloss.Center).PaddingLeft(5).PaddingTop(5).PaddingBottom(5).PaddingRight(5)
 
+var spinnerStyle = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#0000ff", Dark: "#000099"})
+
 var titleStyle = lipgloss.NewStyle().
 	Foreground(lipgloss.Color("#FFFDF5")).
 	Background(lipgloss.Color("#25A065")).
