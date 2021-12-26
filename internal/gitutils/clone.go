@@ -37,12 +37,12 @@ func (r *Repository) String() string {
 func (r *Repository) LastCommit() string {
 	return fmt.Sprintf(
 		"%s %s %s (%s) %s (%s)",
-		r.HeadRef,
+		r.HeadRef[:6],
 		r.HeadRefName,
+		r.LastCommitInfo.Message,
 		r.LastCommitInfo.AuthorName,
 		r.LastCommitInfo.AuthorEmail,
-		r.LastCommitInfo.Message,
-		r.LastCommitInfo.When,
+		r.LastCommitInfo.When.Format("January 2, 2006"),
 	)
 }
 
@@ -80,7 +80,7 @@ func CloneToDisk(ctx context.Context, gitURL, path string, progress io.Writer) (
 		HeadRefName: head.Name().Short(),
 		HeadRef:     head.Hash().String(),
 		LastCommitInfo: commitInfo{
-			Message:     commitObject.Message,
+			Message:     strings.TrimSpace(commitObject.Message),
 			AuthorName:  commitObject.Author.Name,
 			AuthorEmail: commitObject.Author.Email,
 			When:        commitObject.Author.When,
