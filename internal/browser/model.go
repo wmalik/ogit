@@ -2,6 +2,8 @@ package browser
 
 import (
 	"fmt"
+	"ogit/internal/gitutils"
+	"path"
 	"strings"
 	"time"
 
@@ -70,6 +72,9 @@ func (i repoListItem) Description() string { return i.description }
 func (i repoListItem) FilterValue() string { return i.title + i.description }
 func (i repoListItem) BrowserURL() string  { return i.browserURL }
 func (i repoListItem) CloneURL() string    { return i.cloneURL }
+func (i repoListItem) Cloned(cloneDirPath string) bool {
+	return gitutils.Cloned(path.Join(cloneDirPath, i.owner, i.name))
+}
 
 func repoListItemDelegate(cloneDirPath string) list.DefaultDelegate {
 	keyBinding := key.NewBinding(

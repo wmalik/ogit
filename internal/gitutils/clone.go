@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
+	"strings"
 	"time"
 
 	"github.com/go-git/go-git/v5"
@@ -84,4 +86,13 @@ func CloneToDisk(ctx context.Context, gitURL, path string, progress io.Writer) (
 			When:        commitObject.Author.When,
 		},
 	}, nil
+}
+
+// Cloned checks if a path contains a .git directory
+func Cloned(dir string) bool {
+	if _, err := os.Stat(path.Join(dir, ".git")); err != nil {
+		return false
+	}
+
+	return true
 }

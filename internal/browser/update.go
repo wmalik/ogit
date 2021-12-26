@@ -56,8 +56,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		repos := doneFetchRepoList(msg).repos
 		repoListItems := make([]list.Item, len(repos))
 		for i := 0; i < len(repos); i++ {
-			log.Println("Adding repo", repos[i].Name)
-			repoListItems[i] = repoListItem{
+			repoItem := repoListItem{
 				title:       repos[i].Owner + "/" + repos[i].Name,
 				owner:       repos[i].Owner,
 				name:        repos[i].Name,
@@ -65,6 +64,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				browserURL:  repos[i].BrowserURL,
 				cloneURL:    repos[i].CloneURL,
 			}
+
+			if repoItem.Cloned(m.cloneDirPath) {
+				repoItem.title = statusMessageStyle(repoItem.Title())
+				repoItem.description = statusMessageStyle(repoItem.Description())
+			}
+			repoListItems[i] = repoItem
 		}
 
 		m.list.NewStatusMessage(statusMessageStyle(fmt.Sprintf("Fetched %d repos", len(repoListItems))))
