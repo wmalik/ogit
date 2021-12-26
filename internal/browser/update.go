@@ -28,9 +28,10 @@ type errorFetchRepoList struct{ err error }
 func (e errorFetchRepoList) Error() string { return e.err.Error() }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	log.Printf("Update(%+v)\n", msg)
+	log.Println("Updating UI")
 	var cmds []tea.Cmd
 
+	// TODO: move this to a key mapping handler
 	if m.fetch {
 		m.fetch = false
 		cmds = append(cmds, m.list.StartSpinner())
@@ -116,12 +117,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func delegateUpdateFunc(binding key.Binding, cloneDirPath string) func(msg tea.Msg, m *list.Model) tea.Cmd {
 	return func(msg tea.Msg, m *list.Model) tea.Cmd {
-		log.Printf("delegateUpdateFunc(%+v)\n", msg)
+		log.Println("Updating delegate UI")
 
 		var title, owner, name, browserURL, cloneURL string
 
 		selectedItem := m.SelectedItem()
 		selectedRepoListItem, ok := selectedItem.(repoListItem)
+		// TODO: if !ok return nil
 		if ok {
 			title = selectedRepoListItem.Title()
 			owner = selectedRepoListItem.Owner()
