@@ -58,7 +58,7 @@ func NewGithubClient(client *github.Client) *GithubClient {
 }
 
 func (c *GithubClient) GetRepositories(ctx context.Context, owners []string) ([]HostRepository, error) {
-	opt := &github.RepositoryListOptions{}
+	opt := &github.RepositoryListOptions{Sort: "updated"}
 	res := []HostRepository{}
 	var lock = sync.RWMutex{}
 	var wg sync.WaitGroup
