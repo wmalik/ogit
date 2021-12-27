@@ -7,17 +7,13 @@ import (
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
-	"github.com/charmbracelet/bubbles/spinner"
 )
 
 // The state of browser
 type model struct {
 	// the list of repositories
 	list list.Model
-	// whether the list should be fetched from remote
-	// TODO move this to a tea.Cmd
-	fetch bool
-	// the list of github organisations
+	// list of organisations or users (currently only public users or organisations)
 	orgs []string
 	// the path on disk where repositories should be cloned
 	cloneDirPath string
@@ -25,46 +21,25 @@ type model struct {
 
 func NewModel(orgs []string, cloneDirPath string) model {
 	// Start with an empty list of items
-	m := list.NewModel([]list.Item{}, repoListItemDelegate(cloneDirPath), 0, 0)
+	m := list.NewModel([]list.Item{}, delegateWithUpdateFunc(cloneDirPath, orgs), 0, 0)
 	m.StatusMessageLifetime = time.Second * 60
 	m.Title = fmt.Sprintf("[Repositories] [%s] [%s]", strings.Join(orgs, " "), cloneDirPath)
-	m.SetSpinner(spinner.MiniDot)
-	m.AdditionalFullHelpKeys = func() []key.Binding {
+	m.AdditionalShortHelpKeys = func() []key.Binding {
 		return []key.Binding{
 			key.NewBinding(
-				key.WithKeys("H"),
-				key.WithHelp("H", "toggle help"),
+				key.WithKeys("r"),
+				key.WithHelp("r", "refresh list"),
 			),
 			key.NewBinding(
-				key.WithKeys("R"),
-				key.WithHelp("R", "Refresh list"),
+				key.WithKeys("c"),
+				key.WithHelp("c", "clone a repository (shallow)"),
 			),
 		}
 	}
 
 	return model{
 		list:         m,
-		fetch:        true,
 		orgs:         orgs,
 		cloneDirPath: cloneDirPath,
 	}
-}
-
-func repoListItemDelegate(cloneDirPath string) list.DefaultDelegate {
-	keyBinding := key.NewBinding(
-		key.WithKeys("enter"),
-		key.WithHelp("enter", "choose"),
-		key.WithKeys("o"),
-		key.WithHelp("o", "open in firefox"),
-		key.WithKeys("c"),
-		key.WithHelp("c", "clone repository"),
-	)
-
-	d := list.NewDefaultDelegate()
-	d.ShortHelpFunc = func() []key.Binding {
-		return []key.Binding{keyBinding}
-	}
-	d.UpdateFunc = delegateUpdateFunc(keyBinding, cloneDirPath)
-
-	return d
 }
