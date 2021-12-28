@@ -10,6 +10,8 @@ import (
 	"github.com/google/go-github/github"
 )
 
+const pageSize = 100
+
 type GithubRepository struct {
 	github.Repository
 }
@@ -60,7 +62,6 @@ func NewGithubClient(client *github.Client) *GithubClient {
 }
 
 func (c *GithubClient) GetRepositories(ctx context.Context, owners []string) ([]HostRepository, error) {
-	opt := &github.RepositoryListOptions{Sort: "updated"}
 	res := []HostRepository{}
 	var lock = sync.RWMutex{}
 	var wg sync.WaitGroup
@@ -69,13 +70,32 @@ func (c *GithubClient) GetRepositories(ctx context.Context, owners []string) ([]
 	for _, owner := range owners {
 		go func(owner string) {
 			defer wg.Done()
-			repos, _, err := c.client.Repositories.List(ctx, owner, opt)
-			if err != nil {
-				errResult = fmt.Errorf("error while fetching repositories on Github: %s", err)
-				return
+			var reposAcc []*github.Repository
+			opt := &github.RepositoryListOptions{
+				Sort: "updated",
+				ListOptions: github.ListOptions{
+					Page:    0,
+					PerPage: pageSize,
+				},
 			}
-			grepos := make([]HostRepository, len(repos))
-			for i, r := range repos {
+
+			for {
+				repos, resp, err := c.client.Repositories.List(ctx, owner, opt)
+				if err != nil {
+					errResult = fmt.Errorf("error while fetching repositories on Github: %s", err)
+					return
+				}
+
+				reposAcc = append(reposAcc, repos...)
+				if resp.NextPage == 0 {
+					break
+				}
+				opt.ListOptions.Page = resp.NextPage
+				time.Sleep(1 * time.Second)
+			}
+
+			grepos := make([]HostRepository, len(reposAcc))
+			for i, r := range reposAcc {
 				grepos[i] = &GithubRepository{*r}
 			}
 			lock.Lock()
