@@ -3,7 +3,9 @@ package upstream
 import (
 	"context"
 	"fmt"
+	"math"
 	"sync"
+	"time"
 
 	"github.com/google/go-github/github"
 )
@@ -83,4 +85,16 @@ func (c *GithubClient) GetRepositories(ctx context.Context, owners []string) ([]
 	}
 	wg.Wait()
 	return res, errResult
+}
+
+func (c *GithubClient) GetRateLimits(ctx context.Context) (string, error) {
+	limits, _, err := c.client.RateLimits(ctx)
+	if err != nil {
+		return "", fmt.Errorf("error while fetching github rate limits: %s", err)
+	}
+	return fmt.Sprintf("[GitHub API Usage (%d of %d) (resets in %d mins)]",
+		(limits.GetCore().Limit - limits.GetCore().Remaining),
+		limits.GetCore().Limit,
+		int(math.Ceil(time.Until(limits.GetCore().Reset.Time).Minutes())),
+	), nil
 }

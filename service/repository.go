@@ -40,3 +40,12 @@ func (r *RepositoryService) GetRepositoriesByOwners(ctx context.Context, owners 
 	}
 	return &res, nil
 }
+
+func (r *RepositoryService) GetRateLimits(ctx context.Context) (string, error) {
+	limits, err := r.client.GetRateLimits(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	return limits, nil
+}

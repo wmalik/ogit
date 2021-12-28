@@ -45,6 +45,10 @@ func (c *MockClient) WithRepositories(repos []MockRepository) *MockClient {
 	return c
 }
 
+func (c *MockClient) GetRateLimits(ctx context.Context) (string, error) {
+	return "mocked rate limits", nil
+}
+
 func (c *MockClient) GetRepositories(ctx context.Context, owners []string) ([]HostRepository, error) {
 	inputOwners := map[string]struct{}{}
 	for _, owner := range owners {
