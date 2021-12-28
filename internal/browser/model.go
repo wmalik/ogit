@@ -23,7 +23,7 @@ func NewModel(orgs []string, cloneDirPath string) model {
 	// Start with an empty list of items
 	m := list.NewModel([]list.Item{}, delegateItemUpdate(cloneDirPath, orgs), 0, 0)
 	m.StatusMessageLifetime = time.Second * 60
-	m.Title = fmt.Sprintf("[Repositories] [%s] [%s]", strings.Join(orgs, " "), cloneDirPath)
+	m.Title = titleBarText(orgs, cloneDirPath, "")
 	m.AdditionalShortHelpKeys = func() []key.Binding {
 		return []key.Binding{
 			key.NewBinding(
@@ -42,4 +42,13 @@ func NewModel(orgs []string, cloneDirPath string) model {
 		orgs:         orgs,
 		cloneDirPath: cloneDirPath,
 	}
+}
+
+func titleBarText(orgs []string, cloneDirPath string, rateLimits string) string {
+	title := fmt.Sprintf("[Repositories] [%s] [%s]", strings.Join(orgs, " "), cloneDirPath)
+	if rateLimits != "" {
+		title = fmt.Sprintf("%s %s", title, rateLimits)
+	}
+
+	return title
 }

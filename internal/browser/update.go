@@ -68,7 +68,13 @@ func delegateItemUpdate(cloneDirPath string, orgs []string) list.DefaultDelegate
 						return updateStatusMsg(statusError(err.Error()))
 					}
 
-					return refreshReposDoneMsg{repos: *repos}
+					limits, err := s.GetRateLimits(context.Background())
+					if err != nil {
+						log.Println(err)
+						return updateStatusMsg(statusError(err.Error()))
+					}
+
+					return refreshReposDoneMsg{repos: *repos, rateLimits: limits}
 				},
 			)
 
@@ -93,8 +99,10 @@ func delegateItemUpdate(cloneDirPath string, orgs []string) list.DefaultDelegate
 				newItems[i] = repoItem
 			}
 
+			m.Title = titleBarText(orgs, cloneDirPath, msg.rateLimits)
 			m.SetItems(newItems)
 			m.StopSpinner()
+
 			return m.NewStatusMessage(statusMessageStyle(fmt.Sprintf("Fetched %d repos", len(newItems))))
 
 		case updateStatusMsg:
