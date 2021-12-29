@@ -80,7 +80,7 @@ func NewGithubClientWithToken(token string) *GithubClient {
 
 func (c *GithubClient) GetRepositories(ctx context.Context, owners []string) ([]HostRepository, error) {
 	res := []HostRepository{}
-	var lock = sync.RWMutex{}
+	var m sync.Map
 
 	var g errgroup.Group
 
@@ -91,10 +91,8 @@ func (c *GithubClient) GetRepositories(ctx context.Context, owners []string) ([]
 				if err != nil {
 					return err
 				}
-				lock.Lock()
-				res = append(res, repos...)
-				lock.Unlock()
 
+				m.Store(owner, repos)
 				return nil
 			}
 		}(owner))
@@ -103,6 +101,11 @@ func (c *GithubClient) GetRepositories(ctx context.Context, owners []string) ([]
 	if err := g.Wait(); err != nil {
 		return nil, err
 	}
+
+	m.Range(func(key, value interface{}) bool {
+		res = append(res, value.([]HostRepository)...)
+		return true
+	})
 
 	return res, nil
 }
