@@ -9,6 +9,7 @@ import (
 
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
+	"golang.org/x/sync/errgroup"
 )
 
 const pageSize = 100
@@ -80,46 +81,51 @@ func NewGithubClientWithToken(token string) *GithubClient {
 func (c *GithubClient) GetRepositories(ctx context.Context, owners []string) ([]HostRepository, error) {
 	res := []HostRepository{}
 	var lock = sync.RWMutex{}
-	var wg sync.WaitGroup
-	var errResult error
-	wg.Add(len(owners))
+
+	var g errgroup.Group
+
 	for _, owner := range owners {
-		go func(owner string) {
-			defer wg.Done()
-			var reposAcc []*github.Repository
-			opt := &github.RepositoryListOptions{
-				Sort: "updated",
-				ListOptions: github.ListOptions{
-					Page:    0,
-					PerPage: pageSize,
-				},
-			}
-
-			for {
-				repos, resp, err := c.client.Repositories.List(ctx, owner, opt)
-				if err != nil {
-					errResult = fmt.Errorf("error while fetching repositories on Github: %s", err)
-					return
+		g.Go(func(owner string) func() error {
+			return func() error {
+				var reposAcc []*github.Repository
+				opt := &github.RepositoryListOptions{
+					Sort: "updated",
+					ListOptions: github.ListOptions{
+						Page:    0,
+						PerPage: pageSize,
+					},
 				}
 
-				reposAcc = append(reposAcc, repos...)
-				if resp.NextPage == 0 {
-					break
-				}
-				opt.ListOptions.Page = resp.NextPage
-			}
+				for {
+					repos, resp, err := c.client.Repositories.List(ctx, owner, opt)
+					if err != nil {
+						return fmt.Errorf("error while fetching repositories on Github: %s", err)
+					}
 
-			grepos := make([]HostRepository, len(reposAcc))
-			for i, r := range reposAcc {
-				grepos[i] = &GithubRepository{*r}
+					reposAcc = append(reposAcc, repos...)
+					if resp.NextPage == 0 {
+						break
+					}
+					opt.ListOptions.Page = resp.NextPage
+				}
+
+				grepos := make([]HostRepository, len(reposAcc))
+				for i, r := range reposAcc {
+					grepos[i] = &GithubRepository{*r}
+				}
+				lock.Lock()
+				res = append(res, grepos...)
+				lock.Unlock()
+				return nil
 			}
-			lock.Lock()
-			res = append(res, grepos...)
-			lock.Unlock()
-		}(owner)
+		}(owner))
 	}
-	wg.Wait()
-	return res, errResult
+
+	if err := g.Wait(); err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }
 
 func (c *GithubClient) GetRateLimits(ctx context.Context) (string, error) {

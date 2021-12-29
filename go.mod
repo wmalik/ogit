@@ -14,4 +14,5 @@ require (
 	github.com/onsi/gomega v1.17.0
 	github.com/tcnksm/go-gitconfig v0.1.2
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
+	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
 )
