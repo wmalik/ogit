@@ -2,6 +2,7 @@ package browser
 
 import (
 	"fmt"
+	"ogit/service"
 	"strings"
 	"time"
 
@@ -17,11 +18,12 @@ type model struct {
 	orgs []string
 	// the path on disk where repositories should be cloned
 	cloneDirPath string
+	rs *service.RepositoryService
 }
 
-func NewModel(orgs []string, cloneDirPath string, githubToken string) model {
+func NewModel(orgs []string, cloneDirPath string, repoService *service.RepositoryService) model {
 	// Start with an empty list of items
-	m := list.NewModel([]list.Item{}, delegateItemUpdate(cloneDirPath, orgs, githubToken), 0, 0)
+	m := list.NewModel([]list.Item{}, delegateItemUpdate(cloneDirPath, orgs, repoService), 0, 0)
 	m.StatusMessageLifetime = time.Second * 60
 	m.Title = titleBarText(orgs, cloneDirPath, "")
 	m.AdditionalShortHelpKeys = func() []key.Binding {
@@ -41,6 +43,7 @@ func NewModel(orgs []string, cloneDirPath string, githubToken string) model {
 		list:         m,
 		orgs:         orgs,
 		cloneDirPath: cloneDirPath,
+		rs:           repoService,
 	}
 }
 
