@@ -2,7 +2,7 @@ package upstream
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"sync"
 
 	"github.com/google/go-github/github"
@@ -57,18 +57,18 @@ func NewGithubClient(client *github.Client) *GithubClient {
 	return &GithubClient{client}
 }
 
-func (c *GithubClient) GetRepositories(ctx context.Context, owners []string) []HostRepository {
-	opt := &github.RepositoryListOptions{}
+func (c *GithubClient) GetRepositories(ctx context.Context, owners []string) ([]HostRepository, error) {
 	res := []HostRepository{}
 	var lock = sync.RWMutex{}
 	var wg sync.WaitGroup
+	var errResult error
 	wg.Add(len(owners))
 	for _, owner := range owners {
 		go func(owner string) {
 			defer wg.Done()
 			repos, _, err := c.client.Repositories.List(ctx, owner, opt)
 			if err != nil {
-				log.Printf("error while fetching repositories on Github: %s", err)
+				errResult = fmt.Errorf("error while fetching repositories on Github: %s", err)
 				return
 			}
 			grepos := make([]HostRepository, len(repos))
@@ -81,5 +81,5 @@ func (c *GithubClient) GetRepositories(ctx context.Context, owners []string) []H
 		}(owner)
 	}
 	wg.Wait()
-	return res
+	return res, errResult
 }

@@ -20,11 +20,15 @@ func NewRepositoryService(client upstream.RepositoryHostClient) *RepositoryServi
 	return &RepositoryService{client}
 }
 
-func (r *RepositoryService) GetRepositoriesByOwners(ctx context.Context, owners []string) Repositories {
-	repositories := r.client.GetRepositories(ctx, owners)
+func (r *RepositoryService) GetRepositoriesByOwners(ctx context.Context, owners []string) (*Repositories, error) {
+	repositories, err := r.client.GetRepositories(ctx, owners)
+	if err != nil {
+		return nil, err
+	}
+
 	res := make(Repositories, len(repositories))
 	for i, repo := range repositories {
 		res[i].Name = repo.GetName()
 	}
-	return res
+	return &res, nil
 }

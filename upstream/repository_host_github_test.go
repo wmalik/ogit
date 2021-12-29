@@ -15,6 +15,7 @@ import (
 var _ = Describe("Github repo", func() {
 	var client *upstream.GithubClient
 	var repositories []upstream.HostRepository
+	var err error
 	BeforeEach(func() {
 		httpClient := mock.NewHTTPClient().
 			Mock("GET", "/users/greatuser/repos",
@@ -40,7 +41,8 @@ var _ = Describe("Github repo", func() {
 				},
 			).Client()
 		client = upstream.NewGithubClient(github.NewClient(httpClient))
-		repositories = client.GetRepositories(context.Background(), []string{"greatuser"})
+		repositories, err = client.GetRepositories(context.Background(), []string{"greatuser"})
+		Expect(err).To(BeNil())
 	})
 	It("Returns the matching repositories", func() {
 		Expect(len(repositories)).To(Equal(2))

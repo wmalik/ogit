@@ -13,18 +13,21 @@ import (
 var _ = Describe("Repository service", func() {
 	Context("When no owner is provided", func() {
 		var repoService *service.RepositoryService
-		var repositories service.Repositories
+		var repositories *service.Repositories
+		var err error
 		BeforeEach(func() {
 			repoService = service.NewRepositoryService(upstream.NewMockClient())
-			repositories = repoService.GetRepositoriesByOwners(context.Background(), []string{})
+			repositories, err = repoService.GetRepositoriesByOwners(context.Background(), []string{})
+			Expect(err).To(BeNil())
 		})
 		It("Returns no repository", func() {
-			Expect(repositories).To(Equal(service.Repositories{}))
+			Expect(*repositories).To(Equal(service.Repositories{}))
 		})
 	})
 	Context("When an owner is provided", func() {
 		var repoService *service.RepositoryService
-		var repositories service.Repositories
+		var repositories *service.Repositories
+		var err error
 		BeforeEach(func() {
 			client := upstream.NewMockClient().WithRepositories([]upstream.MockRepository{
 				{Owner: "wmalik", Name: "ogit"},
@@ -32,12 +35,13 @@ var _ = Describe("Repository service", func() {
 				{Owner: "padawin", Name: "dotfiles"},
 			})
 			repoService = service.NewRepositoryService(client)
-			repositories = repoService.GetRepositoriesByOwners(context.Background(), []string{"wmalik"})
+			repositories, err = repoService.GetRepositoriesByOwners(context.Background(), []string{"wmalik"})
+			Expect(err).To(BeNil())
 		})
 		It("Returns the matching repositories", func() {
-			Expect(len(repositories)).To(Equal(2))
-			Expect(repositories[0].Name).To(Equal("ogit"))
-			Expect(repositories[1].Name).To(Equal("dotfiles"))
+			Expect(len(*repositories)).To(Equal(2))
+			Expect((*repositories)[0].Name).To(Equal("ogit"))
+			Expect((*repositories)[1].Name).To(Equal("dotfiles"))
 		})
 	})
 })
