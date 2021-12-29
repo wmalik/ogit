@@ -87,35 +87,14 @@ func (c *GithubClient) GetRepositories(ctx context.Context, owners []string) ([]
 	for _, owner := range owners {
 		g.Go(func(owner string) func() error {
 			return func() error {
-				var reposAcc []*github.Repository
-				opt := &github.RepositoryListOptions{
-					Sort: "updated",
-					ListOptions: github.ListOptions{
-						Page:    0,
-						PerPage: pageSize,
-					},
-				}
-
-				for {
-					repos, resp, err := c.client.Repositories.List(ctx, owner, opt)
-					if err != nil {
-						return fmt.Errorf("error while fetching repositories on Github: %s", err)
-					}
-
-					reposAcc = append(reposAcc, repos...)
-					if resp.NextPage == 0 {
-						break
-					}
-					opt.ListOptions.Page = resp.NextPage
-				}
-
-				grepos := make([]HostRepository, len(reposAcc))
-				for i, r := range reposAcc {
-					grepos[i] = &GithubRepository{*r}
+				repos, err := c.getRepositoriesForOwner(ctx, owner, 0)
+				if err != nil {
+					return err
 				}
 				lock.Lock()
-				res = append(res, grepos...)
+				res = append(res, repos...)
 				lock.Unlock()
+
 				return nil
 			}
 		}(owner))
@@ -126,6 +105,36 @@ func (c *GithubClient) GetRepositories(ctx context.Context, owners []string) ([]
 	}
 
 	return res, nil
+}
+
+func (c *GithubClient) getRepositoriesForOwner(ctx context.Context, owner string, startPage int) ([]HostRepository, error) {
+	var reposAcc []*github.Repository
+	opt := &github.RepositoryListOptions{
+		Sort: "updated",
+		ListOptions: github.ListOptions{
+			Page:    startPage,
+			PerPage: pageSize,
+		},
+	}
+
+	for {
+		repos, resp, err := c.client.Repositories.List(ctx, owner, opt)
+		if err != nil {
+			return nil, err
+		}
+
+		reposAcc = append(reposAcc, repos...)
+		if resp.NextPage == 0 {
+			break
+		}
+		opt.ListOptions.Page = resp.NextPage
+	}
+
+	repos := make([]HostRepository, len(reposAcc))
+	for i, r := range reposAcc {
+		repos[i] = &GithubRepository{*r}
+	}
+	return repos, nil
 }
 
 func (c *GithubClient) GetRateLimits(ctx context.Context) (string, error) {
