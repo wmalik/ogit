@@ -11,7 +11,6 @@ import (
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/google/go-github/github"
 )
 
 // Update is called whenever the whole model is updated
@@ -47,7 +46,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 // delegateItemUpdate is called whenever a specific item is updated.
 // It is used for example for messages like "clone repo"
-func delegateItemUpdate(cloneDirPath string, orgs []string) list.DefaultDelegate {
+func delegateItemUpdate(cloneDirPath string, orgs []string, githubToken string) list.DefaultDelegate {
 	updateFunc := func(msg tea.Msg, m *list.Model) tea.Cmd {
 		log.Println("Updating Item")
 
@@ -61,7 +60,7 @@ func delegateItemUpdate(cloneDirPath string, orgs []string) list.DefaultDelegate
 			return tea.Batch(
 				m.StartSpinner(),
 				func() tea.Msg {
-					s := service.NewRepositoryService(upstream.NewGithubClient(github.NewClient(nil)))
+					s := service.NewRepositoryService(upstream.NewGithubClientWithToken(githubToken))
 					repos, err := s.GetRepositoriesByOwners(context.Background(), orgs)
 					if err != nil {
 						log.Println(err)

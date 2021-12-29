@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/google/go-github/github"
+	"golang.org/x/oauth2"
 )
 
 const pageSize = 100
@@ -59,6 +60,21 @@ type GithubClient struct {
 
 func NewGithubClient(client *github.Client) *GithubClient {
 	return &GithubClient{client}
+}
+
+func NewGithubClientWithToken(token string) *GithubClient {
+	if token == "" {
+		return &GithubClient{github.NewClient(nil)}
+	}
+
+	return &GithubClient{
+		github.NewClient(
+			oauth2.NewClient(
+				context.Background(),
+				oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token}),
+			),
+		),
+	}
 }
 
 func (c *GithubClient) GetRepositories(ctx context.Context, owners []string) ([]HostRepository, error) {

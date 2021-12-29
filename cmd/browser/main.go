@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"ogit/internal/browser"
 	"ogit/internal/gitconfig"
@@ -21,7 +22,9 @@ func main() {
 	}
 
 	defer f.Close()
-	if err := tea.NewProgram(browser.NewModel(gitConf.Orgs(), gitConf.CloneDirPath())).Start(); err != nil {
+	if err := tea.NewProgram(
+		browser.NewModel(gitConf.Orgs(), gitConf.CloneDirPath(), os.Getenv("GITHUB_TOKEN")),
+	).Start(); err != nil {
 		log.Fatalln(err)
 	}
 }

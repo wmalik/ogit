@@ -19,9 +19,9 @@ type model struct {
 	cloneDirPath string
 }
 
-func NewModel(orgs []string, cloneDirPath string) model {
+func NewModel(orgs []string, cloneDirPath string, githubToken string) model {
 	// Start with an empty list of items
-	m := list.NewModel([]list.Item{}, delegateItemUpdate(cloneDirPath, orgs), 0, 0)
+	m := list.NewModel([]list.Item{}, delegateItemUpdate(cloneDirPath, orgs, githubToken), 0, 0)
 	m.StatusMessageLifetime = time.Second * 60
 	m.Title = titleBarText(orgs, cloneDirPath, "")
 	m.AdditionalShortHelpKeys = func() []key.Binding {
