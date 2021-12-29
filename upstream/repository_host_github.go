@@ -107,7 +107,6 @@ func (c *GithubClient) GetRepositories(ctx context.Context, owners []string) ([]
 					break
 				}
 				opt.ListOptions.Page = resp.NextPage
-				time.Sleep(1 * time.Second)
 			}
 
 			grepos := make([]HostRepository, len(reposAcc))
