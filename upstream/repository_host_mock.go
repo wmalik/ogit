@@ -49,6 +49,10 @@ func (c *MockClient) GetRateLimits(ctx context.Context) (string, error) {
 	return "mocked rate limits", nil
 }
 
+func (c *MockClient) GetAPIUsage(ctx context.Context) (*APIUsage, error) {
+	return &APIUsage{}, nil
+}
+
 func (c *MockClient) GetRepositories(ctx context.Context, owners []string) ([]HostRepository, error) {
 	inputOwners := map[string]struct{}{}
 	for _, owner := range owners {
