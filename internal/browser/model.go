@@ -18,6 +18,9 @@ type model struct {
 	orgs []string
 	// the path on disk where repositories should be cloned
 	cloneDirPath string
+	// A status bar to show useful information e.g. Github API usage
+	bottomStatusBar string
+
 	rs *service.RepositoryService
 }
 
@@ -25,7 +28,7 @@ func NewModel(orgs []string, cloneDirPath string, repoService *service.Repositor
 	// Start with an empty list of items
 	m := list.NewModel([]list.Item{}, delegateItemUpdate(cloneDirPath, orgs, repoService), 0, 0)
 	m.StatusMessageLifetime = time.Second * 60
-	m.Title = titleBarText(orgs, cloneDirPath, "")
+	m.Title = fmt.Sprintf("[Repositories] [%s] [%s]", strings.Join(orgs, " "), cloneDirPath)
 	m.AdditionalShortHelpKeys = func() []key.Binding {
 		return []key.Binding{
 			key.NewBinding(
@@ -40,18 +43,10 @@ func NewModel(orgs []string, cloneDirPath string, repoService *service.Repositor
 	}
 
 	return model{
-		list:         m,
-		orgs:         orgs,
-		cloneDirPath: cloneDirPath,
-		rs:           repoService,
+		list:            m,
+		orgs:            orgs,
+		cloneDirPath:    cloneDirPath,
+		rs:              repoService,
+		bottomStatusBar: "-",
 	}
-}
-
-func titleBarText(orgs []string, cloneDirPath string, rateLimits string) string {
-	title := fmt.Sprintf("[Repositories] [%s] [%s]", strings.Join(orgs, " "), cloneDirPath)
-	if rateLimits != "" {
-		title = fmt.Sprintf("%s %s", title, rateLimits)
-	}
-
-	return title
 }

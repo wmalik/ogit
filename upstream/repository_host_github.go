@@ -2,8 +2,6 @@ package upstream
 
 import (
 	"context"
-	"fmt"
-	"math"
 	"log"
 	"sync"
 	"time"
@@ -173,16 +171,4 @@ func (c *GithubClient) getRepositoriesForOwner(ctx context.Context, owner string
 		repos[i] = &GithubRepository{*r}
 	}
 	return repos, nil
-}
-
-func (c *GithubClient) GetRateLimits(ctx context.Context) (string, error) {
-	limits, _, err := c.client.RateLimits(ctx)
-	if err != nil {
-		return "", fmt.Errorf("error while fetching github rate limits: %s", err)
-	}
-	return fmt.Sprintf("[GitHub API Usage (%d of %d) (resets in %d mins)]",
-		(limits.GetCore().Limit - limits.GetCore().Remaining),
-		limits.GetCore().Limit,
-		int(math.Ceil(time.Until(limits.GetCore().Reset.Time).Minutes())),
-	), nil
 }

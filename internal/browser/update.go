@@ -20,8 +20,21 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		topGap, rightGap, bottomGap, leftGap := appStyle.GetPadding()
+		bottomGap = bottomGap + bottomStatusBarStyle.GetHeight()
 		m.list.SetSize(msg.Width-leftGap-rightGap, msg.Height-topGap-bottomGap)
 
+	case fetchAPIUsageMsg:
+		return m, func() tea.Msg {
+			apiUsage, err := m.rs.GetAPIUsage(context.Background())
+			if err != nil {
+				log.Println(err)
+				return updateBottomStatusBarMsg(statusError(err.Error()))
+			}
+
+			return updateBottomStatusBarMsg(apiUsage.String())
+		}
+	case updateBottomStatusBarMsg:
+		m.bottomStatusBar = string(msg)
 	case tea.KeyMsg:
 		if m.list.FilterState() == list.Filtering {
 			break
@@ -65,13 +78,7 @@ func delegateItemUpdate(cloneDirPath string, orgs []string, rs *service.Reposito
 						return updateStatusMsg(statusError(err.Error()))
 					}
 
-					limits, err := rs.GetRateLimits(context.Background())
-					if err != nil {
-						log.Println(err)
-						return updateStatusMsg(statusError(err.Error()))
-					}
-
-					return refreshReposDoneMsg{repos: *repos, rateLimits: limits}
+					return refreshReposDoneMsg{repos: *repos}
 				},
 			)
 
@@ -96,11 +103,13 @@ func delegateItemUpdate(cloneDirPath string, orgs []string, rs *service.Reposito
 				newItems[i] = repoItem
 			}
 
-			m.Title = titleBarText(orgs, cloneDirPath, msg.rateLimits)
 			m.SetItems(newItems)
 			m.StopSpinner()
 
-			return m.NewStatusMessage(statusMessageStyle(fmt.Sprintf("Fetched %d repos", len(newItems))))
+			return tea.Batch(
+				m.NewStatusMessage(statusMessageStyle(fmt.Sprintf("Fetched %d repos", len(newItems)))),
+				func() tea.Msg { return fetchAPIUsageMsg{} },
+			)
 
 		case updateStatusMsg:
 			m.StopSpinner()

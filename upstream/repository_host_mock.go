@@ -45,10 +45,6 @@ func (c *MockClient) WithRepositories(repos []MockRepository) *MockClient {
 	return c
 }
 
-func (c *MockClient) GetRateLimits(ctx context.Context) (string, error) {
-	return "mocked rate limits", nil
-}
-
 func (c *MockClient) GetAPIUsage(ctx context.Context) (*APIUsage, error) {
 	return &APIUsage{}, nil
 }
