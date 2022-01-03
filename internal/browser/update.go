@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"ogit/internal/gitutils"
+	"ogit/internal/utils"
 	"ogit/service"
 	"path"
 
@@ -22,6 +23,10 @@ func availableKeyBindingsCB() []key.Binding {
 		key.NewBinding(
 			key.WithKeys("c"),
 			key.WithHelp("c", "clone a repository (shallow)"),
+		),
+		key.NewBinding(
+			key.WithKeys("w"),
+			key.WithHelp("w", "browse home page"),
 		),
 	}
 }
@@ -156,6 +161,15 @@ func delegateItemUpdate(cloneDirPath string, orgs []string, rs *service.Reposito
 						return updateStatusMsg(statusMessageStyle(repoOnDisk.String()))
 					},
 				)
+			case "w":
+				return func() tea.Msg {
+					err := utils.OpenURL(selected.BrowserURL())
+					if err != nil {
+						log.Println(err)
+						return updateStatusMsg(statusError(err.Error()))
+					}
+					return nil
+				}
 
 			default:
 				lastCommit, err := selected.LastCommitInfo(cloneDirPath)
