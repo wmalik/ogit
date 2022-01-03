@@ -107,12 +107,13 @@ func delegateItemUpdate(cloneDirPath string, orgs []string, rs *service.Reposito
 
 			for i := range repos {
 				repoItem := repoListItem{
-					title:       repos[i].Owner + "/" + repos[i].Name,
-					owner:       repos[i].Owner,
-					name:        repos[i].Name,
-					description: repos[i].Description,
-					browserURL:  repos[i].BrowserURL,
-					cloneURL:    repos[i].CloneURL,
+					title:                  repos[i].Owner + "/" + repos[i].Name,
+					owner:                  repos[i].Owner,
+					name:                   repos[i].Name,
+					description:            repos[i].Description,
+					browserHomepageURL:     repos[i].BrowserHomepageURL,
+					browserPullRequestsURL: repos[i].BrowserPullRequestsURL,
+					cloneURL:               repos[i].CloneURL,
 				}
 
 				if repoItem.Cloned(cloneDirPath) {
@@ -163,7 +164,7 @@ func delegateItemUpdate(cloneDirPath string, orgs []string, rs *service.Reposito
 				)
 			case "w":
 				return func() tea.Msg {
-					err := utils.OpenURL(selected.BrowserURL())
+					err := utils.OpenURL(selected.BrowserHomepageURL())
 					if err != nil {
 						log.Println(err)
 						return updateStatusMsg(statusError(err.Error()))
