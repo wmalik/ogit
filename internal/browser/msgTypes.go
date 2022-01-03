@@ -11,3 +11,7 @@ type updateStatusMsg string
 
 type fetchAPIUsageMsg struct{}
 type updateBottomStatusBarMsg string
+
+type cloneRepoMsg struct {
+	repo repoListItem
+}

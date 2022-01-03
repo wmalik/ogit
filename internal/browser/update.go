@@ -139,31 +139,37 @@ func delegateItemUpdate(cloneDirPath string, orgs []string, rs *service.Reposito
 			m.StopSpinner()
 			return m.NewStatusMessage(string(msg))
 
+		case cloneRepoMsg:
+			return func() tea.Msg {
+				defer m.StopSpinner()
+				clonePath := path.Join(cloneDirPath, selected.Owner(), selected.Name())
+				if gitutils.Cloned(clonePath) {
+					return updateStatusMsg(statusMessageStyle("Already Cloned"))
+				}
+
+				repoOnDisk, err := gitutils.CloneToDisk(context.Background(),
+					selected.CloneURL(),
+					clonePath,
+					log.Default().Writer(),
+				)
+				if err != nil {
+					return updateStatusMsg(statusError(err.Error()))
+				}
+
+				selected.title = statusMessageStyle(selected.title)
+				selected.description = statusMessageStyle(selected.description)
+
+				m.SetItem(m.Index(), selected)
+				return updateStatusMsg(statusMessageStyle(repoOnDisk.String()))
+			}
+
 		case tea.KeyMsg:
 			switch msg.String() {
 			case "c":
 				return tea.Batch(
 					m.StartSpinner(),
 					func() tea.Msg {
-						clonePath := path.Join(cloneDirPath, selected.Owner(), selected.Name())
-						if gitutils.Cloned(clonePath) {
-							return updateStatusMsg(statusMessageStyle("Already Cloned"))
-						}
-
-						repoOnDisk, err := gitutils.CloneToDisk(context.Background(),
-							selected.CloneURL(),
-							clonePath,
-							log.Default().Writer(),
-						)
-						if err != nil {
-							return updateStatusMsg(statusError(err.Error()))
-						}
-
-						selected.title = statusMessageStyle(selected.title)
-						selected.description = statusMessageStyle(selected.description)
-
-						m.SetItem(m.Index(), selected)
-						return updateStatusMsg(statusMessageStyle(repoOnDisk.String()))
+						return cloneRepoMsg{selected}
 					},
 				)
 			case "w", "p":
