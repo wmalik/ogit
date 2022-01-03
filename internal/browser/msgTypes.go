@@ -8,3 +8,6 @@ type refreshReposDoneMsg struct {
 	rateLimits string
 }
 type updateStatusMsg string
+
+type fetchAPIUsageMsg struct{}
+type updateBottomStatusBarMsg string

@@ -6,7 +6,6 @@ import (
 	"log"
 	"ogit/internal/gitutils"
 	"ogit/service"
-	"ogit/upstream"
 	"path"
 
 	"github.com/charmbracelet/bubbles/list"
@@ -21,8 +20,21 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		topGap, rightGap, bottomGap, leftGap := appStyle.GetPadding()
+		bottomGap = bottomGap + bottomStatusBarStyle.GetHeight()
 		m.list.SetSize(msg.Width-leftGap-rightGap, msg.Height-topGap-bottomGap)
 
+	case fetchAPIUsageMsg:
+		return m, func() tea.Msg {
+			apiUsage, err := m.rs.GetAPIUsage(context.Background())
+			if err != nil {
+				log.Println(err)
+				return updateBottomStatusBarMsg(statusError(err.Error()))
+			}
+
+			return updateBottomStatusBarMsg(apiUsage.String())
+		}
+	case updateBottomStatusBarMsg:
+		m.bottomStatusBar = string(msg)
 	case tea.KeyMsg:
 		if m.list.FilterState() == list.Filtering {
 			break
@@ -46,7 +58,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 // delegateItemUpdate is called whenever a specific item is updated.
 // It is used for example for messages like "clone repo"
-func delegateItemUpdate(cloneDirPath string, orgs []string, githubToken string) list.DefaultDelegate {
+func delegateItemUpdate(cloneDirPath string, orgs []string, rs *service.RepositoryService) list.DefaultDelegate {
 	updateFunc := func(msg tea.Msg, m *list.Model) tea.Cmd {
 		log.Println("Updating Item")
 
@@ -60,20 +72,13 @@ func delegateItemUpdate(cloneDirPath string, orgs []string, githubToken string) 
 			return tea.Batch(
 				m.StartSpinner(),
 				func() tea.Msg {
-					s := service.NewRepositoryService(upstream.NewGithubClientWithToken(githubToken))
-					repos, err := s.GetRepositoriesByOwners(context.Background(), orgs)
+					repos, err := rs.GetRepositoriesByOwners(context.Background(), orgs)
 					if err != nil {
 						log.Println(err)
 						return updateStatusMsg(statusError(err.Error()))
 					}
 
-					limits, err := s.GetRateLimits(context.Background())
-					if err != nil {
-						log.Println(err)
-						return updateStatusMsg(statusError(err.Error()))
-					}
-
-					return refreshReposDoneMsg{repos: *repos, rateLimits: limits}
+					return refreshReposDoneMsg{repos: *repos}
 				},
 			)
 
@@ -98,11 +103,13 @@ func delegateItemUpdate(cloneDirPath string, orgs []string, githubToken string) 
 				newItems[i] = repoItem
 			}
 
-			m.Title = titleBarText(orgs, cloneDirPath, msg.rateLimits)
 			m.SetItems(newItems)
 			m.StopSpinner()
 
-			return m.NewStatusMessage(statusMessageStyle(fmt.Sprintf("Fetched %d repos", len(newItems))))
+			return tea.Batch(
+				m.NewStatusMessage(statusMessageStyle(fmt.Sprintf("Fetched %d repos", len(newItems)))),
+				func() tea.Msg { return fetchAPIUsageMsg{} },
+			)
 
 		case updateStatusMsg:
 			m.StopSpinner()

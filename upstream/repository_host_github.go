@@ -2,8 +2,7 @@ package upstream
 
 import (
 	"context"
-	"fmt"
-	"math"
+	"log"
 	"sync"
 	"time"
 
@@ -16,6 +15,15 @@ const pageSize = 100
 
 type GithubRepository struct {
 	github.Repository
+}
+
+type APIUsage struct {
+	Name          string
+	Authenticated bool
+	User          string
+	Limit         int
+	Remaining     int
+	ResetsAt      time.Time
 }
 
 func (r *GithubRepository) GetName() string {
@@ -110,6 +118,31 @@ func (c *GithubClient) GetRepositories(ctx context.Context, owners []string) ([]
 	return res, nil
 }
 
+func (c *GithubClient) GetAPIUsage(ctx context.Context) (*APIUsage, error) {
+	limits, _, err := c.client.RateLimits(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	usage := &APIUsage{
+		Name:      "GitHub",
+		Limit:     limits.GetCore().Limit,
+		Remaining: limits.GetCore().Remaining,
+		ResetsAt:  limits.GetCore().Reset.Time,
+	}
+
+	user, _, err := c.client.Users.Get(ctx, "")
+	if err != nil {
+		log.Println("Unable to get user information, perhaps a github token is not set?")
+		usage.Authenticated = false
+	} else {
+		usage.Authenticated = true
+		usage.User = user.GetLogin()
+	}
+
+	return usage, nil
+}
+
 func (c *GithubClient) getRepositoriesForOwner(ctx context.Context, owner string, startPage int) ([]HostRepository, error) {
 	var reposAcc []*github.Repository
 	opt := &github.RepositoryListOptions{
@@ -138,16 +171,4 @@ func (c *GithubClient) getRepositoriesForOwner(ctx context.Context, owner string
 		repos[i] = &GithubRepository{*r}
 	}
 	return repos, nil
-}
-
-func (c *GithubClient) GetRateLimits(ctx context.Context) (string, error) {
-	limits, _, err := c.client.RateLimits(ctx)
-	if err != nil {
-		return "", fmt.Errorf("error while fetching github rate limits: %s", err)
-	}
-	return fmt.Sprintf("[GitHub API Usage (%d of %d) (resets in %d mins)]",
-		(limits.GetCore().Limit - limits.GetCore().Remaining),
-		limits.GetCore().Limit,
-		int(math.Ceil(time.Until(limits.GetCore().Reset.Time).Minutes())),
-	), nil
 }
