@@ -28,6 +28,10 @@ func availableKeyBindingsCB() []key.Binding {
 			key.WithKeys("w"),
 			key.WithHelp("w", "browse home page"),
 		),
+		key.NewBinding(
+			key.WithKeys("p"),
+			key.WithHelp("p", "browse pull requests"),
+		),
 	}
 }
 
@@ -162,9 +166,18 @@ func delegateItemUpdate(cloneDirPath string, orgs []string, rs *service.Reposito
 						return updateStatusMsg(statusMessageStyle(repoOnDisk.String()))
 					},
 				)
-			case "w":
+			case "w", "p":
 				return func() tea.Msg {
-					err := utils.OpenURL(selected.BrowserHomepageURL())
+					var u string
+					if msg.String() == "w" {
+						u = selected.BrowserHomepageURL()
+					} else if msg.String() == "p" {
+						u = selected.BrowserPullRequestsURL()
+					}
+					if u == "" {
+						return updateStatusMsg(statusError("URL not available"))
+					}
+					err := utils.OpenURL(u)
 					if err != nil {
 						log.Println(err)
 						return updateStatusMsg(statusError(err.Error()))
