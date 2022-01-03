@@ -163,6 +163,20 @@ func delegateItemUpdate(cloneDirPath string, orgs []string, rs *service.Reposito
 				return updateStatusMsg(statusMessageStyle(repoOnDisk.String()))
 			}
 
+		case openURLMsg:
+			return func() tea.Msg {
+				u := string(msg)
+				if u == "" {
+					return updateStatusMsg(statusError("URL not available"))
+				}
+				err := utils.OpenURL(u)
+				if err != nil {
+					log.Println(err)
+					return updateStatusMsg(statusError(err.Error()))
+				}
+				return nil
+			}
+
 		case tea.KeyMsg:
 			switch msg.String() {
 			case "c":
@@ -172,23 +186,14 @@ func delegateItemUpdate(cloneDirPath string, orgs []string, rs *service.Reposito
 						return cloneRepoMsg{selected}
 					},
 				)
-			case "w", "p":
+			case "w":
 				return func() tea.Msg {
-					var u string
-					if msg.String() == "w" {
-						u = selected.BrowserHomepageURL()
-					} else if msg.String() == "p" {
-						u = selected.BrowserPullRequestsURL()
-					}
-					if u == "" {
-						return updateStatusMsg(statusError("URL not available"))
-					}
-					err := utils.OpenURL(u)
-					if err != nil {
-						log.Println(err)
-						return updateStatusMsg(statusError(err.Error()))
-					}
-					return nil
+					return openURLMsg(selected.BrowserHomepageURL())
+				}
+
+			case "p":
+				return func() tea.Msg {
+					return openURLMsg(selected.BrowserPullRequestsURL())
 				}
 
 			default:
