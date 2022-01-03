@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 )
 
@@ -29,18 +28,7 @@ func NewModel(orgs []string, cloneDirPath string, repoService *service.Repositor
 	m := list.NewModel([]list.Item{}, delegateItemUpdate(cloneDirPath, orgs, repoService), 0, 0)
 	m.StatusMessageLifetime = time.Second * 60
 	m.Title = fmt.Sprintf("[Repositories] [%s] [%s]", strings.Join(orgs, " "), cloneDirPath)
-	m.AdditionalShortHelpKeys = func() []key.Binding {
-		return []key.Binding{
-			key.NewBinding(
-				key.WithKeys("r"),
-				key.WithHelp("r", "refresh list"),
-			),
-			key.NewBinding(
-				key.WithKeys("c"),
-				key.WithHelp("c", "clone a repository (shallow)"),
-			),
-		}
-	}
+	m.AdditionalShortHelpKeys = availableKeyBindingsCB
 
 	return model{
 		list:            m,

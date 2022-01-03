@@ -8,9 +8,23 @@ import (
 	"ogit/service"
 	"path"
 
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 )
+
+func availableKeyBindingsCB() []key.Binding {
+	return []key.Binding{
+		key.NewBinding(
+			key.WithKeys("r"),
+			key.WithHelp("r", "refresh list"),
+		),
+		key.NewBinding(
+			key.WithKeys("c"),
+			key.WithHelp("c", "clone a repository (shallow)"),
+		),
+	}
+}
 
 // Update is called whenever the whole model is updated
 // It is used for example for messages like "refresh list"
