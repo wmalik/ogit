@@ -47,12 +47,20 @@ func (r *GithubRepository) GetDescription() string {
 	return *r.Description
 }
 
-func (r *GithubRepository) GetBrowserURL() string {
+func (r *GithubRepository) GetBrowserHomepageURL() string {
 	if r.GetHTMLURL() == "" {
 		return ""
 	}
 
 	return r.GetHTMLURL()
+}
+
+func (r *GithubRepository) GetBrowserPullRequestsURL() string {
+	if r.GetHTMLURL() == "" {
+		return ""
+	}
+
+	return r.GetHTMLURL() + "/pulls"
 }
 
 func (r *GithubRepository) GetCloneURL() string {

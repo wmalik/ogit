@@ -7,11 +7,12 @@ import (
 )
 
 type Repository struct {
-	Name        string
-	Owner       string
-	Description string
-	BrowserURL  string
-	CloneURL    string
+	Name                   string
+	Owner                  string
+	Description            string
+	BrowserHomepageURL     string
+	BrowserPullRequestsURL string
+	CloneURL               string
 }
 
 type Repositories []Repository
@@ -35,7 +36,8 @@ func (r *RepositoryService) GetRepositoriesByOwners(ctx context.Context, owners 
 		res[i].Owner = repo.GetOwner()
 		res[i].Name = repo.GetName()
 		res[i].Description = repo.GetDescription()
-		res[i].BrowserURL = repo.GetBrowserURL()
+		res[i].BrowserHomepageURL = repo.GetBrowserHomepageURL()
+		res[i].BrowserPullRequestsURL = repo.GetBrowserPullRequestsURL()
 		res[i].CloneURL = repo.GetCloneURL()
 	}
 	return &res, nil

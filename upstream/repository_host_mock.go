@@ -5,11 +5,12 @@ import (
 )
 
 type MockRepository struct {
-	Owner       string
-	Name        string
-	Description string
-	BrowserURL  string
-	CloneURL    string
+	Owner                  string
+	Name                   string
+	Description            string
+	BrowserHomepageURL     string
+	BrowserPullRequestsURL string
+	CloneURL               string
 }
 
 func (r *MockRepository) GetName() string {
@@ -24,8 +25,12 @@ func (r *MockRepository) GetDescription() string {
 	return r.Description
 }
 
-func (r *MockRepository) GetBrowserURL() string {
-	return r.BrowserURL
+func (r *MockRepository) GetBrowserHomepageURL() string {
+	return r.BrowserHomepageURL
+}
+
+func (r *MockRepository) GetBrowserPullRequestsURL() string {
+	return r.BrowserPullRequestsURL
 }
 
 func (r *MockRepository) GetCloneURL() string {

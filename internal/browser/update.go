@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"ogit/internal/gitutils"
+	"ogit/internal/utils"
 	"ogit/service"
 	"path"
 
@@ -22,6 +23,14 @@ func availableKeyBindingsCB() []key.Binding {
 		key.NewBinding(
 			key.WithKeys("c"),
 			key.WithHelp("c", "clone a repository (shallow)"),
+		),
+		key.NewBinding(
+			key.WithKeys("w"),
+			key.WithHelp("w", "browse home page"),
+		),
+		key.NewBinding(
+			key.WithKeys("p"),
+			key.WithHelp("p", "browse pull requests"),
 		),
 	}
 }
@@ -102,12 +111,13 @@ func delegateItemUpdate(cloneDirPath string, orgs []string, rs *service.Reposito
 
 			for i := range repos {
 				repoItem := repoListItem{
-					title:       repos[i].Owner + "/" + repos[i].Name,
-					owner:       repos[i].Owner,
-					name:        repos[i].Name,
-					description: repos[i].Description,
-					browserURL:  repos[i].BrowserURL,
-					cloneURL:    repos[i].CloneURL,
+					title:                  repos[i].Owner + "/" + repos[i].Name,
+					owner:                  repos[i].Owner,
+					name:                   repos[i].Name,
+					description:            repos[i].Description,
+					browserHomepageURL:     repos[i].BrowserHomepageURL,
+					browserPullRequestsURL: repos[i].BrowserPullRequestsURL,
+					cloneURL:               repos[i].CloneURL,
 				}
 
 				if repoItem.Cloned(cloneDirPath) {
@@ -129,33 +139,62 @@ func delegateItemUpdate(cloneDirPath string, orgs []string, rs *service.Reposito
 			m.StopSpinner()
 			return m.NewStatusMessage(string(msg))
 
+		case cloneRepoMsg:
+			return func() tea.Msg {
+				defer m.StopSpinner()
+				clonePath := path.Join(cloneDirPath, selected.Owner(), selected.Name())
+				if gitutils.Cloned(clonePath) {
+					return updateStatusMsg(statusMessageStyle("Already Cloned"))
+				}
+
+				repoOnDisk, err := gitutils.CloneToDisk(context.Background(),
+					selected.CloneURL(),
+					clonePath,
+					log.Default().Writer(),
+				)
+				if err != nil {
+					return updateStatusMsg(statusError(err.Error()))
+				}
+
+				selected.title = statusMessageStyle(selected.title)
+				selected.description = statusMessageStyle(selected.description)
+
+				m.SetItem(m.Index(), selected)
+				return updateStatusMsg(statusMessageStyle(repoOnDisk.String()))
+			}
+
+		case openURLMsg:
+			return func() tea.Msg {
+				u := string(msg)
+				if u == "" {
+					return updateStatusMsg(statusError("URL not available"))
+				}
+				err := utils.OpenURL(u)
+				if err != nil {
+					log.Println(err)
+					return updateStatusMsg(statusError(err.Error()))
+				}
+				return nil
+			}
+
 		case tea.KeyMsg:
 			switch msg.String() {
 			case "c":
 				return tea.Batch(
 					m.StartSpinner(),
 					func() tea.Msg {
-						clonePath := path.Join(cloneDirPath, selected.Owner(), selected.Name())
-						if gitutils.Cloned(clonePath) {
-							return updateStatusMsg(statusMessageStyle("Already Cloned"))
-						}
-
-						repoOnDisk, err := gitutils.CloneToDisk(context.Background(),
-							selected.CloneURL(),
-							clonePath,
-							log.Default().Writer(),
-						)
-						if err != nil {
-							return updateStatusMsg(statusError(err.Error()))
-						}
-
-						selected.title = statusMessageStyle(selected.title)
-						selected.description = statusMessageStyle(selected.description)
-
-						m.SetItem(m.Index(), selected)
-						return updateStatusMsg(statusMessageStyle(repoOnDisk.String()))
+						return cloneRepoMsg{selected}
 					},
 				)
+			case "w":
+				return func() tea.Msg {
+					return openURLMsg(selected.BrowserHomepageURL())
+				}
+
+			case "p":
+				return func() tea.Msg {
+					return openURLMsg(selected.BrowserPullRequestsURL())
+				}
 
 			default:
 				lastCommit, err := selected.LastCommitInfo(cloneDirPath)
