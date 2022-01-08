@@ -41,7 +41,7 @@ var _ = Describe("Github repo", func() {
 				},
 			).Client()
 		client = upstream.NewGithubClient(github.NewClient(httpClient))
-		repositories, err = client.GetRepositories(context.Background(), []string{"greatuser"})
+		repositories, err = client.GetRepositories(context.Background(), []string{"greatuser"}, false)
 		Expect(err).To(BeNil())
 	})
 	It("Returns the matching repositories", func() {

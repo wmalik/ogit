@@ -24,7 +24,7 @@ func main() {
 	}
 	defer f.Close()
 
-	rs := service.NewRepositoryService(upstream.NewGithubClientWithToken(os.Getenv("GITHUB_TOKEN")))
+	rs := service.NewRepositoryService(upstream.NewGithubClientWithToken(os.Getenv("GITHUB_TOKEN")), gitConf.FetchAuthenticatedUserRepos())
 	if err := tea.NewProgram(
 		browser.NewModel(gitConf.Orgs(), gitConf.CloneDirPath(), rs),
 	).Start(); err != nil {

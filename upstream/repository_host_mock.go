@@ -54,7 +54,7 @@ func (c *MockClient) GetAPIUsage(ctx context.Context) (*APIUsage, error) {
 	return &APIUsage{}, nil
 }
 
-func (c *MockClient) GetRepositories(ctx context.Context, owners []string) ([]HostRepository, error) {
+func (c *MockClient) GetRepositories(ctx context.Context, owners []string, fetchAuthenticationUserRepos bool) ([]HostRepository, error) {
 	inputOwners := map[string]struct{}{}
 	for _, owner := range owners {
 		inputOwners[owner] = struct{}{}

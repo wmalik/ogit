@@ -16,7 +16,7 @@ var _ = Describe("Repository service", func() {
 		var repositories *service.Repositories
 		var err error
 		BeforeEach(func() {
-			repoService = service.NewRepositoryService(upstream.NewMockClient())
+			repoService = service.NewRepositoryService(upstream.NewMockClient(), false)
 			repositories, err = repoService.GetRepositoriesByOwners(context.Background(), []string{})
 			Expect(err).To(BeNil())
 		})
@@ -55,7 +55,7 @@ var _ = Describe("Repository service", func() {
 					CloneURL:               "https://github.com/padawin/dotfiles.git",
 				},
 			})
-			repoService = service.NewRepositoryService(client)
+			repoService = service.NewRepositoryService(client, false)
 			repositories, err = repoService.GetRepositoriesByOwners(context.Background(), []string{"wmalik"})
 			Expect(err).To(BeNil())
 		})

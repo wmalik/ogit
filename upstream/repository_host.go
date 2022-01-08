@@ -1,9 +1,11 @@
 package upstream
 
-import "context"
+import (
+	"context"
+)
 
 type RepositoryHostClient interface {
-	GetRepositories(ctx context.Context, owners []string) ([]HostRepository, error)
+	GetRepositories(ctx context.Context, owners []string, fetchAuthenticatedUserRepos bool) ([]HostRepository, error)
 	GetAPIUsage(ctx context.Context) (*APIUsage, error)
 }
 

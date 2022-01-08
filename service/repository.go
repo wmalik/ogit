@@ -18,15 +18,16 @@ type Repository struct {
 type Repositories []Repository
 
 type RepositoryService struct {
-	client upstream.RepositoryHostClient
+	client         upstream.RepositoryHostClient
+	fetchUserRepos bool
 }
 
-func NewRepositoryService(client upstream.RepositoryHostClient) *RepositoryService {
-	return &RepositoryService{client}
+func NewRepositoryService(client upstream.RepositoryHostClient, fetchUserRepos bool) *RepositoryService {
+	return &RepositoryService{client, fetchUserRepos}
 }
 
 func (r *RepositoryService) GetRepositoriesByOwners(ctx context.Context, owners []string) (*Repositories, error) {
-	repositories, err := r.client.GetRepositories(ctx, owners)
+	repositories, err := r.client.GetRepositories(ctx, owners, r.fetchUserRepos)
 	if err != nil {
 		return nil, err
 	}

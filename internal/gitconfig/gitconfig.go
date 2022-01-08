@@ -11,6 +11,8 @@ import (
 type GitConfig struct {
 	orgs         []string
 	cloneDirPath string
+	// whether to fetch repos associated with the authenticated user
+	fetchAuthenticatedUserRepos bool
 }
 
 // readGitConfig loads the value of ogit.orgs from ~/.gitconfig
@@ -26,7 +28,12 @@ func ReadGitConfig() (*GitConfig, error) {
 		return nil, err
 	}
 
-	return &GitConfig{orgs: orgs, cloneDirPath: *cloneDirPath}, nil
+	fetchUserRepos, err := getFetchAuthenticatedUserRepos()
+	if err != nil {
+		return nil, err
+	}
+
+	return &GitConfig{orgs: orgs, cloneDirPath: *cloneDirPath, fetchAuthenticatedUserRepos: fetchUserRepos}, nil
 }
 
 func (c GitConfig) Orgs() []string {
@@ -35,6 +42,10 @@ func (c GitConfig) Orgs() []string {
 
 func (c GitConfig) CloneDirPath() string {
 	return c.cloneDirPath
+}
+
+func (c GitConfig) FetchAuthenticatedUserRepos() bool {
+	return c.fetchAuthenticatedUserRepos
 }
 
 func getOrgs() ([]string, error) {
@@ -64,4 +75,17 @@ func getCloneDirPath() (*string, error) {
 	}
 
 	return &cloneDirPath, nil
+}
+
+func getFetchAuthenticatedUserRepos() (bool, error) {
+	fetchAuthenticatedUserRepos, err := gitconfig.Entire("ogit.fetchAuthenticatedUserRepos")
+	if err != nil {
+		return false, fmt.Errorf("missing ogit.fetchAuthenticatedUserRepos in git config: %s", err)
+	}
+
+	if strings.TrimSpace(fetchAuthenticatedUserRepos) == "false" {
+		return false, nil
+	}
+
+	return true, nil
 }
