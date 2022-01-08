@@ -3,6 +3,7 @@ package upstream
 import (
 	"context"
 	"log"
+	"net/http"
 	"sync"
 	"time"
 
@@ -115,9 +116,21 @@ func (c *GithubClient) GetRepositories(ctx context.Context, owners []string, fet
 	for _, owner := range owners {
 		g.Go(func(owner string) func() error {
 			return func() error {
-				repos, err := c.getRepositoriesForOwner(ctx, owner, 0)
+				var repos []HostRepository
+				var err error
+				repos, err = c.getRepositoriesForOwner(ctx, owner, 0)
 				if err != nil {
-					return err
+					if err.Error() != "not found" {
+						return err
+					}
+
+				}
+
+				if len(repos) == 0 {
+					repos, err = c.getRepositoriesForOrg(ctx, owner, 0)
+					if err != nil {
+						return err
+					}
 				}
 
 				m.Store(owner, repos)
@@ -177,6 +190,38 @@ func (c *GithubClient) getRepositoriesForOwner(ctx context.Context, owner string
 		repos, resp, err := c.client.Repositories.List(ctx, owner, opt)
 		if err != nil {
 			return nil, err
+		}
+
+		reposAcc = append(reposAcc, repos...)
+		if resp.NextPage == 0 {
+			break
+		}
+		opt.ListOptions.Page = resp.NextPage
+	}
+
+	repos := make([]HostRepository, len(reposAcc))
+	for i, r := range reposAcc {
+		repos[i] = &GithubRepository{*r}
+	}
+	return repos, nil
+}
+
+func (c *GithubClient) getRepositoriesForOrg(ctx context.Context, org string, startPage int) ([]HostRepository, error) {
+	var reposAcc []*github.Repository
+	opt := &github.RepositoryListByOrgOptions{
+		ListOptions: github.ListOptions{
+			Page:    startPage,
+			PerPage: pageSize,
+		},
+	}
+
+	for {
+		repos, resp, err := c.client.Repositories.ListByOrg(ctx, org, opt)
+		if err != nil {
+			if resp.StatusCode != http.StatusNotFound {
+				return nil, err
+			}
+			return []HostRepository{}, nil
 		}
 
 		reposAcc = append(reposAcc, repos...)
