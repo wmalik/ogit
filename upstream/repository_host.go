@@ -15,5 +15,6 @@ type HostRepository interface {
 	GetDescription() string
 	GetBrowserHomepageURL() string
 	GetBrowserPullRequestsURL() string
-	GetCloneURL() string
+	GetHTTPSCloneURL() string
+	GetSSHCloneURL() string
 }

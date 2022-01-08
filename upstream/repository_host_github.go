@@ -63,12 +63,20 @@ func (r *GithubRepository) GetBrowserPullRequestsURL() string {
 	return r.GetHTMLURL() + "/pulls"
 }
 
-func (r *GithubRepository) GetCloneURL() string {
+func (r *GithubRepository) GetHTTPSCloneURL() string {
 	if r.Repository.GetCloneURL() == "" {
 		return ""
 	}
 
-	return r.Repository.GetCloneURL()
+	return r.Repository.GetHTMLURL()
+}
+
+func (r *GithubRepository) GetSSHCloneURL() string {
+	if r.Repository.GetSSHURL() == "" {
+		return ""
+	}
+
+	return r.Repository.GetSSHURL()
 }
 
 type GithubClient struct {

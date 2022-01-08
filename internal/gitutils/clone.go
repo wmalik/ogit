@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing/transport/ssh"
 )
 
 var ErrRepoAlreadyCloned error = errors.New("Repository already cloned")
@@ -30,6 +31,39 @@ type Repository struct {
 	LastCommitInfo commitInfo
 }
 
+type GitUtils struct {
+	auth ssh.AuthMethod
+}
+
+func NewGitUtils(useSSHAgent bool, privKeyPath string) (*GitUtils, error) {
+	if privKeyPath != "" {
+		return newGitUtilsWithPrivKey(privKeyPath)
+	}
+
+	if useSSHAgent {
+		return newGitUtilsWithSSHAgent()
+	}
+
+	return &GitUtils{nil}, nil
+}
+
+func newGitUtilsWithSSHAgent() (*GitUtils, error) {
+	auth, err := ssh.NewSSHAgentAuth("git")
+	if err != nil {
+		return nil, err
+	}
+	return &GitUtils{auth}, nil
+}
+
+func newGitUtilsWithPrivKey(privKeyPath string) (*GitUtils, error) {
+	auth, err := ssh.NewPublicKeysFromFile("git", privKeyPath, "")
+	if err != nil {
+		return nil, err
+	}
+
+	return &GitUtils{auth}, nil
+}
+
 func (r *Repository) String() string {
 	return fmt.Sprintf("%s -> %s (%s %s)", r.GitURL, r.Path, r.HeadRef[:6], r.HeadRefName)
 }
@@ -46,17 +80,25 @@ func (r *Repository) LastCommit() string {
 	)
 }
 
-// CloneToDisk clones a repository from gitURL to path (on disk). The progress
-// of the clone operation is streamed to the progress io.Writer
-func CloneToDisk(ctx context.Context, gitURL, path string, progress io.Writer) (*Repository, error) {
+// CloneToDisk clones a repository to a path on disk.
+// If an authentication method has been configured, the repository is cloned
+// using sshURL, otherwise it is cloned using httpsURL.  The progress of the
+// clone operation is streamed to the progress io.Writer
+func (gu *GitUtils) CloneToDisk(ctx context.Context, httpsURL, sshURL, path string, progress io.Writer) (*Repository, error) {
+	cloneURL := sshURL
+	if gu.auth == nil {
+		cloneURL = httpsURL
+	}
+
 	if err := os.MkdirAll(path, os.ModePerm); err != nil {
 		return nil, err
 	}
 	repo, err := git.PlainCloneContext(ctx, path, false,
 		&git.CloneOptions{
-			URL:      gitURL,
+			URL:      cloneURL,
 			Progress: progress,
 			Depth:    1,
+			Auth:     gu.auth,
 		},
 	)
 	if err != nil {
@@ -77,7 +119,7 @@ func CloneToDisk(ctx context.Context, gitURL, path string, progress io.Writer) (
 	}
 
 	return &Repository{
-		GitURL:      gitURL,
+		GitURL:      cloneURL,
 		Path:        path,
 		HeadRefName: head.Name().Short(),
 		HeadRef:     head.Hash().String(),

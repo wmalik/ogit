@@ -13,6 +13,9 @@ type GitConfig struct {
 	cloneDirPath string
 	// whether to fetch repos associated with the authenticated user
 	fetchAuthenticatedUserRepos bool
+	useSSHAgent                 bool
+	// the path to the SSH private key used for git operations e.g. clone
+	privKeyPath string
 }
 
 // readGitConfig loads the value of ogit.orgs from ~/.gitconfig
@@ -33,7 +36,23 @@ func ReadGitConfig() (*GitConfig, error) {
 		return nil, err
 	}
 
-	return &GitConfig{orgs: orgs, cloneDirPath: *cloneDirPath, fetchAuthenticatedUserRepos: fetchUserRepos}, nil
+	useSSHAgent, err := getUseSSHAgent()
+	if err != nil {
+		return nil, err
+	}
+
+	privKeyPath, err := getPrivKeyPath()
+	if err != nil {
+		return nil, err
+	}
+
+	return &GitConfig{
+		orgs:                        orgs,
+		cloneDirPath:                *cloneDirPath,
+		fetchAuthenticatedUserRepos: fetchUserRepos,
+		useSSHAgent:                 useSSHAgent,
+		privKeyPath:                 privKeyPath,
+	}, nil
 }
 
 func (c GitConfig) Orgs() []string {
@@ -46,6 +65,14 @@ func (c GitConfig) CloneDirPath() string {
 
 func (c GitConfig) FetchAuthenticatedUserRepos() bool {
 	return c.fetchAuthenticatedUserRepos
+}
+
+func (c GitConfig) UseSSHAgent() bool {
+	return c.useSSHAgent
+}
+
+func (c GitConfig) PrivKeyPath() string {
+	return c.privKeyPath
 }
 
 func getOrgs() ([]string, error) {
@@ -88,4 +115,26 @@ func getFetchAuthenticatedUserRepos() (bool, error) {
 	}
 
 	return true, nil
+}
+
+func getUseSSHAgent() (bool, error) {
+	useSSHAgent, err := gitconfig.Entire("ogit.useSSHAgent")
+	if err != nil {
+		return false, fmt.Errorf("missing ogit.useSSHAgent in git config: %s", err)
+	}
+
+	if strings.TrimSpace(useSSHAgent) == "false" {
+		return false, nil
+	}
+
+	return true, nil
+}
+
+func getPrivKeyPath() (string, error) {
+	privKeyPath, err := gitconfig.Entire("ogit.privKeyPath")
+	if err != nil {
+		return "", fmt.Errorf("missing ogit.privKeyPath in git config: %s", err)
+	}
+
+	return strings.TrimSpace(privKeyPath), nil
 }

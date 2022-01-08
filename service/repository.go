@@ -12,7 +12,8 @@ type Repository struct {
 	Description            string
 	BrowserHomepageURL     string
 	BrowserPullRequestsURL string
-	CloneURL               string
+	HTTPSCloneURL          string
+	SSHCloneURL            string
 }
 
 type Repositories []Repository
@@ -39,7 +40,8 @@ func (r *RepositoryService) GetRepositoriesByOwners(ctx context.Context, owners 
 		res[i].Description = repo.GetDescription()
 		res[i].BrowserHomepageURL = repo.GetBrowserHomepageURL()
 		res[i].BrowserPullRequestsURL = repo.GetBrowserPullRequestsURL()
-		res[i].CloneURL = repo.GetCloneURL()
+		res[i].HTTPSCloneURL = repo.GetHTTPSCloneURL()
+		res[i].SSHCloneURL = repo.GetSSHCloneURL()
 	}
 	return &res, nil
 }

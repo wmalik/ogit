@@ -81,7 +81,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 // delegateItemUpdate is called whenever a specific item is updated.
 // It is used for example for messages like "clone repo"
-func delegateItemUpdate(cloneDirPath string, orgs []string, rs *service.RepositoryService) list.DefaultDelegate {
+func delegateItemUpdate(cloneDirPath string, orgs []string, rs *service.RepositoryService, gu *gitutils.GitUtils) list.DefaultDelegate {
 	updateFunc := func(msg tea.Msg, m *list.Model) tea.Cmd {
 		log.Println("Updating Item")
 
@@ -117,7 +117,8 @@ func delegateItemUpdate(cloneDirPath string, orgs []string, rs *service.Reposito
 					description:            repos[i].Description,
 					browserHomepageURL:     repos[i].BrowserHomepageURL,
 					browserPullRequestsURL: repos[i].BrowserPullRequestsURL,
-					cloneURL:               repos[i].CloneURL,
+					httpsCloneURL:          repos[i].HTTPSCloneURL,
+					sshCloneURL:            repos[i].SSHCloneURL,
 				}
 
 				if repoItem.Cloned(cloneDirPath) {
@@ -147,8 +148,9 @@ func delegateItemUpdate(cloneDirPath string, orgs []string, rs *service.Reposito
 					return updateStatusMsg(statusMessageStyle("Already Cloned"))
 				}
 
-				repoOnDisk, err := gitutils.CloneToDisk(context.Background(),
-					selected.CloneURL(),
+				repoOnDisk, err := gu.CloneToDisk(context.Background(),
+					selected.HTTPSCloneURL(),
+					selected.SSHCloneURL(),
 					clonePath,
 					log.Default().Writer(),
 				)
