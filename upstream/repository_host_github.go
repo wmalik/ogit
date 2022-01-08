@@ -104,7 +104,7 @@ func NewGithubClientWithToken(token string) *GithubClient {
 }
 
 func (c *GithubClient) GetRepositories(ctx context.Context, owners []string, fetchAuthenticatedUserRepos bool) ([]HostRepository, error) {
-	res := []HostRepository{}
+	res := HostRepositories{}
 	var m sync.Map
 
 	if fetchAuthenticatedUserRepos {
@@ -148,7 +148,7 @@ func (c *GithubClient) GetRepositories(ctx context.Context, owners []string, fet
 		return true
 	})
 
-	return res, nil
+	return res.DeDuplicate(), nil
 }
 
 func (c *GithubClient) GetAPIUsage(ctx context.Context) (*APIUsage, error) {
