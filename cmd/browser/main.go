@@ -19,17 +19,17 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	f, err := tea.LogToFile("/tmp/ogit.log", "debug")
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer f.Close()
-
 	rs := service.NewRepositoryService(upstream.NewGithubClientWithToken(os.Getenv("GITHUB_TOKEN")), gitConf.FetchAuthenticatedUserRepos())
 	gu, err := gitutils.NewGitUtils(gitConf.UseSSHAgent(), gitConf.PrivKeyPath())
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	f, err := tea.LogToFile("/tmp/ogit.log", "debug")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer f.Close()
 
 	if err := tea.NewProgram(
 		browser.NewModel(gitConf.Orgs(), gitConf.CloneDirPath(), rs, gu),
