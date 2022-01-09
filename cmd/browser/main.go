@@ -19,7 +19,6 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	rs := service.NewRepositoryService(upstream.NewGithubClientWithToken(os.Getenv("GITHUB_TOKEN")), gitConf.FetchAuthenticatedUserRepos())
 	gu, err := gitutils.NewGitUtils(gitConf.UseSSHAgent(), gitConf.PrivKeyPath())
 	if err != nil {
 		log.Fatalln(err)
@@ -31,6 +30,10 @@ func main() {
 	}
 	defer f.Close()
 
+	rs := service.NewRepositoryService(
+		upstream.NewGithubClientWithToken(os.Getenv("GITHUB_TOKEN")),
+		gitConf.FetchAuthenticatedUserRepos(),
+	)
 	if err := tea.NewProgram(
 		browser.NewModel(gitConf.Orgs(), gitConf.CloneDirPath(), rs, gu),
 	).Start(); err != nil {
