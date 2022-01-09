@@ -28,55 +28,33 @@ type APIUsage struct {
 }
 
 func (r *GithubRepository) GetName() string {
-	if r.Name == nil {
-		return ""
-	}
-	return *r.Name
+	return r.Repository.GetName()
 }
 
 func (r *GithubRepository) GetOwner() string {
-	if r.Owner == nil {
+	if r.Repository.GetOwner() == nil {
 		return ""
 	}
-	return r.Owner.GetLogin()
+	return r.Repository.GetOwner().GetLogin()
 }
 
 func (r *GithubRepository) GetDescription() string {
-	if r.Description == nil {
-		return ""
-	}
-	return *r.Description
+	return r.Repository.GetDescription()
 }
 
 func (r *GithubRepository) GetBrowserHomepageURL() string {
-	if r.GetHTMLURL() == "" {
-		return ""
-	}
-
 	return r.GetHTMLURL()
 }
 
 func (r *GithubRepository) GetBrowserPullRequestsURL() string {
-	if r.GetHTMLURL() == "" {
-		return ""
-	}
-
 	return r.GetHTMLURL() + "/pulls"
 }
 
 func (r *GithubRepository) GetHTTPSCloneURL() string {
-	if r.Repository.GetCloneURL() == "" {
-		return ""
-	}
-
 	return r.Repository.GetHTMLURL()
 }
 
 func (r *GithubRepository) GetSSHCloneURL() string {
-	if r.Repository.GetSSHURL() == "" {
-		return ""
-	}
-
 	return r.Repository.GetSSHURL()
 }
 
