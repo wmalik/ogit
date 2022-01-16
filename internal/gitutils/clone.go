@@ -32,7 +32,8 @@ type Repository struct {
 }
 
 type GitUtils struct {
-	auth ssh.AuthMethod
+	auth           ssh.AuthMethod
+	cloneOverHTTPS bool
 }
 
 func NewGitUtils(useSSHAgent bool, privKeyPath string) (*GitUtils, error) {
@@ -44,7 +45,7 @@ func NewGitUtils(useSSHAgent bool, privKeyPath string) (*GitUtils, error) {
 		return newGitUtilsWithSSHAgent()
 	}
 
-	return &GitUtils{nil}, nil
+	return &GitUtils{auth: nil, cloneOverHTTPS: true}, nil
 }
 
 func newGitUtilsWithSSHAgent() (*GitUtils, error) {
@@ -52,7 +53,7 @@ func newGitUtilsWithSSHAgent() (*GitUtils, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &GitUtils{auth}, nil
+	return &GitUtils{auth: auth, cloneOverHTTPS: false}, nil
 }
 
 func newGitUtilsWithPrivKey(privKeyPath string) (*GitUtils, error) {
@@ -61,7 +62,7 @@ func newGitUtilsWithPrivKey(privKeyPath string) (*GitUtils, error) {
 		return nil, err
 	}
 
-	return &GitUtils{auth}, nil
+	return &GitUtils{auth: auth, cloneOverHTTPS: false}, nil
 }
 
 func (r *Repository) String() string {
@@ -86,7 +87,7 @@ func (r *Repository) LastCommit() string {
 // clone operation is streamed to the progress io.Writer
 func (gu *GitUtils) CloneToDisk(ctx context.Context, httpsURL, sshURL, path string, progress io.Writer) (*Repository, error) {
 	cloneURL := sshURL
-	if gu.auth == nil {
+	if gu.cloneOverHTTPS {
 		cloneURL = httpsURL
 	}
 
