@@ -41,7 +41,7 @@ func main() {
 		gitConf.FetchAuthenticatedUserRepos(),
 	)
 	if err := tea.NewProgram(
-		browser.NewModel(gitConf.Orgs(), []string{}, gitConf.CloneDirPath(), rs, gu),
+		browser.NewModel(gitConf.Orgs(), gitConf.GitlabGroups(), gitConf.CloneDirPath(), rs, gu),
 	).Start(); err != nil {
 		log.Fatalln(err)
 	}
