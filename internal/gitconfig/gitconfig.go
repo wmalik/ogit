@@ -1,7 +1,6 @@
 package gitconfig
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
@@ -92,13 +91,11 @@ func getOrgs() ([]string, error) {
 		return nil, fmt.Errorf("missing manadatory config in git config: %s", err)
 	}
 
-	if orgsRaw == "" {
-		return nil, errors.New("blank ogit.orgs in git config")
-	}
-
 	orgs := []string{}
 	for _, org := range strings.Split(orgsRaw, ",") {
-		orgs = append(orgs, strings.TrimSpace(org))
+		if org != "" {
+			orgs = append(orgs, strings.TrimSpace(org))
+		}
 	}
 
 	return orgs, err
