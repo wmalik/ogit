@@ -20,21 +20,29 @@ type Repositories []Repository
 
 type RepositoryService struct {
 	client         upstream.RepositoryHostClient
+	gitlabClient   upstream.RepositoryHostClient
 	fetchUserRepos bool
 }
 
-func NewRepositoryService(client upstream.RepositoryHostClient, fetchUserRepos bool) *RepositoryService {
-	return &RepositoryService{client, fetchUserRepos}
+func NewRepositoryService(client upstream.RepositoryHostClient, gitlabClient upstream.RepositoryHostClient, fetchUserRepos bool) *RepositoryService {
+	return &RepositoryService{client, gitlabClient, fetchUserRepos}
 }
 
-func (r *RepositoryService) GetRepositoriesByOwners(ctx context.Context, owners []string) (*Repositories, error) {
+func (r *RepositoryService) GetRepositoriesByOwners(ctx context.Context, owners []string, gitlabOwners []string) (*Repositories, error) {
 	repositories, err := r.client.GetRepositories(ctx, owners, r.fetchUserRepos)
 	if err != nil {
 		return nil, err
 	}
 
-	res := make(Repositories, len(repositories))
-	for i, repo := range repositories {
+	gitlabRepositories, err := r.gitlabClient.GetRepositories(ctx, gitlabOwners, r.fetchUserRepos)
+	if err != nil {
+		return nil, err
+	}
+
+	allRepositories := append(repositories, gitlabRepositories...)
+
+	res := make(Repositories, len(allRepositories))
+	for i, repo := range allRepositories {
 		res[i].Owner = repo.GetOwner()
 		res[i].Name = repo.GetName()
 		res[i].Description = repo.GetDescription()

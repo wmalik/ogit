@@ -30,8 +30,14 @@ func main() {
 	}
 	defer f.Close()
 
+	gitlabClient, err := upstream.NewGitlabClientWithToken(os.Getenv("GITLAB_TOKEN"))
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	rs := service.NewRepositoryService(
 		upstream.NewGithubClientWithToken(os.Getenv("GITHUB_TOKEN")),
+		gitlabClient,
 		gitConf.FetchAuthenticatedUserRepos(),
 	)
 	if err := tea.NewProgram(
