@@ -12,21 +12,23 @@ type Repository struct {
 	Description            string
 	BrowserHomepageURL     string
 	BrowserPullRequestsURL string
-	CloneURL               string
+	HTTPSCloneURL          string
+	SSHCloneURL            string
 }
 
 type Repositories []Repository
 
 type RepositoryService struct {
-	client upstream.RepositoryHostClient
+	client         upstream.RepositoryHostClient
+	fetchUserRepos bool
 }
 
-func NewRepositoryService(client upstream.RepositoryHostClient) *RepositoryService {
-	return &RepositoryService{client}
+func NewRepositoryService(client upstream.RepositoryHostClient, fetchUserRepos bool) *RepositoryService {
+	return &RepositoryService{client, fetchUserRepos}
 }
 
 func (r *RepositoryService) GetRepositoriesByOwners(ctx context.Context, owners []string) (*Repositories, error) {
-	repositories, err := r.client.GetRepositories(ctx, owners)
+	repositories, err := r.client.GetRepositories(ctx, owners, r.fetchUserRepos)
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +40,8 @@ func (r *RepositoryService) GetRepositoriesByOwners(ctx context.Context, owners 
 		res[i].Description = repo.GetDescription()
 		res[i].BrowserHomepageURL = repo.GetBrowserHomepageURL()
 		res[i].BrowserPullRequestsURL = repo.GetBrowserPullRequestsURL()
-		res[i].CloneURL = repo.GetCloneURL()
+		res[i].HTTPSCloneURL = repo.GetHTTPSCloneURL()
+		res[i].SSHCloneURL = repo.GetSSHCloneURL()
 	}
 	return &res, nil
 }

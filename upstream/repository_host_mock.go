@@ -10,7 +10,8 @@ type MockRepository struct {
 	Description            string
 	BrowserHomepageURL     string
 	BrowserPullRequestsURL string
-	CloneURL               string
+	HTTPSCloneURL          string
+	SSHCloneURL            string
 }
 
 func (r *MockRepository) GetName() string {
@@ -33,8 +34,12 @@ func (r *MockRepository) GetBrowserPullRequestsURL() string {
 	return r.BrowserPullRequestsURL
 }
 
-func (r *MockRepository) GetCloneURL() string {
-	return r.CloneURL
+func (r *MockRepository) GetHTTPSCloneURL() string {
+	return r.HTTPSCloneURL
+}
+
+func (r *MockRepository) GetSSHCloneURL() string {
+	return r.SSHCloneURL
 }
 
 type MockClient struct {
@@ -54,7 +59,7 @@ func (c *MockClient) GetAPIUsage(ctx context.Context) (*APIUsage, error) {
 	return &APIUsage{}, nil
 }
 
-func (c *MockClient) GetRepositories(ctx context.Context, owners []string) ([]HostRepository, error) {
+func (c *MockClient) GetRepositories(ctx context.Context, owners []string, fetchAuthenticationUserRepos bool) ([]HostRepository, error) {
 	inputOwners := map[string]struct{}{}
 	for _, owner := range owners {
 		inputOwners[owner] = struct{}{}
