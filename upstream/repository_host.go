@@ -3,12 +3,10 @@ package upstream
 import (
 	"context"
 	"fmt"
-	"time"
 )
 
 type RepositoryHostClient interface {
 	GetRepositories(ctx context.Context, owners []string, fetchAuthenticatedUserRepos bool) ([]HostRepository, error)
-	GetAPIUsage(ctx context.Context) (*APIUsage, error)
 }
 
 type HostRepository interface {
@@ -35,13 +33,4 @@ func (hr HostRepositories) DeDuplicate() []HostRepository {
 	}
 
 	return results
-}
-
-type APIUsage struct {
-	Name          string
-	Authenticated bool
-	User          string
-	Limit         int
-	Remaining     int
-	ResetsAt      time.Time
 }

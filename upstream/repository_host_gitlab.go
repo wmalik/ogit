@@ -3,9 +3,7 @@ package upstream
 import (
 	"context"
 	"log"
-	"strconv"
 	"sync"
-	"time"
 
 	"github.com/xanzy/go-gitlab"
 	"golang.org/x/sync/errgroup"
@@ -115,37 +113,6 @@ func (c *GitlabClient) GetRepositories(ctx context.Context, groups []string, fet
 	})
 
 	return res.DeDuplicate(), nil
-}
-
-func (c *GitlabClient) GetAPIUsage(ctx context.Context) (*APIUsage, error) {
-	user, resp, err := c.client.Users.CurrentUser()
-	if err != nil {
-		return nil, err
-	}
-
-	limit, err := strconv.ParseInt(resp.Header.Get("RateLimit-Limit"), 10, 64)
-	if err != nil {
-		return nil, err
-	}
-
-	remaining, err := strconv.ParseInt(resp.Header.Get("RateLimit-Remaining"), 10, 64)
-	if err != nil {
-		return nil, err
-	}
-
-	resetsAt, err := strconv.ParseInt(resp.Header.Get("RateLimit-Reset"), 10, 64)
-	if err != nil {
-		return nil, err
-	}
-
-	return &APIUsage{
-		Name:          "GitLab",
-		Authenticated: true,
-		User:          user.Username,
-		Limit:         int(limit),
-		Remaining:     int(remaining),
-		ResetsAt:      time.Unix(resetsAt, 0),
-	}, nil
 }
 
 func (c *GitlabClient) getProjectsForAuthUser(ctx context.Context, userID int, username string) ([]HostRepository, error) {

@@ -129,31 +129,6 @@ func (c *GithubClient) GetRepositories(ctx context.Context, owners []string, fet
 	return res.DeDuplicate(), nil
 }
 
-func (c *GithubClient) GetAPIUsage(ctx context.Context) (*APIUsage, error) {
-	limits, _, err := c.client.RateLimits(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	usage := &APIUsage{
-		Name:      "GitHub",
-		Limit:     limits.GetCore().Limit,
-		Remaining: limits.GetCore().Remaining,
-		ResetsAt:  limits.GetCore().Reset.Time,
-	}
-
-	user, _, err := c.client.Users.Get(ctx, "")
-	if err != nil {
-		log.Println("Unable to get user information, perhaps a github token is not set?")
-		usage.Authenticated = false
-	} else {
-		usage.Authenticated = true
-		usage.User = user.GetLogin()
-	}
-
-	return usage, nil
-}
-
 func (c *GithubClient) getRepositoriesForOwner(ctx context.Context, owner string, startPage int) ([]HostRepository, error) {
 	var reposAcc []*github.Repository
 	opt := &github.RepositoryListOptions{
