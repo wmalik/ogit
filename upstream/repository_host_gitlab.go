@@ -12,6 +12,7 @@ import (
 )
 
 const gitlabPageSize = 100
+const gitlabUpstream = "gitlab.com"
 
 type GitlabProject struct {
 	gitlab.Project
@@ -47,11 +48,13 @@ func (r *GitlabProject) GetSSHCloneURL() string {
 }
 
 type GitlabClient struct {
-	client *gitlab.Client
+	client   *gitlab.Client
+	username string // the username of authenticated user
+	userID   int    // the id of authenticated user
 }
 
 func NewGitlabClient(client *gitlab.Client) *GitlabClient {
-	return &GitlabClient{client}
+	return &GitlabClient{client: client, username: "nobody"}
 }
 
 func NewGitlabClientWithToken(token string) (*GitlabClient, error) {
@@ -60,28 +63,29 @@ func NewGitlabClientWithToken(token string) (*GitlabClient, error) {
 		return nil, err
 	}
 
-	return &GitlabClient{client}, nil
+	return &GitlabClient{client: client, username: "nobody"}, nil
 }
 
 func (c *GitlabClient) GetRepositories(ctx context.Context, groups []string, fetchAuthenticatedUserRepos bool) ([]HostRepository, error) {
 	res := HostRepositories{}
 	var m sync.Map
 
+	if err := c.setUserInfo(ctx); err != nil {
+		return nil, err
+	}
+
+	logAuthenticatedUser(gitlabUpstream, c.username)
+
 	var g errgroup.Group
 	if fetchAuthenticatedUserRepos {
 		g.Go(func(ctx context.Context) func() error {
 			return func() error {
-				user, _, err := c.client.Users.CurrentUser()
+				userProjects, err := c.getProjectsForAuthUser(ctx, c.userID, c.username)
 				if err != nil {
 					return err
 				}
 
-				userProjects, err := c.getProjectsForAuthUser(ctx, user.ID, user.Username)
-				if err != nil {
-					return err
-				}
-
-				m.Store(user.Username, userProjects)
+				m.Store(c.username, userProjects)
 				return nil
 			}
 		}(ctx))
@@ -160,6 +164,8 @@ func (c *GitlabClient) getProjectsForAuthUser(ctx context.Context, userID int, u
 			log.Fatal(err)
 		}
 
+		logPaginationStatus(gitlabUpstream, username, len(projects), resp.TotalPages-resp.NextPage-1, resp.Header.Get("RateLimit-Remaining"))
+
 		allProjects = append(allProjects, projects...)
 
 		if resp.NextPage == 0 {
@@ -194,6 +200,8 @@ func (c *GitlabClient) getProjectsForGroup(ctx context.Context, group string) ([
 			return nil, err
 		}
 
+		logPaginationStatus(gitlabUpstream, group, len(groupProjects), resp.TotalPages-resp.NextPage-1, resp.Header.Get("RateLimit-Remaining"))
+
 		allProjects = append(allProjects, groupProjects...)
 
 		if resp.NextPage == 0 {
@@ -208,4 +216,16 @@ func (c *GitlabClient) getProjectsForGroup(ctx context.Context, group string) ([
 		repos[i] = &GitlabProject{*p, group}
 	}
 	return repos, nil
+}
+
+// setUserInfo fetches the authenticated user's information and stores it
+func (c *GitlabClient) setUserInfo(ctx context.Context) error {
+	user, _, err := c.client.Users.CurrentUser()
+	if err != nil {
+		return err
+	}
+
+	c.username = user.Username
+	c.userID = user.ID
+	return nil
 }

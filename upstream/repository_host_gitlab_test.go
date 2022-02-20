@@ -19,6 +19,33 @@ var _ = Describe("Gitlab repo", func() {
 	var err error
 	BeforeEach(func() {
 		httpClient := mock.NewHTTPClient().
+			Mock("GET", "/api/v4/user",
+				func(w http.ResponseWriter, r *http.Request) {
+					_, _ = w.Write([]byte(`
+						{
+						  "id": 1,
+						  "username": "john_smith",
+						  "name": "John Smith",
+						  "state": "active",
+						  "avatar_url": "http://localhost:3000/uploads/user/avatar/1/cd8.jpeg",
+						  "web_url": "http://localhost:3000/john_smith",
+						  "created_at": "2012-05-23T08:00:58Z",
+						  "bio": "",
+						  "bot": false,
+						  "location": null,
+						  "public_email": "john@example.com",
+						  "skype": "",
+						  "linkedin": "",
+						  "twitter": "",
+						  "website_url": "",
+						  "organization": "",
+						  "job_title": "Operations Specialist",
+						  "followers": 1,
+						  "following": 1
+						}`,
+					))
+				},
+			).
 			Mock("GET", "/api/v4/groups/greatuser/projects",
 				func(w http.ResponseWriter, r *http.Request) {
 					_, _ = w.Write([]byte(`

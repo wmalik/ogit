@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"strconv"
 	"sync"
 
 	"github.com/google/go-github/github"
@@ -12,6 +13,7 @@ import (
 )
 
 const pageSize = 100
+const githubUpstream = "github.com"
 
 type GithubRepository struct {
 	github.Repository
@@ -49,25 +51,27 @@ func (r *GithubRepository) GetSSHCloneURL() string {
 }
 
 type GithubClient struct {
-	client *github.Client
+	client   *github.Client
+	username string
 }
 
 func NewGithubClient(client *github.Client) *GithubClient {
-	return &GithubClient{client}
+	return &GithubClient{client: client, username: "nobody"}
 }
 
 func NewGithubClientWithToken(token string) *GithubClient {
 	if token == "" {
-		return &GithubClient{github.NewClient(nil)}
+		return &GithubClient{client: github.NewClient(nil), username: "nobody"}
 	}
 
 	return &GithubClient{
-		github.NewClient(
+		client: github.NewClient(
 			oauth2.NewClient(
 				context.Background(),
 				oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token}),
 			),
 		),
+		username: "nobody",
 	}
 }
 
@@ -78,6 +82,12 @@ func (c *GithubClient) GetRepositories(ctx context.Context, owners []string, fet
 	if fetchAuthenticatedUserRepos {
 		owners = append(owners, "")
 	}
+
+	if err := c.setUserInfo(ctx); err != nil {
+		return nil, err
+	}
+
+	logAuthenticatedUser(githubUpstream, c.username)
 
 	var g errgroup.Group
 
@@ -160,6 +170,8 @@ func (c *GithubClient) getRepositoriesForOwner(ctx context.Context, owner string
 			return nil, err
 		}
 
+		logPaginationStatus(githubUpstream, owner, len(repos), resp.LastPage-resp.NextPage, strconv.Itoa(resp.Remaining))
+
 		reposAcc = append(reposAcc, repos...)
 		if resp.NextPage == 0 {
 			break
@@ -192,6 +204,8 @@ func (c *GithubClient) getRepositoriesForOrg(ctx context.Context, org string, st
 			return []HostRepository{}, nil
 		}
 
+		logPaginationStatus(githubUpstream, org, len(repos), resp.LastPage-resp.NextPage, strconv.Itoa(resp.Remaining))
+
 		reposAcc = append(reposAcc, repos...)
 		if resp.NextPage == 0 {
 			break
@@ -204,4 +218,16 @@ func (c *GithubClient) getRepositoriesForOrg(ctx context.Context, org string, st
 		repos[i] = &GithubRepository{*r}
 	}
 	return repos, nil
+}
+
+// setUserInfo fetches the authenticated user's information and stores it
+func (c *GithubClient) setUserInfo(ctx context.Context) error {
+	user, _, err := c.client.Users.Get(ctx, "")
+	if err != nil {
+		log.Println("Unable to get user information, perhaps a github token is not set?")
+		return err
+	}
+
+	c.username = user.GetLogin()
+	return nil
 }
