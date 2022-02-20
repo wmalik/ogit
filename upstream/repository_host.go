@@ -3,6 +3,7 @@ package upstream
 import (
 	"context"
 	"fmt"
+	"time"
 )
 
 type RepositoryHostClient interface {
@@ -34,4 +35,13 @@ func (hr HostRepositories) DeDuplicate() []HostRepository {
 	}
 
 	return results
+}
+
+type APIUsage struct {
+	Name          string
+	Authenticated bool
+	User          string
+	Limit         int
+	Remaining     int
+	ResetsAt      time.Time
 }

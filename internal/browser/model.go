@@ -24,11 +24,11 @@ type model struct {
 	rs *service.RepositoryService
 }
 
-func NewModel(orgs []string, cloneDirPath string, repoService *service.RepositoryService, gu *gitutils.GitUtils) model {
+func NewModel(orgs []string, gitlabGroups []string, cloneDirPath string, repoService *service.RepositoryService, gu *gitutils.GitUtils) model {
 	// Start with an empty list of items
-	m := list.NewModel([]list.Item{}, delegateItemUpdate(cloneDirPath, orgs, repoService, gu), 0, 0)
+	m := list.NewModel([]list.Item{}, delegateItemUpdate(cloneDirPath, orgs, gitlabGroups, repoService, gu), 0, 0)
 	m.StatusMessageLifetime = time.Second * 60
-	m.Title = fmt.Sprintf("[Repositories] [%s] [%s]", strings.Join(orgs, " "), cloneDirPath)
+	m.Title = fmt.Sprintf("[Repositories] [%s] [%s] [%s]", strings.Join(orgs, " "), strings.Join(gitlabGroups, " "), cloneDirPath)
 	m.AdditionalShortHelpKeys = availableKeyBindingsCB
 
 	return model{

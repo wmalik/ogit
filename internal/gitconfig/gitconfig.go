@@ -1,7 +1,6 @@
 package gitconfig
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
@@ -10,6 +9,7 @@ import (
 
 type GitConfig struct {
 	orgs         []string
+	gitlabGroups []string
 	cloneDirPath string
 	// whether to fetch repos associated with the authenticated user
 	fetchAuthenticatedUserRepos bool
@@ -22,6 +22,11 @@ type GitConfig struct {
 func ReadGitConfig() (*GitConfig, error) {
 
 	orgs, err := getOrgs()
+	if err != nil {
+		return nil, err
+	}
+
+	gitlabGroups, err := getGitlabGroups()
 	if err != nil {
 		return nil, err
 	}
@@ -48,6 +53,7 @@ func ReadGitConfig() (*GitConfig, error) {
 
 	return &GitConfig{
 		orgs:                        orgs,
+		gitlabGroups:                gitlabGroups,
 		cloneDirPath:                *cloneDirPath,
 		fetchAuthenticatedUserRepos: fetchUserRepos,
 		useSSHAgent:                 useSSHAgent,
@@ -57,6 +63,10 @@ func ReadGitConfig() (*GitConfig, error) {
 
 func (c GitConfig) Orgs() []string {
 	return c.orgs
+}
+
+func (c GitConfig) GitlabGroups() []string {
+	return c.gitlabGroups
 }
 
 func (c GitConfig) CloneDirPath() string {
@@ -81,16 +91,30 @@ func getOrgs() ([]string, error) {
 		return nil, fmt.Errorf("missing manadatory config in git config: %s", err)
 	}
 
-	if orgsRaw == "" {
-		return nil, errors.New("blank ogit.orgs in git config")
-	}
-
 	orgs := []string{}
 	for _, org := range strings.Split(orgsRaw, ",") {
-		orgs = append(orgs, strings.TrimSpace(org))
+		if org != "" {
+			orgs = append(orgs, strings.TrimSpace(org))
+		}
 	}
 
 	return orgs, err
+}
+
+func getGitlabGroups() ([]string, error) {
+	gitlabGroupsRaw, err := gitconfig.Entire("ogit.gitlabGroups")
+	if err != nil {
+		return nil, fmt.Errorf("missing manadatory config in git config: %s", err)
+	}
+
+	gitlabGroups := []string{}
+	for _, org := range strings.Split(gitlabGroupsRaw, ",") {
+		if org != "" {
+			gitlabGroups = append(gitlabGroups, strings.TrimSpace(org))
+		}
+	}
+
+	return gitlabGroups, err
 }
 
 func getCloneDirPath() (*string, error) {

@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"sync"
-	"time"
 
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
@@ -16,15 +15,6 @@ const pageSize = 100
 
 type GithubRepository struct {
 	github.Repository
-}
-
-type APIUsage struct {
-	Name          string
-	Authenticated bool
-	User          string
-	Limit         int
-	Remaining     int
-	ResetsAt      time.Time
 }
 
 func (r *GithubRepository) GetName() string {

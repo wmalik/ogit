@@ -81,7 +81,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 // delegateItemUpdate is called whenever a specific item is updated.
 // It is used for example for messages like "clone repo"
-func delegateItemUpdate(cloneDirPath string, orgs []string, rs *service.RepositoryService, gu *gitutils.GitUtils) list.DefaultDelegate {
+func delegateItemUpdate(cloneDirPath string, orgs []string, gitlabGroups []string, rs *service.RepositoryService, gu *gitutils.GitUtils) list.DefaultDelegate {
 	updateFunc := func(msg tea.Msg, m *list.Model) tea.Cmd {
 		log.Println("Updating Item")
 
@@ -95,7 +95,7 @@ func delegateItemUpdate(cloneDirPath string, orgs []string, rs *service.Reposito
 			return tea.Batch(
 				m.StartSpinner(),
 				func() tea.Msg {
-					repos, err := rs.GetRepositoriesByOwners(context.Background(), orgs)
+					repos, err := rs.GetRepositoriesByOwners(context.Background(), orgs, gitlabGroups)
 					if err != nil {
 						log.Println(err)
 						return updateStatusMsg(statusError(err.Error()))
