@@ -53,19 +53,3 @@ func (r *RepositoryService) GetRepositoriesByOwners(ctx context.Context, owners 
 	}
 	return &res, nil
 }
-
-func (r *RepositoryService) GetAPIUsage(ctx context.Context) (*APIUsage, error) {
-	githubUsage, err := r.client.GetAPIUsage(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return &APIUsage{
-		Name:          githubUsage.Name,
-		Authenticated: githubUsage.Authenticated,
-		User:          githubUsage.User,
-		Limit:         githubUsage.Limit,
-		Remaining:     githubUsage.Remaining,
-		ResetsAt:      githubUsage.ResetsAt,
-	}, nil
-}
