@@ -2,9 +2,9 @@ package browser
 
 import (
 	"fmt"
+	"ogit/internal/db"
 	"ogit/internal/gitutils"
 	"ogit/service"
-	"strings"
 	"time"
 
 	"github.com/charmbracelet/bubbles/list"
@@ -24,18 +24,36 @@ type model struct {
 	rs *service.RepositoryService
 }
 
-func NewModel(orgs []string, gitlabGroups []string, cloneDirPath string, repoService *service.RepositoryService, gu *gitutils.GitUtils) model {
-	// Start with an empty list of items
-	m := list.NewModel([]list.Item{}, delegateItemUpdate(cloneDirPath, orgs, gitlabGroups, repoService, gu), 0, 0)
+func NewModelWithItems(repos []db.Repository, cloneDirPath string, gu *gitutils.GitUtils) model {
+
+	items := make([]list.Item, len(repos))
+
+	for i := range repos {
+		repoItem := repoListItem{
+			title:                  repos[i].Title,
+			owner:                  repos[i].Owner,
+			name:                   repos[i].Name,
+			description:            repos[i].Description,
+			browserHomepageURL:     repos[i].BrowserHomepageURL,
+			browserPullRequestsURL: repos[i].BrowserPullRequestsURL,
+			httpsCloneURL:          repos[i].HTTPSCloneURL,
+			sshCloneURL:            repos[i].SSHCloneURL,
+		}
+
+		if repoItem.Cloned(cloneDirPath) {
+			repoItem.title = statusMessageStyle(repoItem.Title())
+			repoItem.description = statusMessageStyle(repoItem.Description())
+		}
+		items[i] = repoItem
+	}
+	m := list.NewModel(items, delegateItemUpdate(cloneDirPath, gu), 0, 0)
 	m.StatusMessageLifetime = time.Second * 60
-	m.Title = fmt.Sprintf("[Repositories] [%s] [%s] [%s]", strings.Join(orgs, " "), strings.Join(gitlabGroups, " "), cloneDirPath)
+	m.Title = fmt.Sprintf("[Repositories] [%s]", cloneDirPath)
 	m.AdditionalShortHelpKeys = availableKeyBindingsCB
 
 	return model{
 		list:            m,
-		orgs:            orgs,
 		cloneDirPath:    cloneDirPath,
-		rs:              repoService,
 		bottomStatusBar: "-",
 	}
 }

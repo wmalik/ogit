@@ -6,7 +6,6 @@ import (
 	"log"
 	"ogit/internal/gitutils"
 	"ogit/internal/utils"
-	"ogit/service"
 	"path"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -16,10 +15,6 @@ import (
 
 func availableKeyBindingsCB() []key.Binding {
 	return []key.Binding{
-		key.NewBinding(
-			key.WithKeys("r"),
-			key.WithHelp("r", "refresh list"),
-		),
 		key.NewBinding(
 			key.WithKeys("c"),
 			key.WithHelp("c", "clone a repository (shallow)"),
@@ -36,7 +31,6 @@ func availableKeyBindingsCB() []key.Binding {
 }
 
 // Update is called whenever the whole model is updated
-// It is used for example for messages like "refresh list"
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	log.Println("Updating UI")
 
@@ -46,16 +40,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		bottomGap = bottomGap + bottomStatusBarStyle.GetHeight()
 		m.list.SetSize(msg.Width-leftGap-rightGap, msg.Height-topGap-bottomGap)
 
-	case fetchAPIUsageMsg:
-		return m, func() tea.Msg {
-			apiUsage, err := m.rs.GetAPIUsage(context.Background())
-			if err != nil {
-				log.Println(err)
-				return updateBottomStatusBarMsg(statusError(err.Error()))
-			}
-
-			return updateBottomStatusBarMsg(apiUsage.String())
-		}
 	case updateBottomStatusBarMsg:
 		m.bottomStatusBar = string(msg)
 	case tea.KeyMsg:
@@ -66,8 +50,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.Type {
 		case tea.KeyRunes:
 			switch string(msg.Runes) {
-			case "r":
-				return m, func() tea.Msg { return refreshReposMsg{} }
 			default:
 				log.Println("Key Pressed", string(msg.Runes))
 			}
@@ -81,7 +63,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 // delegateItemUpdate is called whenever a specific item is updated.
 // It is used for example for messages like "clone repo"
-func delegateItemUpdate(cloneDirPath string, orgs []string, gitlabGroups []string, rs *service.RepositoryService, gu *gitutils.GitUtils) list.DefaultDelegate {
+func delegateItemUpdate(cloneDirPath string, gu *gitutils.GitUtils) list.DefaultDelegate {
 	updateFunc := func(msg tea.Msg, m *list.Model) tea.Cmd {
 		log.Println("Updating Item")
 
@@ -91,51 +73,6 @@ func delegateItemUpdate(cloneDirPath string, orgs []string, gitlabGroups []strin
 		}
 
 		switch msg := msg.(type) {
-		case refreshReposMsg:
-			return tea.Batch(
-				m.StartSpinner(),
-				func() tea.Msg {
-					repos, err := rs.GetRepositoriesByOwners(context.Background(), orgs, gitlabGroups)
-					if err != nil {
-						log.Println(err)
-						return updateStatusMsg(statusError(err.Error()))
-					}
-
-					return refreshReposDoneMsg{repos: *repos}
-				},
-			)
-
-		case refreshReposDoneMsg:
-			repos := msg.repos
-			newItems := make([]list.Item, len(repos))
-
-			for i := range repos {
-				repoItem := repoListItem{
-					title:                  repos[i].Owner + "/" + repos[i].Name,
-					owner:                  repos[i].Owner,
-					name:                   repos[i].Name,
-					description:            repos[i].Description,
-					browserHomepageURL:     repos[i].BrowserHomepageURL,
-					browserPullRequestsURL: repos[i].BrowserPullRequestsURL,
-					httpsCloneURL:          repos[i].HTTPSCloneURL,
-					sshCloneURL:            repos[i].SSHCloneURL,
-				}
-
-				if repoItem.Cloned(cloneDirPath) {
-					repoItem.title = statusMessageStyle(repoItem.Title())
-					repoItem.description = statusMessageStyle(repoItem.Description())
-				}
-				newItems[i] = repoItem
-			}
-
-			m.SetItems(newItems)
-			m.StopSpinner()
-
-			return tea.Batch(
-				m.NewStatusMessage(statusMessageStyle(fmt.Sprintf("Fetched %d repos", len(newItems)))),
-				func() tea.Msg { return fetchAPIUsageMsg{} },
-			)
-
 		case updateStatusMsg:
 			m.StopSpinner()
 			return m.NewStatusMessage(string(msg))
