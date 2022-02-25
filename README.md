@@ -47,9 +47,9 @@ Sync repositories on startup unless -nosync is specified
 ```
 export GITHUB_TOKEN="yourpersonalaccesstoken"
 export GITLAB_TOKEN="yourtokenhere"
-go run cmd/browser/main.go
-go run cmd/browser/main.go --nosync
-go run cmd/browser/main.go --clear
+go run cmd/ogit/main.go
+go run cmd/ogit/main.go --nosync
+go run cmd/ogit/main.go --clear
 ```
 
 
