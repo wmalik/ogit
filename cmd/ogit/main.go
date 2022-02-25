@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"ogit/internal/browser"
+	"ogit/internal/bulkclone"
 
 	"github.com/urfave/cli/v2"
 )
@@ -29,6 +30,30 @@ func main() {
 				log.Fatalln(err)
 			}
 			return nil
+		},
+		Commands: []*cli.Command{
+			{
+				Name:    "clone",
+				Aliases: []string{"c"},
+				Usage:   "Clone repositories in bulk",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:     "org",
+						Usage:    "Organization name",
+						Required: true,
+					},
+					&cli.StringFlag{
+						Name:  "filter",
+						Usage: "filter repositories by name",
+					},
+				},
+				Action: func(c *cli.Context) error {
+					if err := bulkclone.HandleCommandClone(c.String("org"), c.String("filter")); err != nil {
+						log.Fatalln(err)
+					}
+					return nil
+				},
+			},
 		},
 	}
 

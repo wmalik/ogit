@@ -60,6 +60,18 @@ func (d *Database) SelectAllRepositories(ctx context.Context) ([]Repository, err
 	return repos, nil
 }
 
+func (d *Database) SelectRepositories(ctx context.Context, org, filter string) ([]Repository, error) {
+	var repos []Repository
+	if result := d.DB.WithContext(ctx).
+		Where("owner = ?", org).
+		Where("name LIKE ?", "%"+filter+"%").
+		Find(&repos); result.Error != nil {
+		return nil, result.Error
+	}
+
+	return repos, nil
+}
+
 func (d *Database) DeleteAllRepositories(ctx context.Context) error {
 	result := d.DB.WithContext(ctx).Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(&Repository{})
 	if result.Error != nil {
