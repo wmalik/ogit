@@ -8,7 +8,7 @@ before:
     - go generate ./...
 builds:
   - env:
-    main: ./cmd/browser/
+    main: ./cmd/ogit/
 
     targets:
       - linux_amd64

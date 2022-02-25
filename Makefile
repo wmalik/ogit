@@ -14,7 +14,7 @@ test:
 
 .PHONY: run
 run:
-	go run cmd/browser/main.go
+	go run cmd/ogit/main.go
 
 .PHONY: all
 all: build lint test
