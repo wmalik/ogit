@@ -2,7 +2,6 @@ package browser
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"ogit/internal/gitutils"
 	"ogit/internal/utils"
@@ -95,8 +94,7 @@ func delegateItemUpdate(cloneDirPath string, gu *gitutils.GitUtils) list.Default
 					return updateStatusMsg(statusError(err.Error()))
 				}
 
-				selected.title = statusMessageStyle(selected.title)
-				selected.description = statusMessageStyle(selected.description)
+				selected.title = brightStyle.Render(selected.title)
 
 				m.SetItem(m.Index(), selected)
 				return updateStatusMsg(statusMessageStyle(repoOnDisk.String()))
@@ -136,12 +134,7 @@ func delegateItemUpdate(cloneDirPath string, gu *gitutils.GitUtils) list.Default
 				}
 
 			default:
-				lastCommit, err := selected.LastCommitInfo(cloneDirPath)
-				if err != nil {
-					return m.NewStatusMessage(fmt.Sprintf("unable to read last commit: %s", err))
-				}
-
-				return m.NewStatusMessage(lastCommit)
+				return m.NewStatusMessage(selected.description)
 			}
 		}
 
@@ -149,6 +142,10 @@ func delegateItemUpdate(cloneDirPath string, gu *gitutils.GitUtils) list.Default
 	}
 
 	d := list.NewDefaultDelegate()
+	d.Styles.NormalTitle = d.Styles.NormalTitle.Foreground(dimmedColor)
+	d.Styles.SelectedTitle = d.Styles.SelectedTitle.UnsetForeground().Background(selectedColor)
+	d.ShowDescription = false
+	d.SetSpacing(0)
 	d.UpdateFunc = updateFunc
 	return d
 }

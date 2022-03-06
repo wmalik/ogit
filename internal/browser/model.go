@@ -41,15 +41,16 @@ func NewModelWithItems(repos []db.Repository, cloneDirPath string, gu *gitutils.
 		}
 
 		if repoItem.Cloned(cloneDirPath) {
-			repoItem.title = statusMessageStyle(repoItem.Title())
-			repoItem.description = statusMessageStyle(repoItem.Description())
+			repoItem.title = brightStyle.Render(repoItem.title)
 		}
 		items[i] = repoItem
 	}
 	m := list.NewModel(items, delegateItemUpdate(cloneDirPath, gu), 0, 0)
 	m.StatusMessageLifetime = time.Second * 60
-	m.Title = fmt.Sprintf("[Repositories] [%s]", cloneDirPath)
+	m.Title = fmt.Sprintf("[ogit] [%s]", cloneDirPath)
+	m.Styles.Title = titleBarStyle
 	m.AdditionalShortHelpKeys = availableKeyBindingsCB
+	m.SetShowStatusBar(false)
 
 	return model{
 		list:            m,
