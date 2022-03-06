@@ -102,7 +102,7 @@ func getOrgs() ([]string, error) {
 }
 
 func getGitlabGroups() ([]string, error) {
-	gitlabGroupsRaw, err := gitconfig.Entire("ogit.gitlabGroups")
+	gitlabGroupsRaw, err := gitconfig.Entire("ogit.gitlab.orgs")
 	if err != nil {
 		return nil, fmt.Errorf("missing manadatory config in git config: %s", err)
 	}
