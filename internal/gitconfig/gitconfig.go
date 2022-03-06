@@ -86,7 +86,7 @@ func (c GitConfig) PrivKeyPath() string {
 }
 
 func getOrgs() ([]string, error) {
-	orgsRaw, err := gitconfig.Entire("ogit.orgs")
+	orgsRaw, err := gitconfig.Entire("ogit.github.orgs")
 	if err != nil {
 		return nil, fmt.Errorf("missing manadatory config in git config: %s", err)
 	}
