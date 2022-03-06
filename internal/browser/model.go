@@ -42,7 +42,6 @@ func NewModelWithItems(repos []db.Repository, cloneDirPath string, gu *gitutils.
 
 		if repoItem.Cloned(cloneDirPath) {
 			repoItem.title = statusMessageStyle(repoItem.Title())
-			repoItem.description = statusMessageStyle(repoItem.Description())
 		}
 		items[i] = repoItem
 	}

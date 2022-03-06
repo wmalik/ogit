@@ -96,7 +96,6 @@ func delegateItemUpdate(cloneDirPath string, gu *gitutils.GitUtils) list.Default
 				}
 
 				selected.title = statusMessageStyle(selected.title)
-				selected.description = statusMessageStyle(selected.description)
 
 				m.SetItem(m.Index(), selected)
 				return updateStatusMsg(statusMessageStyle(repoOnDisk.String()))
@@ -149,6 +148,7 @@ func delegateItemUpdate(cloneDirPath string, gu *gitutils.GitUtils) list.Default
 	}
 
 	d := list.NewDefaultDelegate()
+	d.ShowDescription = false
 	d.UpdateFunc = updateFunc
 	return d
 }
