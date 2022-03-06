@@ -11,10 +11,6 @@ var bottomStatusBarStyle = lipgloss.NewStyle().Height(1).Faint(true)
 
 var spinnerStyle = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#0000ff", Dark: "#000099"})
 
-var titleStyle = lipgloss.NewStyle().
-	Foreground(lipgloss.Color("#FFFDF5")).
-	Background(lipgloss.Color("#25A065")).
-	Padding(0, 1)
 var brightStyle = lipgloss.NewStyle().
 	Foreground(lipgloss.AdaptiveColor{Light: "#1a1a1a", Dark: "#dddddd"})
 
