@@ -95,7 +95,7 @@ func delegateItemUpdate(cloneDirPath string, gu *gitutils.GitUtils) list.Default
 					return updateStatusMsg(statusError(err.Error()))
 				}
 
-				selected.title = statusMessageStyle(selected.title)
+				selected.title = brightStyle.Render(selected.title)
 
 				m.SetItem(m.Index(), selected)
 				return updateStatusMsg(statusMessageStyle(repoOnDisk.String()))
