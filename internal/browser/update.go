@@ -142,7 +142,10 @@ func delegateItemUpdate(cloneDirPath string, gu *gitutils.GitUtils) list.Default
 	}
 
 	d := list.NewDefaultDelegate()
+	d.Styles.NormalTitle = d.Styles.NormalTitle.Foreground(dimmedColor)
+	d.Styles.SelectedTitle = d.Styles.SelectedTitle.UnsetForeground().Background(selectedColor)
 	d.ShowDescription = false
+	d.SetSpacing(0)
 	d.UpdateFunc = updateFunc
 	return d
 }
