@@ -2,7 +2,6 @@ package browser
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"ogit/internal/gitutils"
 	"ogit/internal/utils"
@@ -135,12 +134,7 @@ func delegateItemUpdate(cloneDirPath string, gu *gitutils.GitUtils) list.Default
 				}
 
 			default:
-				lastCommit, err := selected.LastCommitInfo(cloneDirPath)
-				if err != nil {
-					return m.NewStatusMessage(fmt.Sprintf("unable to read last commit: %s", err))
-				}
-
-				return m.NewStatusMessage(lastCommit)
+				return m.NewStatusMessage(selected.description)
 			}
 		}
 
