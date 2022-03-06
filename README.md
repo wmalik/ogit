@@ -10,21 +10,12 @@ Add a section in your `~/.gitconfig`:
 [ogit]
   storagePath = /home/arthur/ogit
   fetchUserRepos = true
-  useSSHAgent = true
-  privKeyPath =
+  sshAuth = ssh-agent # or sshAuth = /path/to/ssh_private_key
 [ogit "github"]
   orgs = tpope
 [ogit "gitlab"]
   orgs = fdroid
 ```
-
-Please note that `privKeyPath` must be specified in the config, however it
-can be an empty string. Also, `privKeyPath` can not point to a private key with
-passphrase. In that case, do the following:
-
-* add the private key to ssh-agent
-* set `privKeyPath` to an empty string
-* set `useSSAgent = true`
 
 ### Usage
 

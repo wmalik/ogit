@@ -41,12 +41,7 @@ func ReadGitConfig() (*GitConfig, error) {
 		return nil, err
 	}
 
-	useSSHAgent, err := getUseSSHAgent()
-	if err != nil {
-		return nil, err
-	}
-
-	privKeyPath, err := getPrivKeyPath()
+	useSSHAgent, privKeyPath, err := getSSHAuth()
 	if err != nil {
 		return nil, err
 	}
@@ -141,24 +136,15 @@ func getFetchAuthenticatedUserRepos() (bool, error) {
 	return true, nil
 }
 
-func getUseSSHAgent() (bool, error) {
-	useSSHAgent, err := gitconfig.Entire("ogit.useSSHAgent")
+func getSSHAuth() (useSSHAgent bool, privKeyPath string, err error) {
+	sshAuth, err := gitconfig.Entire("ogit.sshAuth")
 	if err != nil {
-		return false, fmt.Errorf("missing ogit.useSSHAgent in git config: %s", err)
+		return false, "", fmt.Errorf("missing ogit.sshAuth in git config: %s", err)
 	}
 
-	if strings.TrimSpace(useSSHAgent) == "false" {
-		return false, nil
+	if strings.TrimSpace(sshAuth) == "ssh-agent" {
+		return true, "", nil
 	}
 
-	return true, nil
-}
-
-func getPrivKeyPath() (string, error) {
-	privKeyPath, err := gitconfig.Entire("ogit.privKeyPath")
-	if err != nil {
-		return "", fmt.Errorf("missing ogit.privKeyPath in git config: %s", err)
-	}
-
-	return strings.TrimSpace(privKeyPath), nil
+	return false, strings.TrimSpace(sshAuth), nil
 }
