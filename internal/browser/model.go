@@ -47,7 +47,8 @@ func NewModelWithItems(repos []db.Repository, cloneDirPath string, gu *gitutils.
 	}
 	m := list.NewModel(items, delegateItemUpdate(cloneDirPath, gu), 0, 0)
 	m.StatusMessageLifetime = time.Second * 60
-	m.Title = fmt.Sprintf("[Repositories] [%s]", cloneDirPath)
+	m.Title = fmt.Sprintf("[ogit] [%s]", cloneDirPath)
+	m.Styles.Title = titleBarStyle
 	m.AdditionalShortHelpKeys = availableKeyBindingsCB
 
 	return model{
