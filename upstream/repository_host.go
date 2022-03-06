@@ -6,7 +6,7 @@ import (
 )
 
 type RepositoryHostClient interface {
-	GetRepositories(ctx context.Context, owners []string, fetchAuthenticatedUserRepos bool) ([]HostRepository, error)
+	GetRepositories(ctx context.Context, owners []string, fetchUserRepos bool) ([]HostRepository, error)
 }
 
 type HostRepository interface {

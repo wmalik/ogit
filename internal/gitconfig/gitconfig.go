@@ -10,10 +10,10 @@ import (
 type GitConfig struct {
 	orgs         []string
 	gitlabGroups []string
-	cloneDirPath string
+	storagePath  string
 	// whether to fetch repos associated with the authenticated user
-	fetchAuthenticatedUserRepos bool
-	useSSHAgent                 bool
+	fetchUserRepos bool
+	useSSHAgent    bool
 	// the path to the SSH private key used for git operations e.g. clone
 	privKeyPath string
 }
@@ -31,7 +31,7 @@ func ReadGitConfig() (*GitConfig, error) {
 		return nil, err
 	}
 
-	cloneDirPath, err := getCloneDirPath()
+	storagePath, err := getStoragePath()
 	if err != nil {
 		return nil, err
 	}
@@ -41,23 +41,18 @@ func ReadGitConfig() (*GitConfig, error) {
 		return nil, err
 	}
 
-	useSSHAgent, err := getUseSSHAgent()
-	if err != nil {
-		return nil, err
-	}
-
-	privKeyPath, err := getPrivKeyPath()
+	useSSHAgent, privKeyPath, err := getSSHAuth()
 	if err != nil {
 		return nil, err
 	}
 
 	return &GitConfig{
-		orgs:                        orgs,
-		gitlabGroups:                gitlabGroups,
-		cloneDirPath:                *cloneDirPath,
-		fetchAuthenticatedUserRepos: fetchUserRepos,
-		useSSHAgent:                 useSSHAgent,
-		privKeyPath:                 privKeyPath,
+		orgs:           orgs,
+		gitlabGroups:   gitlabGroups,
+		storagePath:    *storagePath,
+		fetchUserRepos: fetchUserRepos,
+		useSSHAgent:    useSSHAgent,
+		privKeyPath:    privKeyPath,
 	}, nil
 }
 
@@ -69,12 +64,12 @@ func (c GitConfig) GitlabGroups() []string {
 	return c.gitlabGroups
 }
 
-func (c GitConfig) CloneDirPath() string {
-	return c.cloneDirPath
+func (c GitConfig) StoragePath() string {
+	return c.storagePath
 }
 
-func (c GitConfig) FetchAuthenticatedUserRepos() bool {
-	return c.fetchAuthenticatedUserRepos
+func (c GitConfig) FetchUserRepos() bool {
+	return c.fetchUserRepos
 }
 
 func (c GitConfig) UseSSHAgent() bool {
@@ -86,7 +81,7 @@ func (c GitConfig) PrivKeyPath() string {
 }
 
 func getOrgs() ([]string, error) {
-	orgsRaw, err := gitconfig.Entire("ogit.orgs")
+	orgsRaw, err := gitconfig.Entire("ogit.github.orgs")
 	if err != nil {
 		return nil, fmt.Errorf("missing manadatory config in git config: %s", err)
 	}
@@ -102,7 +97,7 @@ func getOrgs() ([]string, error) {
 }
 
 func getGitlabGroups() ([]string, error) {
-	gitlabGroupsRaw, err := gitconfig.Entire("ogit.gitlabGroups")
+	gitlabGroupsRaw, err := gitconfig.Entire("ogit.gitlab.orgs")
 	if err != nil {
 		return nil, fmt.Errorf("missing manadatory config in git config: %s", err)
 	}
@@ -117,48 +112,39 @@ func getGitlabGroups() ([]string, error) {
 	return gitlabGroups, err
 }
 
-func getCloneDirPath() (*string, error) {
-	var cloneDirPath string
+func getStoragePath() (*string, error) {
+	var storagePath string
 	var err error
-	cloneDirPath, err = gitconfig.Entire("ogit.clonedirpath")
+	storagePath, err = gitconfig.Entire("ogit.storagePath")
 	if err != nil {
-		return nil, fmt.Errorf("missing ogit.clonedirpath in git config: %s", err)
+		return nil, fmt.Errorf("missing ogit.storagePath in git config: %s", err)
 	}
 
-	return &cloneDirPath, nil
+	return &storagePath, nil
 }
 
 func getFetchAuthenticatedUserRepos() (bool, error) {
-	fetchAuthenticatedUserRepos, err := gitconfig.Entire("ogit.fetchAuthenticatedUserRepos")
+	fetchUserRepos, err := gitconfig.Entire("ogit.fetchUserRepos")
 	if err != nil {
-		return false, fmt.Errorf("missing ogit.fetchAuthenticatedUserRepos in git config: %s", err)
+		return false, fmt.Errorf("missing ogit.fetchUserRepos in git config: %s", err)
 	}
 
-	if strings.TrimSpace(fetchAuthenticatedUserRepos) == "false" {
+	if strings.TrimSpace(fetchUserRepos) == "false" {
 		return false, nil
 	}
 
 	return true, nil
 }
 
-func getUseSSHAgent() (bool, error) {
-	useSSHAgent, err := gitconfig.Entire("ogit.useSSHAgent")
+func getSSHAuth() (useSSHAgent bool, privKeyPath string, err error) {
+	sshAuth, err := gitconfig.Entire("ogit.sshAuth")
 	if err != nil {
-		return false, fmt.Errorf("missing ogit.useSSHAgent in git config: %s", err)
+		return false, "", fmt.Errorf("missing ogit.sshAuth in git config: %s", err)
 	}
 
-	if strings.TrimSpace(useSSHAgent) == "false" {
-		return false, nil
+	if strings.TrimSpace(sshAuth) == "ssh-agent" {
+		return true, "", nil
 	}
 
-	return true, nil
-}
-
-func getPrivKeyPath() (string, error) {
-	privKeyPath, err := gitconfig.Entire("ogit.privKeyPath")
-	if err != nil {
-		return "", fmt.Errorf("missing ogit.privKeyPath in git config: %s", err)
-	}
-
-	return strings.TrimSpace(privKeyPath), nil
+	return false, strings.TrimSpace(sshAuth), nil
 }

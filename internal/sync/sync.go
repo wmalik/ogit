@@ -23,7 +23,7 @@ func Sync(ctx context.Context, gitConf *gitconfig.GitConfig) error {
 	rs := service.NewRepositoryService(
 		upstream.NewGithubClientWithToken(os.Getenv("GITHUB_TOKEN")),
 		gitlabClient,
-		gitConf.FetchAuthenticatedUserRepos(),
+		gitConf.FetchUserRepos(),
 	)
 
 	log.Println("Syncing repositories")
@@ -32,7 +32,7 @@ func Sync(ctx context.Context, gitConf *gitconfig.GitConfig) error {
 		log.Fatalln(err)
 	}
 
-	localDB, err := db.NewDB(path.Join(gitConf.CloneDirPath(), "ogit.db"))
+	localDB, err := db.NewDB(path.Join(gitConf.StoragePath(), "ogit.db"))
 	if err != nil {
 		log.Fatalln(err)
 	}

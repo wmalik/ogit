@@ -8,45 +8,43 @@ Add a section in your `~/.gitconfig`:
 
 ```
 [ogit]
-  orgs = padawin, tpope, charmbracelet, wmalik
-  gitlabGroups = fdroid
-  clonedirpath = /absolute/path/on/disk
-  fetchAuthenticatedUserRepos = true
-  useSSHAgent = true
-  privKeyPath =
+  storagePath = /home/arthur/ogit
+  fetchUserRepos = true
+  sshAuth = ssh-agent # or sshAuth = /path/to/ssh_private_key
+[ogit "github"]
+  orgs = tpope
+[ogit "gitlab"]
+  orgs = fdroid
 ```
 
-Please note that `privKeyPath` must be specified in the config, however it
-can be an empty string. Also, `privKeyPath` can not point to a private key with
-passphrase. In that case, do the following:
-
-* add the private key to ssh-agent
-* set `privKeyPath` to an empty string
-* set `useSSAgent = true`
-
-### Run
+### Usage
 
 Generate a GitHub personal access token
 [here](https://github.com/settings/tokens) with full `repo` access.
 
 ```
 $ ogit --help
+NAME:
+   ogit - Organize git repositories
 
-Usage: ogit [OPTION]
-Organize git repositories
-Sync repositories on startup unless -nosync is specified
+USAGE:
+   ogit [global options] command [command options] [arguments...]
 
-  -clear
-    	Clear all local repository metadata
-  -nosync
-    	Disable syncing of repositories metadata at startup
+COMMANDS:
+   clone, c  Clone repositories in bulk
+   help, h   Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --nosync    Disable syncing of repositories metadata at startup (default: false)
+   --clear     Clear all local repository metadata (default: false)
+   --help, -h  show help (default: false)
 ```
 
 #### Examples
 
 ```
-export GITHUB_TOKEN="yourpersonalaccesstoken"
-export GITLAB_TOKEN="yourtokenhere"
+export GITHUB_TOKEN="yourpersonalaccesstoken_with_full_repo_access"
+export GITLAB_TOKEN="yourtoken_with_read_api_scope"
 go run cmd/ogit/main.go
 go run cmd/ogit/main.go --nosync
 go run cmd/ogit/main.go --clear
