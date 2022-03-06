@@ -12,8 +12,8 @@ type GitConfig struct {
 	gitlabGroups []string
 	storagePath  string
 	// whether to fetch repos associated with the authenticated user
-	fetchAuthenticatedUserRepos bool
-	useSSHAgent                 bool
+	fetchUserRepos bool
+	useSSHAgent    bool
 	// the path to the SSH private key used for git operations e.g. clone
 	privKeyPath string
 }
@@ -73,8 +73,8 @@ func (c GitConfig) StoragePath() string {
 	return c.storagePath
 }
 
-func (c GitConfig) FetchAuthenticatedUserRepos() bool {
-	return c.fetchAuthenticatedUserRepos
+func (c GitConfig) FetchUserRepos() bool {
+	return c.fetchUserRepos
 }
 
 func (c GitConfig) UseSSHAgent() bool {
@@ -129,12 +129,12 @@ func getStoragePath() (*string, error) {
 }
 
 func getFetchAuthenticatedUserRepos() (bool, error) {
-	fetchAuthenticatedUserRepos, err := gitconfig.Entire("ogit.fetchAuthenticatedUserRepos")
+	fetchUserRepos, err := gitconfig.Entire("ogit.fetchUserRepos")
 	if err != nil {
-		return false, fmt.Errorf("missing ogit.fetchAuthenticatedUserRepos in git config: %s", err)
+		return false, fmt.Errorf("missing ogit.fetchUserRepos in git config: %s", err)
 	}
 
-	if strings.TrimSpace(fetchAuthenticatedUserRepos) == "false" {
+	if strings.TrimSpace(fetchUserRepos) == "false" {
 		return false, nil
 	}
 

@@ -75,11 +75,11 @@ func NewGithubClientWithToken(token string) *GithubClient {
 	}
 }
 
-func (c *GithubClient) GetRepositories(ctx context.Context, owners []string, fetchAuthenticatedUserRepos bool) ([]HostRepository, error) {
+func (c *GithubClient) GetRepositories(ctx context.Context, owners []string, fetchUserRepos bool) ([]HostRepository, error) {
 	res := HostRepositories{}
 	var m sync.Map
 
-	if fetchAuthenticatedUserRepos {
+	if fetchUserRepos {
 		owners = append(owners, "")
 	}
 

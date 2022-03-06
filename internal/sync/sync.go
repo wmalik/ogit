@@ -23,7 +23,7 @@ func Sync(ctx context.Context, gitConf *gitconfig.GitConfig) error {
 	rs := service.NewRepositoryService(
 		upstream.NewGithubClientWithToken(os.Getenv("GITHUB_TOKEN")),
 		gitlabClient,
-		gitConf.FetchAuthenticatedUserRepos(),
+		gitConf.FetchUserRepos(),
 	)
 
 	log.Println("Syncing repositories")

@@ -64,7 +64,7 @@ func NewGitlabClientWithToken(token string) (*GitlabClient, error) {
 	return &GitlabClient{client: client, username: "nobody"}, nil
 }
 
-func (c *GitlabClient) GetRepositories(ctx context.Context, groups []string, fetchAuthenticatedUserRepos bool) ([]HostRepository, error) {
+func (c *GitlabClient) GetRepositories(ctx context.Context, groups []string, fetchUserRepos bool) ([]HostRepository, error) {
 	res := HostRepositories{}
 	var m sync.Map
 
@@ -75,7 +75,7 @@ func (c *GitlabClient) GetRepositories(ctx context.Context, groups []string, fet
 	logAuthenticatedUser(gitlabUpstream, c.username)
 
 	var g errgroup.Group
-	if fetchAuthenticatedUserRepos {
+	if fetchUserRepos {
 		g.Go(func(ctx context.Context) func() error {
 			return func() error {
 				userProjects, err := c.getProjectsForAuthUser(ctx, c.userID, c.username)
