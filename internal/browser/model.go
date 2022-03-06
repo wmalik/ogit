@@ -50,6 +50,7 @@ func NewModelWithItems(repos []db.Repository, cloneDirPath string, gu *gitutils.
 	m.Title = fmt.Sprintf("[ogit] [%s]", cloneDirPath)
 	m.Styles.Title = titleBarStyle
 	m.AdditionalShortHelpKeys = availableKeyBindingsCB
+	m.SetShowStatusBar(false)
 
 	return model{
 		list:            m,
