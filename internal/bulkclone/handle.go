@@ -19,7 +19,7 @@ func HandleCommandClone(org, filter string) error {
 		return err
 	}
 
-	localDB, err := db.NewDB(path.Join(gitConf.CloneDirPath(), "ogit.db"))
+	localDB, err := db.NewDB(path.Join(gitConf.StoragePath(), "ogit.db"))
 	if err != nil {
 		return err
 	}
@@ -40,7 +40,7 @@ func HandleCommandClone(org, filter string) error {
 
 	cloneFailed := false
 	for _, repo := range repos {
-		clonePath := path.Join(gitConf.CloneDirPath(), repo.Owner, repo.Name)
+		clonePath := path.Join(gitConf.StoragePath(), repo.Owner, repo.Name)
 
 		if gitutils.Cloned(clonePath) {
 			printMsgDimmed(fmt.Sprintf("[already cloned] %s/%s", repo.Owner, repo.Name))

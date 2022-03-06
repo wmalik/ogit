@@ -10,7 +10,7 @@ import (
 type GitConfig struct {
 	orgs         []string
 	gitlabGroups []string
-	cloneDirPath string
+	storagePath  string
 	// whether to fetch repos associated with the authenticated user
 	fetchAuthenticatedUserRepos bool
 	useSSHAgent                 bool
@@ -31,7 +31,7 @@ func ReadGitConfig() (*GitConfig, error) {
 		return nil, err
 	}
 
-	cloneDirPath, err := getCloneDirPath()
+	storagePath, err := getStoragePath()
 	if err != nil {
 		return nil, err
 	}
@@ -52,12 +52,12 @@ func ReadGitConfig() (*GitConfig, error) {
 	}
 
 	return &GitConfig{
-		orgs:                        orgs,
-		gitlabGroups:                gitlabGroups,
-		cloneDirPath:                *cloneDirPath,
-		fetchAuthenticatedUserRepos: fetchUserRepos,
-		useSSHAgent:                 useSSHAgent,
-		privKeyPath:                 privKeyPath,
+		orgs:           orgs,
+		gitlabGroups:   gitlabGroups,
+		storagePath:    *storagePath,
+		fetchUserRepos: fetchUserRepos,
+		useSSHAgent:    useSSHAgent,
+		privKeyPath:    privKeyPath,
 	}, nil
 }
 
@@ -69,8 +69,8 @@ func (c GitConfig) GitlabGroups() []string {
 	return c.gitlabGroups
 }
 
-func (c GitConfig) CloneDirPath() string {
-	return c.cloneDirPath
+func (c GitConfig) StoragePath() string {
+	return c.storagePath
 }
 
 func (c GitConfig) FetchAuthenticatedUserRepos() bool {
@@ -117,15 +117,15 @@ func getGitlabGroups() ([]string, error) {
 	return gitlabGroups, err
 }
 
-func getCloneDirPath() (*string, error) {
-	var cloneDirPath string
+func getStoragePath() (*string, error) {
+	var storagePath string
 	var err error
-	cloneDirPath, err = gitconfig.Entire("ogit.clonedirpath")
+	storagePath, err = gitconfig.Entire("ogit.storagePath")
 	if err != nil {
-		return nil, fmt.Errorf("missing ogit.clonedirpath in git config: %s", err)
+		return nil, fmt.Errorf("missing ogit.storagePath in git config: %s", err)
 	}
 
-	return &cloneDirPath, nil
+	return &storagePath, nil
 }
 
 func getFetchAuthenticatedUserRepos() (bool, error) {

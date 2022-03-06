@@ -32,7 +32,7 @@ func Sync(ctx context.Context, gitConf *gitconfig.GitConfig) error {
 		log.Fatalln(err)
 	}
 
-	localDB, err := db.NewDB(path.Join(gitConf.CloneDirPath(), "ogit.db"))
+	localDB, err := db.NewDB(path.Join(gitConf.StoragePath(), "ogit.db"))
 	if err != nil {
 		log.Fatalln(err)
 	}

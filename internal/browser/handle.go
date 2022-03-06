@@ -20,7 +20,7 @@ func HandleCommandDefault(noSync, clear bool) error {
 		log.Fatalln(err)
 	}
 
-	localDB, err := db.NewDB(path.Join(gitConf.CloneDirPath(), "ogit.db"))
+	localDB, err := db.NewDB(path.Join(gitConf.StoragePath(), "ogit.db"))
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -59,7 +59,7 @@ func HandleCommandDefault(noSync, clear bool) error {
 	defer f.Close()
 
 	if err := tea.NewProgram(
-		NewModelWithItems(repos, gitConf.CloneDirPath(), gu),
+		NewModelWithItems(repos, gitConf.StoragePath(), gu),
 	).Start(); err != nil {
 		log.Fatalln(err)
 	}
