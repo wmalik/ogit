@@ -32,11 +32,11 @@ USAGE:
 
 COMMANDS:
    clone, c  Clone repositories in bulk
+   clear     Clear all local repository metadata (not the repository contents)
    help, h   Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --nosync    Disable syncing of repositories metadata at startup (default: false)
-   --clear     Clear all local repository metadata (default: false)
+   --cached    Disable syncing of repositories metadata at startup (default: false)
    --help, -h  show help (default: false)
 ```
 
