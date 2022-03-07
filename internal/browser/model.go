@@ -47,7 +47,7 @@ func toItems(repos []db.Repository, storagePath string) []list.Item {
 	items := make([]list.Item, len(repos))
 
 	for i := range repos {
-		repoItem := repoListItem{
+		repoItem := repoItem{
 			title:                  repos[i].Title,
 			owner:                  repos[i].Owner,
 			name:                   repos[i].Name,
@@ -71,12 +71,12 @@ func toItems(repos []db.Repository, storagePath string) []list.Item {
 func sortItemsCloned(items []list.Item) []list.Item {
 	// sort items by whether they have been cloned
 	sort.Slice(items, func(i, j int) bool {
-		return items[i].(repoListItem).Cloned()
+		return items[i].(repoItem).Cloned()
 	})
 
 	// sort items in lexical order
 	sort.Slice(items, func(i, j int) bool {
-		return items[i].(repoListItem).Title() < items[j].(repoListItem).Title()
+		return items[i].(repoItem).Title() < items[j].(repoItem).Title()
 	})
 	return items
 }

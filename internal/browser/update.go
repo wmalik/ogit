@@ -65,7 +65,7 @@ func delegateItemUpdate(storagePath string, gu *gitutils.GitUtils) list.DefaultD
 	updateFunc := func(msg tea.Msg, m *list.Model) tea.Cmd {
 		log.Println("Updating Item")
 
-		selected, ok := m.SelectedItem().(repoListItem)
+		selected, ok := m.SelectedItem().(repoItem)
 		if !ok && len(m.VisibleItems()) > 0 {
 			return m.NewStatusMessage("unknown item type")
 		}
