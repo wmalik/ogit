@@ -5,6 +5,7 @@ import (
 	"ogit/internal/db"
 	"ogit/internal/gitutils"
 	"ogit/service"
+	"sort"
 	"time"
 
 	"github.com/charmbracelet/bubbles/list"
@@ -26,6 +27,22 @@ type model struct {
 
 func NewModelWithItems(repos []db.Repository, cloneDirPath string, gu *gitutils.GitUtils) model {
 
+	listItems := sortItemsCloned(toItems(repos, cloneDirPath), cloneDirPath)
+	m := list.NewModel(listItems, delegateItemUpdate(cloneDirPath, gu), 0, 0)
+	m.StatusMessageLifetime = time.Second * 60
+	m.Title = fmt.Sprintf("[ogit] [%s]", cloneDirPath)
+	m.Styles.Title = titleBarStyle
+	m.AdditionalShortHelpKeys = availableKeyBindingsCB
+	m.SetShowStatusBar(false)
+
+	return model{
+		list:            m,
+		cloneDirPath:    cloneDirPath,
+		bottomStatusBar: "-",
+	}
+}
+
+func toItems(repos []db.Repository, cloneDirPath string) []list.Item {
 	items := make([]list.Item, len(repos))
 
 	for i := range repos {
@@ -45,16 +62,19 @@ func NewModelWithItems(repos []db.Repository, cloneDirPath string, gu *gitutils.
 		}
 		items[i] = repoItem
 	}
-	m := list.NewModel(items, delegateItemUpdate(cloneDirPath, gu), 0, 0)
-	m.StatusMessageLifetime = time.Second * 60
-	m.Title = fmt.Sprintf("[ogit] [%s]", cloneDirPath)
-	m.Styles.Title = titleBarStyle
-	m.AdditionalShortHelpKeys = availableKeyBindingsCB
-	m.SetShowStatusBar(false)
 
-	return model{
-		list:            m,
-		cloneDirPath:    cloneDirPath,
-		bottomStatusBar: "-",
-	}
+	return items
+}
+
+func sortItemsCloned(items []list.Item, cloneDirPath string) []list.Item {
+	// sort items by whether they have been cloned
+	sort.Slice(items, func(i, j int) bool {
+		return items[i].(repoListItem).Cloned(cloneDirPath)
+	})
+
+	// sort items in lexical order
+	sort.Slice(items, func(i, j int) bool {
+		return items[i].(repoListItem).Title() < items[j].(repoListItem).Title()
+	})
+	return items
 }
