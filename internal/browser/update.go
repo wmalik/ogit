@@ -82,7 +82,7 @@ func delegateItemUpdate(storagePath string, gu *gitutils.GitUtils) list.DefaultD
 					return updateStatusMsg(statusMessageStyle("Already Cloned"))
 				}
 
-				repoOnDisk, err := gu.CloneToDisk(context.Background(),
+				repoString, err := gu.CloneToDisk(context.Background(),
 					selected.HTTPSCloneURL(),
 					selected.SSHCloneURL(),
 					selected.StoragePath(),
@@ -95,7 +95,7 @@ func delegateItemUpdate(storagePath string, gu *gitutils.GitUtils) list.DefaultD
 				selected.title = brightStyle.Render(selected.title)
 
 				m.SetItem(m.Index(), selected)
-				return updateStatusMsg(statusMessageStyle(repoOnDisk.String()))
+				return updateStatusMsg(statusMessageStyle(repoString))
 			}
 
 		case openURLMsg:
