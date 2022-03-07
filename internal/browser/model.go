@@ -38,7 +38,7 @@ func NewModelWithItems(repos []db.Repository, storagePath string, gu *gitutils.G
 
 	return model{
 		list:            m,
-		storagePath:    storagePath,
+		storagePath:     storagePath,
 		bottomStatusBar: "-",
 	}
 }
