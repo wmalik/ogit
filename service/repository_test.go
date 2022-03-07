@@ -6,8 +6,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"ogit/service"
-	"ogit/upstream"
+	"github.com/wmalik/ogit/service"
+	"github.com/wmalik/ogit/upstream"
 )
 
 var _ = Describe("Repository service", func() {

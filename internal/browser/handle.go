@@ -3,11 +3,12 @@ package browser
 import (
 	"context"
 	"log"
-	"ogit/internal/db"
-	"ogit/internal/gitconfig"
-	"ogit/internal/gitutils"
-	"ogit/internal/sync"
 	"path"
+
+	"github.com/wmalik/ogit/internal/db"
+	"github.com/wmalik/ogit/internal/gitconfig"
+	"github.com/wmalik/ogit/internal/gitutils"
+	"github.com/wmalik/ogit/internal/sync"
 
 	tea "github.com/charmbracelet/bubbletea"
 )

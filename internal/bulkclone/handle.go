@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"ogit/internal/db"
-	"ogit/internal/gitconfig"
-	"ogit/internal/gitutils"
 	"path"
+
+	"github.com/wmalik/ogit/internal/db"
+	"github.com/wmalik/ogit/internal/gitconfig"
+	"github.com/wmalik/ogit/internal/gitutils"
 
 	"github.com/charmbracelet/lipgloss"
 )

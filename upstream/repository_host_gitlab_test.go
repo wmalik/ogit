@@ -8,8 +8,8 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/xanzy/go-gitlab"
 
-	"ogit/mock"
-	"ogit/upstream"
+	"github.com/wmalik/ogit/mock"
+	"github.com/wmalik/ogit/upstream"
 )
 
 var _ = Describe("Gitlab repo", func() {

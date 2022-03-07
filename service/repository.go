@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"ogit/upstream"
+	"github.com/wmalik/ogit/upstream"
 )
 
 type Repository struct {

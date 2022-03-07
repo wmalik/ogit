@@ -4,9 +4,10 @@ import (
 	"context"
 	"io"
 	"log"
-	"ogit/internal/db"
-	"ogit/internal/gitutils"
 	"path"
+
+	"github.com/wmalik/ogit/internal/db"
+	"github.com/wmalik/ogit/internal/gitutils"
 )
 
 type repoItem struct {
