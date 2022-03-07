@@ -40,16 +40,3 @@ type cloneService interface {
 func (i repoItem) Clone(ctx context.Context, cloner cloneService) (string, error) {
 	return cloner.CloneToDisk(ctx, i.Repository.HTTPSCloneURL, i.Repository.SSHCloneURL, i.StoragePath(), log.Default().Writer())
 }
-
-func (i repoItem) LastCommitInfo() (string, error) {
-	if i.Cloned() {
-		repo, err := gitutils.ReadRepository(i.StoragePath())
-		if err != nil {
-			return "", err
-		}
-
-		return repo.LastCommit(), nil
-	}
-
-	return "", nil
-}
