@@ -19,6 +19,10 @@ type GithubRepository struct {
 	github.Repository
 }
 
+func (r *GithubRepository) GetProvider() string {
+	return "github"
+}
+
 func (r *GithubRepository) GetName() string {
 	return r.Repository.GetName()
 }

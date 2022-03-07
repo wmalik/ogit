@@ -5,6 +5,7 @@ import (
 )
 
 type MockRepository struct {
+	Provider               string
 	Owner                  string
 	Name                   string
 	Description            string
@@ -12,6 +13,10 @@ type MockRepository struct {
 	BrowserPullRequestsURL string
 	HTTPSCloneURL          string
 	SSHCloneURL            string
+}
+
+func (r *MockRepository) GetProvider() string {
+	return r.Provider
 }
 
 func (r *MockRepository) GetName() string {

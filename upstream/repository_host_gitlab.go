@@ -17,6 +17,10 @@ type GitlabProject struct {
 	Username string
 }
 
+func (r *GitlabProject) GetProvider() string {
+	return "gitlab"
+}
+
 func (r *GitlabProject) GetName() string {
 	return r.Project.Path
 }

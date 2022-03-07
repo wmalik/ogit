@@ -32,6 +32,7 @@ var _ = Describe("Repository service", func() {
 		BeforeEach(func() {
 			gitlabClient := upstream.NewMockClient().WithRepositories([]upstream.MockRepository{
 				{
+					Provider:               "gitlab",
 					Owner:                  "wmalik",
 					Name:                   "ogit",
 					Description:            "TUI for browsing GitHub and GitLab orgnizations",
@@ -41,6 +42,7 @@ var _ = Describe("Repository service", func() {
 					SSHCloneURL:            "git@gitlab.com/wmalik/ogit.git",
 				},
 				{
+					Provider:               "gitlab",
 					Owner:                  "wmalik",
 					Name:                   "dotfiles",
 					Description:            "wmalik's config files",
@@ -50,6 +52,7 @@ var _ = Describe("Repository service", func() {
 					SSHCloneURL:            "git@gitlab.com/wmalik/dotfiles.git",
 				},
 				{
+					Provider:               "gitlab",
 					Owner:                  "padawin",
 					Name:                   "dotfiles",
 					Description:            "padawin's config files",
@@ -61,6 +64,7 @@ var _ = Describe("Repository service", func() {
 			})
 			client := upstream.NewMockClient().WithRepositories([]upstream.MockRepository{
 				{
+					Provider:               "github",
 					Owner:                  "wmalik",
 					Name:                   "ogit",
 					Description:            "TUI for browsing GitHub and GitLab orgnizations",
@@ -70,6 +74,7 @@ var _ = Describe("Repository service", func() {
 					SSHCloneURL:            "git@github.com/wmalik/ogit.git",
 				},
 				{
+					Provider:               "github",
 					Owner:                  "wmalik",
 					Name:                   "dotfiles",
 					Description:            "wmalik's config files",
@@ -79,6 +84,7 @@ var _ = Describe("Repository service", func() {
 					SSHCloneURL:            "git@github.com/wmalik/dotfiles.git",
 				},
 				{
+					Provider:               "github",
 					Owner:                  "padawin",
 					Name:                   "dotfiles",
 					Description:            "padawin's config files",
@@ -94,24 +100,28 @@ var _ = Describe("Repository service", func() {
 		})
 		It("Returns the matching repositories", func() {
 			Expect(len(*repositories)).To(Equal(4))
+			Expect((*repositories)[0].Provider).To(Equal("github"))
 			Expect((*repositories)[0].Name).To(Equal("ogit"))
 			Expect((*repositories)[0].Description).To(Equal("TUI for browsing GitHub and GitLab orgnizations"))
 			Expect((*repositories)[0].BrowserHomepageURL).To(Equal("https://github.com/wmalik/ogit"))
 			Expect((*repositories)[0].BrowserPullRequestsURL).To(Equal("https://github.com/wmalik/ogit/pulls"))
 			Expect((*repositories)[0].HTTPSCloneURL).To(Equal("https://github.com/wmalik/ogit.git"))
 			Expect((*repositories)[0].SSHCloneURL).To(Equal("git@github.com/wmalik/ogit.git"))
+			Expect((*repositories)[1].Provider).To(Equal("github"))
 			Expect((*repositories)[1].Name).To(Equal("dotfiles"))
 			Expect((*repositories)[1].Description).To(Equal("wmalik's config files"))
 			Expect((*repositories)[1].BrowserHomepageURL).To(Equal("https://github.com/wmalik/dotfiles"))
 			Expect((*repositories)[1].BrowserPullRequestsURL).To(Equal("https://github.com/wmalik/dotfiles/pulls"))
 			Expect((*repositories)[1].HTTPSCloneURL).To(Equal("https://github.com/wmalik/dotfiles.git"))
 			Expect((*repositories)[1].SSHCloneURL).To(Equal("git@github.com/wmalik/dotfiles.git"))
+			Expect((*repositories)[2].Provider).To(Equal("gitlab"))
 			Expect((*repositories)[2].Name).To(Equal("ogit"))
 			Expect((*repositories)[2].Description).To(Equal("TUI for browsing GitHub and GitLab orgnizations"))
 			Expect((*repositories)[2].BrowserHomepageURL).To(Equal("https://gitlab.com/wmalik/ogit"))
 			Expect((*repositories)[2].BrowserPullRequestsURL).To(Equal("https://gitlab.com/wmalik/ogit/pulls"))
 			Expect((*repositories)[2].HTTPSCloneURL).To(Equal("https://gitlab.com/wmalik/ogit.git"))
 			Expect((*repositories)[2].SSHCloneURL).To(Equal("git@gitlab.com/wmalik/ogit.git"))
+			Expect((*repositories)[3].Provider).To(Equal("gitlab"))
 			Expect((*repositories)[3].Name).To(Equal("dotfiles"))
 			Expect((*repositories)[3].Description).To(Equal("wmalik's config files"))
 			Expect((*repositories)[3].BrowserHomepageURL).To(Equal("https://gitlab.com/wmalik/dotfiles"))

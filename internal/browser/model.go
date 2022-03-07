@@ -5,7 +5,6 @@ import (
 	"ogit/internal/db"
 	"ogit/internal/gitutils"
 	"ogit/service"
-	"path"
 	"sort"
 	"time"
 
@@ -38,7 +37,7 @@ func NewModelWithItems(repos []db.Repository, storagePath string, gu *gitutils.G
 
 	return model{
 		list:            m,
-		storagePath:    storagePath,
+		storagePath:     storagePath,
 		bottomStatusBar: "-",
 	}
 }
@@ -47,20 +46,9 @@ func toItems(repos []db.Repository, storagePath string) []list.Item {
 	items := make([]list.Item, len(repos))
 
 	for i := range repos {
-		repoItem := repoListItem{
-			title:                  repos[i].Title,
-			owner:                  repos[i].Owner,
-			name:                   repos[i].Name,
-			description:            repos[i].Description,
-			browserHomepageURL:     repos[i].BrowserHomepageURL,
-			browserPullRequestsURL: repos[i].BrowserPullRequestsURL,
-			httpsCloneURL:          repos[i].HTTPSCloneURL,
-			sshCloneURL:            repos[i].SSHCloneURL,
-			storagePath:            path.Join(storagePath, repos[i].Owner, repos[i].Name),
-		}
-
+		repoItem := newRepoItem(&repos[i], storagePath)
 		if repoItem.Cloned() {
-			repoItem.title = brightStyle.Render(repoItem.title)
+			repoItem.SetTitle(brightStyle.Render(repoItem.Repository.Title))
 		}
 		items[i] = repoItem
 	}
@@ -71,12 +59,12 @@ func toItems(repos []db.Repository, storagePath string) []list.Item {
 func sortItemsCloned(items []list.Item) []list.Item {
 	// sort items by whether they have been cloned
 	sort.Slice(items, func(i, j int) bool {
-		return items[i].(repoListItem).Cloned()
+		return items[i].(repoItem).Cloned()
 	})
 
 	// sort items in lexical order
 	sort.Slice(items, func(i, j int) bool {
-		return items[i].(repoListItem).Title() < items[j].(repoListItem).Title()
+		return items[i].(repoItem).Repository.Title < items[j].(repoItem).Repository.Title
 	})
 	return items
 }

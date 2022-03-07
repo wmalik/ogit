@@ -10,6 +10,7 @@ type RepositoryHostClient interface {
 }
 
 type HostRepository interface {
+	GetProvider() string
 	GetName() string
 	GetOwner() string
 	GetDescription() string

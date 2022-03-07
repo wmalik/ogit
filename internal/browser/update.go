@@ -39,6 +39,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.list.SetSize(msg.Width-leftGap-rightGap, msg.Height-topGap-bottomGap)
 
 	case updateBottomStatusBarMsg:
+		m.list.StopSpinner()
 		m.bottomStatusBar = string(msg)
 	case tea.KeyMsg:
 		if m.list.FilterState() == list.Filtering {
@@ -65,7 +66,7 @@ func delegateItemUpdate(storagePath string, gu *gitutils.GitUtils) list.DefaultD
 	updateFunc := func(msg tea.Msg, m *list.Model) tea.Cmd {
 		log.Println("Updating Item")
 
-		selected, ok := m.SelectedItem().(repoListItem)
+		selected, ok := m.SelectedItem().(repoItem)
 		if !ok && len(m.VisibleItems()) > 0 {
 			return m.NewStatusMessage("unknown item type")
 		}
@@ -79,18 +80,18 @@ func delegateItemUpdate(storagePath string, gu *gitutils.GitUtils) list.DefaultD
 			return func() tea.Msg {
 				defer m.StopSpinner()
 				if selected.Cloned() {
-					return updateStatusMsg(statusMessageStyle("Already Cloned"))
+					return updateBottomStatusBarMsg(statusMessageStyle("[Already Cloned] " + selected.StoragePath()))
 				}
 
 				repoString, err := selected.Clone(context.Background(), gu)
 				if err != nil {
-					return updateStatusMsg(statusError(err.Error()))
+					return updateBottomStatusBarMsg(statusError(err.Error()))
 				}
 
-				selected.title = brightStyle.Render(selected.title)
+				selected.SetTitle(brightStyle.Render(selected.Repository.Title))
 
 				m.SetItem(m.Index(), selected)
-				return updateStatusMsg(statusMessageStyle(repoString))
+				return updateBottomStatusBarMsg(statusMessageStyle("[Cloned] " + repoString))
 			}
 
 		case openURLMsg:
@@ -118,16 +119,16 @@ func delegateItemUpdate(storagePath string, gu *gitutils.GitUtils) list.DefaultD
 				)
 			case "w":
 				return func() tea.Msg {
-					return openURLMsg(selected.BrowserHomepageURL())
+					return openURLMsg(selected.Repository.BrowserHomepageURL)
 				}
 
 			case "p":
 				return func() tea.Msg {
-					return openURLMsg(selected.BrowserPullRequestsURL())
+					return openURLMsg(selected.Repository.BrowserPullRequestsURL)
 				}
 
 			default:
-				return m.NewStatusMessage(selected.description)
+				return m.NewStatusMessage(selected.Repository.Description)
 			}
 		}
 
