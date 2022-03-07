@@ -46,7 +46,7 @@ GLOBAL OPTIONS:
 export GITHUB_TOKEN="yourpersonalaccesstoken_with_full_repo_access"
 export GITLAB_TOKEN="yourtoken_with_read_api_scope"
 go run cmd/ogit/main.go
-go run cmd/ogit/main.go --nosync
+go run cmd/ogit/main.go --cached
 go run cmd/ogit/main.go --clear
 ```
 
