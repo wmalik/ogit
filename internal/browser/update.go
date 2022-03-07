@@ -39,6 +39,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.list.SetSize(msg.Width-leftGap-rightGap, msg.Height-topGap-bottomGap)
 
 	case updateBottomStatusBarMsg:
+		m.list.StopSpinner()
 		m.bottomStatusBar = string(msg)
 	case tea.KeyMsg:
 		if m.list.FilterState() == list.Filtering {
