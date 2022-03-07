@@ -17,7 +17,7 @@ type repoItem struct {
 func newRepoItem(repo *db.Repository, storageBasePath string) repoItem {
 	return repoItem{
 		Repository:      repo,
-		repoStoragePath: path.Join(storageBasePath, repo.Owner, repo.Name),
+		repoStoragePath: path.Join(storageBasePath, repo.Provider, repo.Owner, repo.Name),
 	}
 }
 
