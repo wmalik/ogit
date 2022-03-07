@@ -87,7 +87,7 @@ func delegateItemUpdate(storagePath string, gu *gitutils.GitUtils) list.DefaultD
 					return updateStatusMsg(statusError(err.Error()))
 				}
 
-				selected.title = brightStyle.Render(selected.title)
+				selected.SetTitle(brightStyle.Render(selected.Repository.Title))
 
 				m.SetItem(m.Index(), selected)
 				return updateStatusMsg(statusMessageStyle(repoString))
@@ -118,16 +118,16 @@ func delegateItemUpdate(storagePath string, gu *gitutils.GitUtils) list.DefaultD
 				)
 			case "w":
 				return func() tea.Msg {
-					return openURLMsg(selected.BrowserHomepageURL())
+					return openURLMsg(selected.Repository.BrowserHomepageURL)
 				}
 
 			case "p":
 				return func() tea.Msg {
-					return openURLMsg(selected.BrowserPullRequestsURL())
+					return openURLMsg(selected.Repository.BrowserPullRequestsURL)
 				}
 
 			default:
-				return m.NewStatusMessage(selected.description)
+				return m.NewStatusMessage(selected.Repository.Description)
 			}
 		}
 
