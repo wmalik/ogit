@@ -5,6 +5,7 @@ import (
 	"ogit/internal/db"
 	"ogit/internal/gitutils"
 	"ogit/service"
+	"path"
 	"sort"
 	"time"
 
@@ -27,7 +28,7 @@ type model struct {
 
 func NewModelWithItems(repos []db.Repository, cloneDirPath string, gu *gitutils.GitUtils) model {
 
-	listItems := sortItemsCloned(toItems(repos, cloneDirPath), cloneDirPath)
+	listItems := sortItemsCloned(toItems(repos, cloneDirPath))
 	m := list.NewModel(listItems, delegateItemUpdate(cloneDirPath, gu), 0, 0)
 	m.StatusMessageLifetime = time.Second * 60
 	m.Title = fmt.Sprintf("[ogit] [%s]", cloneDirPath)
@@ -55,9 +56,10 @@ func toItems(repos []db.Repository, cloneDirPath string) []list.Item {
 			browserPullRequestsURL: repos[i].BrowserPullRequestsURL,
 			httpsCloneURL:          repos[i].HTTPSCloneURL,
 			sshCloneURL:            repos[i].SSHCloneURL,
+			storagePath:            path.Join(cloneDirPath, repos[i].Owner, repos[i].Name),
 		}
 
-		if repoItem.Cloned(cloneDirPath) {
+		if repoItem.Cloned() {
 			repoItem.title = brightStyle.Render(repoItem.title)
 		}
 		items[i] = repoItem
@@ -66,10 +68,10 @@ func toItems(repos []db.Repository, cloneDirPath string) []list.Item {
 	return items
 }
 
-func sortItemsCloned(items []list.Item, cloneDirPath string) []list.Item {
+func sortItemsCloned(items []list.Item) []list.Item {
 	// sort items by whether they have been cloned
 	sort.Slice(items, func(i, j int) bool {
-		return items[i].(repoListItem).Cloned(cloneDirPath)
+		return items[i].(repoListItem).Cloned()
 	})
 
 	// sort items in lexical order
