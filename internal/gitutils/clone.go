@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -82,6 +83,9 @@ func (r *Repository) LastCommit() string {
 }
 
 // CloneToDisk clones a repository to a path on disk.
+// The repository is cloned first to a temporary path, and then renamed to the
+// desired path. The function guarantees that if `path` exists, it contains
+// a fully cloned repository.
 // If an authentication method has been configured, the repository is cloned
 // using sshURL, otherwise it is cloned using httpsURL.  The progress of the
 // clone operation is streamed to the progress io.Writer
@@ -91,10 +95,17 @@ func (gu *GitUtils) CloneToDisk(ctx context.Context, httpsURL, sshURL, path stri
 		cloneURL = httpsURL
 	}
 
-	if err := os.MkdirAll(path, os.ModePerm); err != nil {
+	if err := os.MkdirAll(filepath.Dir(path), os.ModePerm); err != nil {
 		return "", err
 	}
-	repo, err := git.PlainCloneContext(ctx, path, false,
+
+	tmpDir, err := os.MkdirTemp(filepath.Dir(path), filepath.Base(path))
+	if err != nil {
+		return "", err
+	}
+	defer os.RemoveAll(tmpDir)
+
+	repo, err := git.PlainCloneContext(ctx, tmpDir, false,
 		&git.CloneOptions{
 			URL:      cloneURL,
 			Progress: progress,
@@ -103,9 +114,6 @@ func (gu *GitUtils) CloneToDisk(ctx context.Context, httpsURL, sshURL, path stri
 		},
 	)
 	if err != nil {
-		if errors.Is(err, git.ErrRepositoryAlreadyExists) {
-			return "", ErrRepoAlreadyCloned
-		}
 		return "", err
 	}
 
@@ -131,6 +139,11 @@ func (gu *GitUtils) CloneToDisk(ctx context.Context, httpsURL, sshURL, path stri
 			When:        commitObject.Author.When,
 		},
 	}
+
+	if err := os.Rename(tmpDir, path); err != nil {
+		return "", fmt.Errorf("rename failed after cloning: %s", err)
+	}
+
 	return repository.String(), nil
 }
 
