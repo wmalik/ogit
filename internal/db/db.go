@@ -71,12 +71,3 @@ func (d *Database) SelectRepositories(ctx context.Context, org, filter string) (
 
 	return repos, nil
 }
-
-func (d *Database) DeleteAllRepositories(ctx context.Context) error {
-	result := d.DB.WithContext(ctx).Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(&Repository{})
-	if result.Error != nil {
-		return result.Error
-	}
-
-	return nil
-}

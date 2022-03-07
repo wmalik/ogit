@@ -6,6 +6,7 @@ import (
 
 	"ogit/internal/browser"
 	"ogit/internal/bulkclone"
+	"ogit/internal/clear"
 
 	"github.com/urfave/cli/v2"
 )
@@ -19,14 +20,9 @@ func main() {
 				Usage: "Disable syncing of repositories metadata at startup",
 				Value: false,
 			},
-			&cli.BoolFlag{
-				Name:  "clear",
-				Usage: "Clear all local repository metadata",
-				Value: false,
-			},
 		},
 		Action: func(c *cli.Context) error {
-			if err := browser.HandleCommandDefault(c.Bool("nosync"), c.Bool("clear")); err != nil {
+			if err := browser.HandleCommandDefault(c.Bool("nosync")); err != nil {
 				log.Fatalln(err)
 			}
 			return nil
@@ -49,6 +45,16 @@ func main() {
 				},
 				Action: func(c *cli.Context) error {
 					if err := bulkclone.HandleCommandClone(c.String("org"), c.String("filter")); err != nil {
+						log.Fatalln(err)
+					}
+					return nil
+				},
+			},
+			{
+				Name:  "clear",
+				Usage: "Clear all local repository metadata (not the repository contents)",
+				Action: func(c *cli.Context) error {
+					if err := clear.HandleCommandDefault(c.Context); err != nil {
 						log.Fatalln(err)
 					}
 					return nil
