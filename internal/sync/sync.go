@@ -52,6 +52,7 @@ func toDatabaseRepositories(repos *service.Repositories) []db.Repository {
 	dbRepos := []db.Repository{}
 	for _, repo := range *repos {
 		dbRepos = append(dbRepos, db.NewRepository(
+			repo.Provider,
 			fmt.Sprintf("%s/%s", repo.Owner, repo.Name),
 			repo.Owner,
 			repo.Name,

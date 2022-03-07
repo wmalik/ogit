@@ -4,6 +4,7 @@ import "gorm.io/gorm"
 
 type Repository struct {
 	gorm.Model
+	Provider               string
 	Title                  string `gorm:"unique"`
 	Owner                  string
 	Name                   string
@@ -15,6 +16,7 @@ type Repository struct {
 }
 
 func NewRepository(
+	provider,
 	title,
 	owner,
 	name,
@@ -25,6 +27,7 @@ func NewRepository(
 	sshCloneURL string,
 ) Repository {
 	return Repository{
+		Provider:               provider,
 		Title:                  title,
 		Owner:                  owner,
 		Name:                   name,
