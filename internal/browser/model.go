@@ -19,31 +19,31 @@ type model struct {
 	// list of organisations or users (currently only public users or organisations)
 	orgs []string
 	// the path on disk where repositories should be cloned
-	cloneDirPath string
+	storagePath string
 	// A status bar to show useful information e.g. Github API usage
 	bottomStatusBar string
 
 	rs *service.RepositoryService
 }
 
-func NewModelWithItems(repos []db.Repository, cloneDirPath string, gu *gitutils.GitUtils) model {
+func NewModelWithItems(repos []db.Repository, storagePath string, gu *gitutils.GitUtils) model {
 
-	listItems := sortItemsCloned(toItems(repos, cloneDirPath))
-	m := list.NewModel(listItems, delegateItemUpdate(cloneDirPath, gu), 0, 0)
+	listItems := sortItemsCloned(toItems(repos, storagePath))
+	m := list.NewModel(listItems, delegateItemUpdate(storagePath, gu), 0, 0)
 	m.StatusMessageLifetime = time.Second * 60
-	m.Title = fmt.Sprintf("[ogit] [%s]", cloneDirPath)
+	m.Title = fmt.Sprintf("[ogit] [%s]", storagePath)
 	m.Styles.Title = titleBarStyle
 	m.AdditionalShortHelpKeys = availableKeyBindingsCB
 	m.SetShowStatusBar(false)
 
 	return model{
 		list:            m,
-		cloneDirPath:    cloneDirPath,
+		storagePath:    storagePath,
 		bottomStatusBar: "-",
 	}
 }
 
-func toItems(repos []db.Repository, cloneDirPath string) []list.Item {
+func toItems(repos []db.Repository, storagePath string) []list.Item {
 	items := make([]list.Item, len(repos))
 
 	for i := range repos {
@@ -56,7 +56,7 @@ func toItems(repos []db.Repository, cloneDirPath string) []list.Item {
 			browserPullRequestsURL: repos[i].BrowserPullRequestsURL,
 			httpsCloneURL:          repos[i].HTTPSCloneURL,
 			sshCloneURL:            repos[i].SSHCloneURL,
-			storagePath:            path.Join(cloneDirPath, repos[i].Owner, repos[i].Name),
+			storagePath:            path.Join(storagePath, repos[i].Owner, repos[i].Name),
 		}
 
 		if repoItem.Cloned() {
