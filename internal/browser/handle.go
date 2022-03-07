@@ -28,7 +28,7 @@ func HandleCommandDefault(useCache bool) error {
 		log.Fatalln(err)
 	}
 
-	if useCache == false {
+	if !useCache {
 		if err := sync.Sync(ctx, gitConf); err != nil {
 			log.Fatalln(err)
 		}
