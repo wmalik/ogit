@@ -5,6 +5,8 @@ import (
 	"ogit/internal/db"
 	"ogit/internal/gitutils"
 	"ogit/service"
+	"path"
+	"sort"
 	"time"
 
 	"github.com/charmbracelet/bubbles/list"
@@ -17,15 +19,31 @@ type model struct {
 	// list of organisations or users (currently only public users or organisations)
 	orgs []string
 	// the path on disk where repositories should be cloned
-	cloneDirPath string
+	storagePath string
 	// A status bar to show useful information e.g. Github API usage
 	bottomStatusBar string
 
 	rs *service.RepositoryService
 }
 
-func NewModelWithItems(repos []db.Repository, cloneDirPath string, gu *gitutils.GitUtils) model {
+func NewModelWithItems(repos []db.Repository, storagePath string, gu *gitutils.GitUtils) model {
 
+	listItems := sortItemsCloned(toItems(repos, storagePath))
+	m := list.NewModel(listItems, delegateItemUpdate(storagePath, gu), 0, 0)
+	m.StatusMessageLifetime = time.Second * 60
+	m.Title = fmt.Sprintf("[ogit] [%s]", storagePath)
+	m.Styles.Title = titleBarStyle
+	m.AdditionalShortHelpKeys = availableKeyBindingsCB
+	m.SetShowStatusBar(false)
+
+	return model{
+		list:            m,
+		storagePath:    storagePath,
+		bottomStatusBar: "-",
+	}
+}
+
+func toItems(repos []db.Repository, storagePath string) []list.Item {
 	items := make([]list.Item, len(repos))
 
 	for i := range repos {
@@ -38,23 +56,27 @@ func NewModelWithItems(repos []db.Repository, cloneDirPath string, gu *gitutils.
 			browserPullRequestsURL: repos[i].BrowserPullRequestsURL,
 			httpsCloneURL:          repos[i].HTTPSCloneURL,
 			sshCloneURL:            repos[i].SSHCloneURL,
+			storagePath:            path.Join(storagePath, repos[i].Owner, repos[i].Name),
 		}
 
-		if repoItem.Cloned(cloneDirPath) {
+		if repoItem.Cloned() {
 			repoItem.title = brightStyle.Render(repoItem.title)
 		}
 		items[i] = repoItem
 	}
-	m := list.NewModel(items, delegateItemUpdate(cloneDirPath, gu), 0, 0)
-	m.StatusMessageLifetime = time.Second * 60
-	m.Title = fmt.Sprintf("[ogit] [%s]", cloneDirPath)
-	m.Styles.Title = titleBarStyle
-	m.AdditionalShortHelpKeys = availableKeyBindingsCB
-	m.SetShowStatusBar(false)
 
-	return model{
-		list:            m,
-		cloneDirPath:    cloneDirPath,
-		bottomStatusBar: "-",
-	}
+	return items
+}
+
+func sortItemsCloned(items []list.Item) []list.Item {
+	// sort items by whether they have been cloned
+	sort.Slice(items, func(i, j int) bool {
+		return items[i].(repoListItem).Cloned()
+	})
+
+	// sort items in lexical order
+	sort.Slice(items, func(i, j int) bool {
+		return items[i].(repoListItem).Title() < items[j].(repoListItem).Title()
+	})
+	return items
 }

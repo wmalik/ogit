@@ -1,8 +1,10 @@
 package browser
 
 import (
+    "context"
+    "io"
+    "log"
 	"ogit/internal/gitutils"
-	"path"
 )
 
 type repoListItem struct {
@@ -14,6 +16,7 @@ type repoListItem struct {
 	browserPullRequestsURL string
 	httpsCloneURL          string
 	sshCloneURL            string
+	storagePath            string
 }
 
 func (i repoListItem) Title() string                  { return i.title }
@@ -25,13 +28,22 @@ func (i repoListItem) BrowserHomepageURL() string     { return i.browserHomepage
 func (i repoListItem) BrowserPullRequestsURL() string { return i.browserPullRequestsURL }
 func (i repoListItem) HTTPSCloneURL() string          { return i.httpsCloneURL }
 func (i repoListItem) SSHCloneURL() string            { return i.sshCloneURL }
-func (i repoListItem) Cloned(cloneDirPath string) bool {
-	return gitutils.Cloned(path.Join(cloneDirPath, i.owner, i.name))
+func (i repoListItem) StoragePath() string            { return i.storagePath }
+func (i repoListItem) Cloned() bool {
+	return gitutils.Cloned(i.storagePath)
 }
 
-func (i repoListItem) LastCommitInfo(cloneDirPath string) (string, error) {
-	if i.Cloned(cloneDirPath) {
-		repo, err := gitutils.ReadRepository(path.Join(cloneDirPath, i.owner, i.name))
+type cloneService interface {
+  CloneToDisk(ctx context.Context, httpsURL string, sshURL string, path string, progress io.Writer) (string, error)
+}
+
+func (i repoListItem) Clone(ctx context.Context, cloner cloneService) (string, error) {
+  return cloner.CloneToDisk(ctx, i.httpsCloneURL, i.sshCloneURL, i.storagePath, log.Default().Writer())
+}
+
+func (i repoListItem) LastCommitInfo() (string, error) {
+	if i.Cloned() {
+		repo, err := gitutils.ReadRepository(i.storagePath)
 		if err != nil {
 			return "", err
 		}

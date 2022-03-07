@@ -85,14 +85,14 @@ func (r *Repository) LastCommit() string {
 // If an authentication method has been configured, the repository is cloned
 // using sshURL, otherwise it is cloned using httpsURL.  The progress of the
 // clone operation is streamed to the progress io.Writer
-func (gu *GitUtils) CloneToDisk(ctx context.Context, httpsURL, sshURL, path string, progress io.Writer) (*Repository, error) {
+func (gu *GitUtils) CloneToDisk(ctx context.Context, httpsURL, sshURL, path string, progress io.Writer) (string, error) {
 	cloneURL := sshURL
 	if gu.cloneOverHTTPS {
 		cloneURL = httpsURL
 	}
 
 	if err := os.MkdirAll(path, os.ModePerm); err != nil {
-		return nil, err
+		return "", err
 	}
 	repo, err := git.PlainCloneContext(ctx, path, false,
 		&git.CloneOptions{
@@ -104,22 +104,22 @@ func (gu *GitUtils) CloneToDisk(ctx context.Context, httpsURL, sshURL, path stri
 	)
 	if err != nil {
 		if errors.Is(err, git.ErrRepositoryAlreadyExists) {
-			return nil, ErrRepoAlreadyCloned
+			return "", ErrRepoAlreadyCloned
 		}
-		return nil, err
+		return "", err
 	}
 
 	head, err := repo.Head()
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	commitObject, err := repo.CommitObject(head.Hash())
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	return &Repository{
+	repository := &Repository{
 		GitURL:      cloneURL,
 		Path:        path,
 		HeadRefName: head.Name().Short(),
@@ -130,7 +130,8 @@ func (gu *GitUtils) CloneToDisk(ctx context.Context, httpsURL, sshURL, path stri
 			AuthorEmail: commitObject.Author.Email,
 			When:        commitObject.Author.When,
 		},
-	}, nil
+	}
+	return repository.String(), nil
 }
 
 // Cloned checks if a path contains a .git directory

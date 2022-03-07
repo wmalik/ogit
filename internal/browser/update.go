@@ -5,7 +5,6 @@ import (
 	"log"
 	"ogit/internal/gitutils"
 	"ogit/internal/utils"
-	"path"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
@@ -62,7 +61,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 // delegateItemUpdate is called whenever a specific item is updated.
 // It is used for example for messages like "clone repo"
-func delegateItemUpdate(cloneDirPath string, gu *gitutils.GitUtils) list.DefaultDelegate {
+func delegateItemUpdate(storagePath string, gu *gitutils.GitUtils) list.DefaultDelegate {
 	updateFunc := func(msg tea.Msg, m *list.Model) tea.Cmd {
 		log.Println("Updating Item")
 
@@ -79,17 +78,11 @@ func delegateItemUpdate(cloneDirPath string, gu *gitutils.GitUtils) list.Default
 		case cloneRepoMsg:
 			return func() tea.Msg {
 				defer m.StopSpinner()
-				clonePath := path.Join(cloneDirPath, selected.Owner(), selected.Name())
-				if gitutils.Cloned(clonePath) {
+				if selected.Cloned() {
 					return updateStatusMsg(statusMessageStyle("Already Cloned"))
 				}
 
-				repoOnDisk, err := gu.CloneToDisk(context.Background(),
-					selected.HTTPSCloneURL(),
-					selected.SSHCloneURL(),
-					clonePath,
-					log.Default().Writer(),
-				)
+				repoString, err := selected.Clone(context.Background(), gu)
 				if err != nil {
 					return updateStatusMsg(statusError(err.Error()))
 				}
@@ -97,7 +90,7 @@ func delegateItemUpdate(cloneDirPath string, gu *gitutils.GitUtils) list.Default
 				selected.title = brightStyle.Render(selected.title)
 
 				m.SetItem(m.Index(), selected)
-				return updateStatusMsg(statusMessageStyle(repoOnDisk.String()))
+				return updateStatusMsg(statusMessageStyle(repoString))
 			}
 
 		case openURLMsg:
