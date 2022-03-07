@@ -1,6 +1,9 @@
 package browser
 
 import (
+    "context"
+    "io"
+    "log"
 	"ogit/internal/gitutils"
 )
 
@@ -28,6 +31,14 @@ func (i repoListItem) SSHCloneURL() string            { return i.sshCloneURL }
 func (i repoListItem) StoragePath() string            { return i.storagePath }
 func (i repoListItem) Cloned() bool {
 	return gitutils.Cloned(i.storagePath)
+}
+
+type cloneService interface {
+  CloneToDisk(ctx context.Context, httpsURL string, sshURL string, path string, progress io.Writer) (string, error)
+}
+
+func (i repoListItem) Clone(ctx context.Context, cloner cloneService) (string, error) {
+  return cloner.CloneToDisk(ctx, i.httpsCloneURL, i.sshCloneURL, i.storagePath, log.Default().Writer())
 }
 
 func (i repoListItem) LastCommitInfo() (string, error) {
