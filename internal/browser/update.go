@@ -30,8 +30,6 @@ func availableKeyBindingsCB() []key.Binding {
 
 // Update is called whenever the whole model is updated
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	log.Println("Updating UI")
-
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		topGap, rightGap, bottomGap, leftGap := appStyle.GetPadding()
@@ -64,8 +62,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 // It is used for example for messages like "clone repo"
 func delegateItemUpdate(storagePath string, gu *gitutils.GitUtils) list.DefaultDelegate {
 	updateFunc := func(msg tea.Msg, m *list.Model) tea.Cmd {
-		log.Println("Updating Item")
-
 		selected, ok := m.SelectedItem().(repoItem)
 		if !ok && len(m.VisibleItems()) > 0 {
 			return m.NewStatusMessage("unknown item type")
