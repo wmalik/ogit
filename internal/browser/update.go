@@ -5,7 +5,6 @@ import (
 	"log"
 	"ogit/internal/gitutils"
 	"ogit/internal/utils"
-	"path"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
@@ -79,15 +78,14 @@ func delegateItemUpdate(storagePath string, gu *gitutils.GitUtils) list.DefaultD
 		case cloneRepoMsg:
 			return func() tea.Msg {
 				defer m.StopSpinner()
-				clonePath := path.Join(storagePath, selected.Owner(), selected.Name())
-				if gitutils.Cloned(clonePath) {
+				if selected.Cloned() {
 					return updateStatusMsg(statusMessageStyle("Already Cloned"))
 				}
 
 				repoOnDisk, err := gu.CloneToDisk(context.Background(),
 					selected.HTTPSCloneURL(),
 					selected.SSHCloneURL(),
-					clonePath,
+					selected.StoragePath(),
 					log.Default().Writer(),
 				)
 				if err != nil {
