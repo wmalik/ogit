@@ -7,13 +7,12 @@ import (
 	"ogit/internal/gitconfig"
 	"ogit/internal/gitutils"
 	"ogit/internal/sync"
-	"os"
 	"path"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func HandleCommandDefault(noSync, clear bool) error {
+func HandleCommandDefault(noSync bool) error {
 	ctx := context.Background()
 	gitConf, err := gitconfig.ReadGitConfig()
 	if err != nil {
@@ -27,13 +26,6 @@ func HandleCommandDefault(noSync, clear bool) error {
 
 	if err := localDB.Init(); err != nil {
 		log.Fatalln(err)
-	}
-
-	if clear {
-		if err := localDB.DeleteAllRepositories(ctx); err != nil {
-			log.Fatalln(err)
-		}
-		os.Exit(0)
 	}
 
 	if noSync == false {
