@@ -80,18 +80,18 @@ func delegateItemUpdate(storagePath string, gu *gitutils.GitUtils) list.DefaultD
 			return func() tea.Msg {
 				defer m.StopSpinner()
 				if selected.Cloned() {
-					return updateStatusMsg(statusMessageStyle("Already Cloned"))
+					return updateBottomStatusBarMsg(statusMessageStyle("[Already Cloned] " + selected.StoragePath()))
 				}
 
 				repoString, err := selected.Clone(context.Background(), gu)
 				if err != nil {
-					return updateStatusMsg(statusError(err.Error()))
+					return updateBottomStatusBarMsg(statusError(err.Error()))
 				}
 
 				selected.SetTitle(brightStyle.Render(selected.Repository.Title))
 
 				m.SetItem(m.Index(), selected)
-				return updateStatusMsg(statusMessageStyle(repoString))
+				return updateBottomStatusBarMsg(statusMessageStyle("[Cloned] " + repoString))
 			}
 
 		case openURLMsg:
