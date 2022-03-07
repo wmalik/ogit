@@ -2,11 +2,12 @@ package browser
 
 import (
 	"fmt"
-	"ogit/internal/db"
-	"ogit/internal/gitutils"
-	"ogit/service"
 	"sort"
 	"time"
+
+	"github.com/wmalik/ogit/internal/db"
+	"github.com/wmalik/ogit/internal/gitutils"
+	"github.com/wmalik/ogit/service"
 
 	"github.com/charmbracelet/bubbles/list"
 )

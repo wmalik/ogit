@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"ogit/internal/db"
-	"ogit/internal/gitconfig"
-	"ogit/service"
-	"ogit/upstream"
 	"os"
 	"path"
+
+	"github.com/wmalik/ogit/internal/db"
+	"github.com/wmalik/ogit/internal/gitconfig"
+	"github.com/wmalik/ogit/service"
+	"github.com/wmalik/ogit/upstream"
 )
 
 // Sync fetches the repository metadata from upstream and stores it in the local

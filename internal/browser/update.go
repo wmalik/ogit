@@ -3,8 +3,9 @@ package browser
 import (
 	"context"
 	"log"
-	"ogit/internal/gitutils"
-	"ogit/internal/utils"
+
+	"github.com/wmalik/ogit/internal/gitutils"
+	"github.com/wmalik/ogit/internal/utils"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"

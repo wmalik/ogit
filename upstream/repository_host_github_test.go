@@ -8,8 +8,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"ogit/mock"
-	"ogit/upstream"
+	"github.com/wmalik/ogit/mock"
+	"github.com/wmalik/ogit/upstream"
 )
 
 var _ = Describe("Github repo", func() {

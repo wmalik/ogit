@@ -1,4 +1,4 @@
-module ogit
+module github.com/wmalik/ogit
 
 go 1.16
 

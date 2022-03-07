@@ -4,9 +4,9 @@ import (
 	"log"
 	"os"
 
-	"ogit/internal/browser"
-	"ogit/internal/bulkclone"
-	"ogit/internal/clear"
+	"github.com/wmalik/ogit/internal/browser"
+	"github.com/wmalik/ogit/internal/bulkclone"
+	"github.com/wmalik/ogit/internal/clear"
 
 	"github.com/urfave/cli/v2"
 )

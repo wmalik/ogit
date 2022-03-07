@@ -3,9 +3,10 @@ package clear
 import (
 	"context"
 	"log"
-	"ogit/internal/gitconfig"
 	"os"
 	"path"
+
+	"github.com/wmalik/ogit/internal/gitconfig"
 )
 
 func HandleCommandDefault(ctx context.Context) error {
