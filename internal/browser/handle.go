@@ -12,7 +12,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func HandleCommandDefault(noSync bool) error {
+func HandleCommandDefault(useCache bool) error {
 	ctx := context.Background()
 	gitConf, err := gitconfig.ReadGitConfig()
 	if err != nil {
@@ -28,7 +28,7 @@ func HandleCommandDefault(noSync bool) error {
 		log.Fatalln(err)
 	}
 
-	if noSync == false {
+	if !useCache {
 		if err := sync.Sync(ctx, gitConf); err != nil {
 			log.Fatalln(err)
 		}

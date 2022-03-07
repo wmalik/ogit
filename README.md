@@ -32,11 +32,11 @@ USAGE:
 
 COMMANDS:
    clone, c  Clone repositories in bulk
+   clear     Clear all local repository metadata (not the repository contents)
    help, h   Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --nosync    Disable syncing of repositories metadata at startup (default: false)
-   --clear     Clear all local repository metadata (default: false)
+   --cached    Disable syncing of repositories metadata at startup (default: false)
    --help, -h  show help (default: false)
 ```
 
@@ -46,7 +46,7 @@ GLOBAL OPTIONS:
 export GITHUB_TOKEN="yourpersonalaccesstoken_with_full_repo_access"
 export GITLAB_TOKEN="yourtoken_with_read_api_scope"
 go run cmd/ogit/main.go
-go run cmd/ogit/main.go --nosync
+go run cmd/ogit/main.go --cached
 go run cmd/ogit/main.go --clear
 ```
 

@@ -16,13 +16,13 @@ func main() {
 		Usage: "Organize git repositories",
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
-				Name:  "nosync",
+				Name:  "cached",
 				Usage: "Disable syncing of repositories metadata at startup",
 				Value: false,
 			},
 		},
 		Action: func(c *cli.Context) error {
-			if err := browser.HandleCommandDefault(c.Bool("nosync")); err != nil {
+			if err := browser.HandleCommandDefault(c.Bool("cached")); err != nil {
 				log.Fatalln(err)
 			}
 			return nil
