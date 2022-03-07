@@ -97,5 +97,7 @@ var _ = Describe("Gitlab repo", func() {
 		Expect(repositories[1].GetBrowserPullRequestsURL()).To(Equal("https://gitlab.com/greatuser/personal-website/merge_requests"))
 		Expect(repositories[1].GetHTTPSCloneURL()).To(Equal("https://gitlab.com/greatuser/personal-website"))
 		Expect(repositories[1].GetSSHCloneURL()).To(Equal("git@gitlab.com:greatuser/personal-website.git"))
+		Expect(repositories[0].GetProvider()).To(Equal("gitlab"))
+		Expect(repositories[1].GetProvider()).To(Equal("gitlab"))
 	})
 })

@@ -101,5 +101,7 @@ var _ = Describe("Github repo", func() {
 		Expect(len(repositories)).To(Equal(2))
 		Expect(repositories[0].GetName()).To(Equal("dotfiles"))
 		Expect(repositories[1].GetName()).To(Equal("personal-website"))
+		Expect(repositories[0].GetProvider()).To(Equal("github"))
+		Expect(repositories[1].GetProvider()).To(Equal("github"))
 	})
 })
