@@ -19,6 +19,10 @@ func availableKeyBindingsCB() []key.Binding {
 			key.WithHelp("c", "clone a repository (shallow)"),
 		),
 		key.NewBinding(
+			key.WithKeys("s"),
+			key.WithHelp("s", "open a shell in cloned directory"),
+		),
+		key.NewBinding(
 			key.WithKeys("w"),
 			key.WithHelp("w", "browse home page"),
 		),
@@ -30,7 +34,7 @@ func availableKeyBindingsCB() []key.Binding {
 }
 
 // Update is called whenever the whole model is updated
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		topGap, rightGap, bottomGap, leftGap := appStyle.GetPadding()
@@ -48,6 +52,16 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.Type {
 		case tea.KeyRunes:
 			switch string(msg.Runes) {
+			case "s":
+				if m.list.SelectedItem().(repoItem).Cloned() {
+					m.spawnShell = true
+					return m, tea.Quit
+				}
+				return m, func() tea.Msg {
+					return updateBottomStatusBarMsg(
+						statusError("Not cloned yet, press c to clone"),
+					)
+				}
 			default:
 				log.Println("Key Pressed", string(msg.Runes))
 			}
@@ -56,6 +70,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	newListModel, cmd := m.list.Update(msg)
 	m.list = newListModel
+	m.selectedItemStoragePath = m.list.SelectedItem().(repoItem).repoStoragePath
 	return m, cmd
 }
 

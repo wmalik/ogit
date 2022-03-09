@@ -22,11 +22,15 @@ type model struct {
 	storagePath string
 	// A status bar to show useful information e.g. Github API usage
 	bottomStatusBar string
+	// the storage path of the selected item
+	selectedItemStoragePath string
+	// whether a shell should be spawned after the TUI exits
+	spawnShell bool
 
 	rs *service.RepositoryService
 }
 
-func NewModelWithItems(repos []db.Repository, storagePath string, gu *gitutils.GitUtils) model {
+func NewModelWithItems(repos []db.Repository, storagePath string, gu *gitutils.GitUtils) *model {
 
 	listItems := sortItemsCloned(toItems(repos, storagePath))
 	m := list.NewModel(listItems, delegateItemUpdate(storagePath, gu), 0, 0)
@@ -36,7 +40,7 @@ func NewModelWithItems(repos []db.Repository, storagePath string, gu *gitutils.G
 	m.AdditionalShortHelpKeys = availableKeyBindingsCB
 	m.SetShowStatusBar(false)
 
-	return model{
+	return &model{
 		list:            m,
 		storagePath:     storagePath,
 		bottomStatusBar: "-",

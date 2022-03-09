@@ -8,6 +8,7 @@ import (
 	"github.com/wmalik/ogit/internal/db"
 	"github.com/wmalik/ogit/internal/gitconfig"
 	"github.com/wmalik/ogit/internal/gitutils"
+	"github.com/wmalik/ogit/internal/shell"
 	"github.com/wmalik/ogit/internal/sync"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -51,10 +52,16 @@ func HandleCommandDefault(useCache bool) error {
 	}
 	defer f.Close()
 
-	if err := tea.NewProgram(
-		NewModelWithItems(repos, gitConf.StoragePath(), gu),
-	).Start(); err != nil {
+	model := NewModelWithItems(repos, gitConf.StoragePath(), gu)
+	if err := tea.NewProgram(model, tea.WithAltScreen()).Start(); err != nil {
 		log.Fatalln(err)
 	}
+
+	if model.spawnShell {
+		if err := shell.Spawn(model.selectedItemStoragePath); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
