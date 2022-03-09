@@ -2,6 +2,8 @@ package gitconfig
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/tcnksm/go-gitconfig"
@@ -18,42 +20,64 @@ type GitConfig struct {
 	privKeyPath string
 }
 
+func defaultGitConfig() *GitConfig {
+	return &GitConfig{
+		storagePath:    filepath.Join(os.TempDir(), "ogit"),
+		fetchUserRepos: true,
+		useSSHAgent:    true,
+		privKeyPath:    "",
+	}
+}
+
 // readGitConfig loads the value of ogit.orgs from ~/.gitconfig
 func ReadGitConfig() (*GitConfig, error) {
+
+	conf := defaultGitConfig()
 
 	orgs, err := getOrgs()
 	if err != nil {
 		return nil, err
+	}
+	if len(orgs) > 0 {
+		conf.orgs = orgs
 	}
 
 	gitlabGroups, err := getGitlabGroups()
 	if err != nil {
 		return nil, err
 	}
+	if len(gitlabGroups) > 0 {
+		conf.gitlabGroups = gitlabGroups
+	}
 
 	storagePath, err := getStoragePath()
 	if err != nil {
 		return nil, err
+	}
+	if storagePath != "" {
+		conf.storagePath = storagePath
 	}
 
 	fetchUserRepos, err := getFetchAuthenticatedUserRepos()
 	if err != nil {
 		return nil, err
 	}
+	if fetchUserRepos != true {
+		conf.fetchUserRepos = fetchUserRepos
+	}
 
 	useSSHAgent, privKeyPath, err := getSSHAuth()
 	if err != nil {
 		return nil, err
 	}
+	if useSSHAgent != true {
+		conf.useSSHAgent = useSSHAgent
+	}
+	if privKeyPath != "" {
+		conf.privKeyPath = privKeyPath
+	}
 
-	return &GitConfig{
-		orgs:           orgs,
-		gitlabGroups:   gitlabGroups,
-		storagePath:    storagePath,
-		fetchUserRepos: fetchUserRepos,
-		useSSHAgent:    useSSHAgent,
-		privKeyPath:    privKeyPath,
-	}, nil
+	return conf, nil
 }
 
 func (c GitConfig) Orgs() []string {
