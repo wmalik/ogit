@@ -49,7 +49,7 @@ func ReadGitConfig() (*GitConfig, error) {
 	return &GitConfig{
 		orgs:           orgs,
 		gitlabGroups:   gitlabGroups,
-		storagePath:    *storagePath,
+		storagePath:    storagePath,
 		fetchUserRepos: fetchUserRepos,
 		useSSHAgent:    useSSHAgent,
 		privKeyPath:    privKeyPath,
@@ -112,15 +112,15 @@ func getGitlabGroups() ([]string, error) {
 	return gitlabGroups, err
 }
 
-func getStoragePath() (*string, error) {
+func getStoragePath() (string, error) {
 	var storagePath string
 	var err error
 	storagePath, err = gitconfig.Entire("ogit.storagePath")
 	if err != nil {
-		return nil, fmt.Errorf("missing ogit.storagePath in git config: %s", err)
+		return "", fmt.Errorf("missing ogit.storagePath in git config: %s", err)
 	}
 
-	return &storagePath, nil
+	return storagePath, nil
 }
 
 func getFetchAuthenticatedUserRepos() (bool, error) {
