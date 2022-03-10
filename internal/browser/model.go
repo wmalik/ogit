@@ -9,6 +9,7 @@ import (
 	"github.com/wmalik/ogit/internal/gitutils"
 	"github.com/wmalik/ogit/service"
 
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 )
 
@@ -22,24 +23,51 @@ type model struct {
 	storagePath string
 	// A status bar to show useful information e.g. Github API usage
 	bottomStatusBar string
+	// the storage path of the selected item
+	selectedItemStoragePath string
+	// whether a shell should be spawned after the TUI exits
+	spawnShell bool
 
+	gu *gitutils.GitUtils
 	rs *service.RepositoryService
 }
 
-func NewModelWithItems(repos []db.Repository, storagePath string, gu *gitutils.GitUtils) model {
+func NewModelWithItems(repos []db.Repository, storagePath string, gu *gitutils.GitUtils) *model {
 
 	listItems := sortItemsCloned(toItems(repos, storagePath))
-	m := list.NewModel(listItems, delegateItemUpdate(storagePath, gu), 0, 0)
+	m := list.NewModel(listItems, listItemDelegate(storagePath), 0, 0)
 	m.StatusMessageLifetime = time.Second * 60
 	m.Title = fmt.Sprintf("[ogit] [%s]", storagePath)
 	m.Styles.Title = titleBarStyle
 	m.AdditionalShortHelpKeys = availableKeyBindingsCB
 	m.SetShowStatusBar(false)
 
-	return model{
+	return &model{
 		list:            m,
 		storagePath:     storagePath,
 		bottomStatusBar: "-",
+		gu:              gu,
+	}
+}
+
+func availableKeyBindingsCB() []key.Binding {
+	return []key.Binding{
+		key.NewBinding(
+			key.WithKeys("c"),
+			key.WithHelp("c", "clone a repository (shallow)"),
+		),
+		key.NewBinding(
+			key.WithKeys("o"),
+			key.WithHelp("o", "open cloned directory"),
+		),
+		key.NewBinding(
+			key.WithKeys("w"),
+			key.WithHelp("w", "browse home page"),
+		),
+		key.NewBinding(
+			key.WithKeys("p"),
+			key.WithHelp("p", "browse pull requests"),
+		),
 	}
 }
 
