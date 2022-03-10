@@ -18,8 +18,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	if m.list.FilterState() != list.Filtering {
-		cmds = append(cmds, handleKeyMsg(msg, m, selected)...)
-		cmds = append(cmds, handleMsg(msg, m, selected)...)
+		cmds = append(cmds, handleKeyMsg(msg, m, selected))
+		cmds = append(cmds, handleMsg(msg, m, selected))
 	}
 
 	newListModel, cmd := m.list.Update(msg)
@@ -28,7 +28,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, tea.Batch(append(cmds, cmd)...)
 }
 
-func handleMsg(msg tea.Msg, m *model, selected repoItem) []tea.Cmd {
+func handleMsg(msg tea.Msg, m *model, selected repoItem) tea.Cmd {
 	cmds := []tea.Cmd{}
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
@@ -77,10 +77,10 @@ func handleMsg(msg tea.Msg, m *model, selected repoItem) []tea.Cmd {
 		})
 
 	}
-	return cmds
+	return tea.Batch(cmds...)
 }
 
-func handleKeyMsg(msg tea.Msg, m *model, selected repoItem) []tea.Cmd {
+func handleKeyMsg(msg tea.Msg, m *model, selected repoItem) tea.Cmd {
 	cmds := []tea.Cmd{}
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -116,7 +116,7 @@ func handleKeyMsg(msg tea.Msg, m *model, selected repoItem) []tea.Cmd {
 		}
 	}
 
-	return cmds
+	return tea.Batch(cmds...)
 }
 
 // listItemDelegate configures general behaviour/styling of the list items
