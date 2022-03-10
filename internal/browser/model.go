@@ -9,6 +9,7 @@ import (
 	"github.com/wmalik/ogit/internal/gitutils"
 	"github.com/wmalik/ogit/service"
 
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 )
 
@@ -46,6 +47,27 @@ func NewModelWithItems(repos []db.Repository, storagePath string, gu *gitutils.G
 		storagePath:     storagePath,
 		bottomStatusBar: "-",
 		gu:              gu,
+	}
+}
+
+func availableKeyBindingsCB() []key.Binding {
+	return []key.Binding{
+		key.NewBinding(
+			key.WithKeys("c"),
+			key.WithHelp("c", "clone a repository (shallow)"),
+		),
+		key.NewBinding(
+			key.WithKeys("o"),
+			key.WithHelp("o", "open cloned directory"),
+		),
+		key.NewBinding(
+			key.WithKeys("w"),
+			key.WithHelp("w", "browse home page"),
+		),
+		key.NewBinding(
+			key.WithKeys("p"),
+			key.WithHelp("p", "browse pull requests"),
+		),
 	}
 }
 

@@ -6,31 +6,9 @@ import (
 
 	"github.com/wmalik/ogit/internal/utils"
 
-	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 )
-
-func availableKeyBindingsCB() []key.Binding {
-	return []key.Binding{
-		key.NewBinding(
-			key.WithKeys("c"),
-			key.WithHelp("c", "clone a repository (shallow)"),
-		),
-		key.NewBinding(
-			key.WithKeys("o"),
-			key.WithHelp("o", "open cloned directory"),
-		),
-		key.NewBinding(
-			key.WithKeys("w"),
-			key.WithHelp("w", "browse home page"),
-		),
-		key.NewBinding(
-			key.WithKeys("p"),
-			key.WithHelp("p", "browse pull requests"),
-		),
-	}
-}
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	cmds := []tea.Cmd{}
