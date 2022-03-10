@@ -18,8 +18,8 @@ func availableKeyBindingsCB() []key.Binding {
 			key.WithHelp("c", "clone a repository (shallow)"),
 		),
 		key.NewBinding(
-			key.WithKeys("s"),
-			key.WithHelp("s", "open a shell in cloned directory"),
+			key.WithKeys("o"),
+			key.WithHelp("o", "open cloned directory"),
 		),
 		key.NewBinding(
 			key.WithKeys("w"),
@@ -109,7 +109,7 @@ func handleKeyMsg(msg tea.Msg, m *model, selected repoItem) []tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch string(msg.Runes) {
-		case "s":
+		case "o":
 			if selected.Cloned() {
 				m.spawnShell = true
 				cmds = append(cmds, tea.Quit)
