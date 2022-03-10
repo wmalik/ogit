@@ -36,9 +36,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	cmds := []tea.Cmd{}
 	selected, ok := m.list.SelectedItem().(repoItem)
 	if !ok && len(m.list.VisibleItems()) > 0 {
-		cmds = append(cmds, func() tea.Msg {
-			return updateBottomStatusBarMsg(statusError("unknown type"))
-		})
+		return m, nil
 	}
 
 	if m.list.FilterState() != list.Filtering {
