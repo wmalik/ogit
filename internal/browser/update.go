@@ -137,7 +137,6 @@ func handleKeyMsg(msg tea.Msg, m *model, selected repoItem) []tea.Cmd {
 			})
 		default:
 			log.Println("Key Pressed", string(msg.Runes))
-			cmds = append(cmds, m.list.NewStatusMessage(selected.Repository.Description))
 		}
 	}
 
@@ -151,5 +150,11 @@ func listItemDelegate(storagePath string) list.DefaultDelegate {
 	d.Styles.SelectedTitle = d.Styles.SelectedTitle.UnsetForeground().Background(selectedColor)
 	d.ShowDescription = false
 	d.SetSpacing(0)
+	d.UpdateFunc = func(msg tea.Msg, m *list.Model) tea.Cmd {
+		if selected, ok := m.SelectedItem().(repoItem); ok {
+			return m.NewStatusMessage(selected.Repository.Description)
+		}
+		return nil
+	}
 	return d
 }
