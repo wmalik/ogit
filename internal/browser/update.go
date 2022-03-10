@@ -144,16 +144,12 @@ func handleKeyMsg(msg tea.Msg, m *model, selected repoItem) []tea.Cmd {
 	return cmds
 }
 
-// delegateItemUpdate is called whenever a specific item is updated.
-// It is used for example for messages like "clone repo"
-func delegateItemUpdate(storagePath string) list.DefaultDelegate {
+// listItemDelegate configures general behaviour/styling of the list items
+func listItemDelegate(storagePath string) list.DefaultDelegate {
 	d := list.NewDefaultDelegate()
 	d.Styles.NormalTitle = d.Styles.NormalTitle.Foreground(dimmedColor)
 	d.Styles.SelectedTitle = d.Styles.SelectedTitle.UnsetForeground().Background(selectedColor)
 	d.ShowDescription = false
 	d.SetSpacing(0)
-	d.UpdateFunc = func(msg tea.Msg, m *list.Model) tea.Cmd {
-		return nil
-	}
 	return d
 }

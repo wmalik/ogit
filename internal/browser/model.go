@@ -34,7 +34,7 @@ type model struct {
 func NewModelWithItems(repos []db.Repository, storagePath string, gu *gitutils.GitUtils) *model {
 
 	listItems := sortItemsCloned(toItems(repos, storagePath))
-	m := list.NewModel(listItems, delegateItemUpdate(storagePath), 0, 0)
+	m := list.NewModel(listItems, listItemDelegate(storagePath), 0, 0)
 	m.StatusMessageLifetime = time.Second * 60
 	m.Title = fmt.Sprintf("[ogit] [%s]", storagePath)
 	m.Styles.Title = titleBarStyle
