@@ -148,10 +148,13 @@ func (gu *GitUtils) CloneToDisk(ctx context.Context, httpsURL, sshURL, path stri
 }
 
 // Cloned checks if a path contains a .git directory
-func Cloned(dir string) bool {
+func Cloned(dir string) (bool, error) {
 	if _, err := os.Stat(path.Join(dir, ".git")); err != nil {
-		return false
+		if errors.Is(err, os.ErrNotExist) {
+			return false, nil
+		}
+		return false, err
 	}
 
-	return true
+	return true, nil
 }
