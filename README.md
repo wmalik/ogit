@@ -1,55 +1,129 @@
 # ogit
 
-TUI for organizing git repositories.
+TUI and CLI for organizing git repositories across multiple providers (e.g.
+GitHub, GitLab).
+
+### Install
+
+#### Install via go-install
+
+```
+go install -ldflags="-X main.version=installed-with-go-install" github.com/wmalik/ogit/cmd/ogit@latest
+```
+
+#### Install via source code
+
+```
+go build -ldflags="-X main.version=local-build" -o ogit cmd/ogit/main.go
+```
+
+#### Install via GitHub Releases
+
+Download a pre-built binary for your platform [here](https://github.com/wmalik/ogit/releases/latest)
 
 ### Configuration
 
-Add a section in your `~/.gitconfig`:
+Add `[ogit]` sections to `~/.gitconfig`.
+
+<details>
+  <summary>Config for GitHub repositories (using ssh-agent)</summary>
 
 ```
 [ogit]
-  storagePath = /home/arthur/ogit
+  storagePath = /absolute/path/on/disk
+  fetchUserRepos = false
+  sshAuth = ssh-agent
+[ogit "github"]
+  orgs = tpope, charmbracelet
+```
+</details>
+
+<details>
+  <summary>Config for GitHub and GitLab repositories (using ssh-agent)</summary>
+
+```
+[ogit]
+  storagePath = /absolute/path/on/disk
+  fetchUserRepos = false
+  sshAuth = ssh-agent
+[ogit "github"]
+  orgs = tpope, charmbracelet
+[ogit "gitlab"]
+  orgs = fdroid
+```
+</details>
+
+<details>
+  <summary>Config for user's repositories only (using ssh-agent)</summary>
+
+```
+[ogit]
+  storagePath = /absolute/path/on/disk
   fetchUserRepos = true
-  sshAuth = ssh-agent # or sshAuth = /path/to/ssh_private_key
+  sshAuth = ssh-agent
+```
+</details>
+
+<details>
+  <summary>Config for GitHub and GitLab repositories (using private SSH key)</summary>
+
+```
+[ogit]
+  storagePath = /absolute/path/on/disk
+  fetchUserRepos = false
+  sshAuth = /absolute/path/to/privatekey
 [ogit "github"]
   orgs = tpope
 [ogit "gitlab"]
   orgs = fdroid
 ```
+</details>
+
+#### Authentication
+
+##### SSH Auth
+
+The `sshAuth` attribute in `~/.gitconfig` is used to perform the "git clone"
+operation for both Github and GitLab repositories.
+An SSH key pair must be available on the host machine and associated with the
+GitHub and GitLab accounts. The SSH key pair can be fetched from either an
+ssh-agent or from a file on disk. If the private key is protected with
+a passphrase, the only way to use it is through ssh-agent.
+
+##### GitHub/GitLab API Auth
+
+Personal access tokens for GitHub/GitLab must be configured via the following
+environment variables:
+
+* `GITHUB_TOKEN` (with `repo` scope)
+* `GITLAB_TOKEN` (with `read_api` scope)
+
+The tokens can be generated [here](https://github.com/settings/tokens/new) and
+[here](https://gitlab.com/-/profile/personal_access_tokens).
 
 ### Usage
 
-Generate a GitHub personal access token
-[here](https://github.com/settings/tokens) with full `repo` access.
-
-```
-$ ogit --help
-NAME:
-   ogit - Organize git repositories
-
-USAGE:
-   ogit [global options] command [command options] [arguments...]
-
-COMMANDS:
-   clone, c  Clone repositories in bulk
-   clear     Clear all local repository metadata (not the repository contents)
-   help, h   Shows a list of commands or help for one command
-
-GLOBAL OPTIONS:
-   --cached    Disable syncing of repositories metadata at startup (default: false)
-   --help, -h  show help (default: false)
-```
-
-#### Examples
+#### Export tokens for API authentication
 
 ```
 export GITHUB_TOKEN="yourpersonalaccesstoken_with_full_repo_access"
 export GITLAB_TOKEN="yourtoken_with_read_api_scope"
-go run cmd/ogit/main.go
-go run cmd/ogit/main.go --cached
-go run cmd/ogit/main.go --clear
 ```
 
+#### Fetch repository metadata and launch TUI
 
-Please note that the GitHub API enforces [rate limits](https://docs.github.com/en/developers/apps/building-github-apps/rate-limits-for-github-apps)
-(5000 requests per hour) when a personal access token is used.
+```
+ogit fetch && ogit
+```
+
+#### Clone all repositories belonging to an org
+
+```
+ogit clone --org tpope
+```
+
+#### Clone some repositories belonging to an org
+
+```
+ogit clone --org tpope --filter vim
+```
