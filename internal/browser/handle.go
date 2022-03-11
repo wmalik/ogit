@@ -3,6 +3,7 @@ package browser
 import (
 	"context"
 	"log"
+	"os"
 	"path"
 
 	"github.com/wmalik/ogit/internal/db"
@@ -19,6 +20,10 @@ func HandleCommandFetch() error {
 	gitConf, err := gitconfig.ReadGitConfig()
 	if err != nil {
 		log.Fatalln(err)
+	}
+
+	if err := os.MkdirAll(gitConf.StoragePath(), os.ModePerm); err != nil {
+		return err
 	}
 
 	localDB, err := db.NewDB(path.Join(gitConf.StoragePath(), "ogit.db"))
