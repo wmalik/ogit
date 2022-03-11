@@ -14,7 +14,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func HandleCommandDefault(useCache bool) error {
+func HandleCommandFetch() error {
 	ctx := context.Background()
 	gitConf, err := gitconfig.ReadGitConfig()
 	if err != nil {
@@ -30,10 +30,26 @@ func HandleCommandDefault(useCache bool) error {
 		log.Fatalln(err)
 	}
 
-	if !useCache {
-		if err := sync.Sync(ctx, gitConf); err != nil {
-			log.Fatalln(err)
-		}
+	if err := sync.Sync(ctx, gitConf); err != nil {
+		log.Fatalln(err)
+	}
+
+	return nil
+}
+func HandleCommandDefault() error {
+	ctx := context.Background()
+	gitConf, err := gitconfig.ReadGitConfig()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	localDB, err := db.NewDB(path.Join(gitConf.StoragePath(), "ogit.db"))
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	if err := localDB.Init(); err != nil {
+		log.Fatalln(err)
 	}
 
 	repos, err := localDB.SelectAllRepositories(ctx)
