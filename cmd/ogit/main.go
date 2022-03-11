@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -11,9 +12,18 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// ldflags populated by goreleaser
+var (
+	version = "development"
+	commit  = "unknown"
+	date    = "unknown"
+)
+
 func main() {
 	app := &cli.App{
-		Usage: "Organize git repositories",
+		Usage:       "Organize git repositories",
+		Version:     fmt.Sprintf("%s %s %s", version, commit, date),
+		HideVersion: false,
 		Action: func(c *cli.Context) error {
 			if err := browser.HandleCommandDefault(); err != nil {
 				log.Fatalln(err)
