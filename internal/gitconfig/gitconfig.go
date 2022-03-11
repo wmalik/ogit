@@ -1,7 +1,6 @@
 package gitconfig
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -62,8 +61,8 @@ func ReadGitConfig() (*GitConfig, error) {
 	if err != nil {
 		return nil, err
 	}
-	if fetchUserRepos != true {
-		conf.fetchUserRepos = fetchUserRepos
+	if fetchUserRepos == false {
+		conf.fetchUserRepos = false
 	}
 
 	useSSHAgent, privKeyPath, err := getSSHAuth()
@@ -107,7 +106,10 @@ func (c GitConfig) PrivKeyPath() string {
 func getOrgs() ([]string, error) {
 	orgsRaw, err := gitconfig.Entire("ogit.github.orgs")
 	if err != nil {
-		return nil, fmt.Errorf("missing manadatory config in git config: %s", err)
+		if strings.Contains(err.Error(), "not found") {
+			return []string{}, nil
+		}
+		return nil, err
 	}
 
 	orgs := []string{}
@@ -123,7 +125,10 @@ func getOrgs() ([]string, error) {
 func getGitlabGroups() ([]string, error) {
 	gitlabGroupsRaw, err := gitconfig.Entire("ogit.gitlab.orgs")
 	if err != nil {
-		return nil, fmt.Errorf("missing manadatory config in git config: %s", err)
+		if strings.Contains(err.Error(), "not found") {
+			return []string{}, nil
+		}
+		return nil, err
 	}
 
 	gitlabGroups := []string{}
@@ -141,7 +146,10 @@ func getStoragePath() (string, error) {
 	var err error
 	storagePath, err = gitconfig.Entire("ogit.storagePath")
 	if err != nil {
-		return "", fmt.Errorf("missing ogit.storagePath in git config: %s", err)
+		if strings.Contains(err.Error(), "not found") {
+			return "", nil
+		}
+		return "", err
 	}
 
 	return storagePath, nil
@@ -150,7 +158,10 @@ func getStoragePath() (string, error) {
 func getFetchAuthenticatedUserRepos() (bool, error) {
 	fetchUserRepos, err := gitconfig.Entire("ogit.fetchUserRepos")
 	if err != nil {
-		return false, fmt.Errorf("missing ogit.fetchUserRepos in git config: %s", err)
+		if strings.Contains(err.Error(), "not found") {
+			return true, nil
+		}
+		return false, err
 	}
 
 	if strings.TrimSpace(fetchUserRepos) == "false" {
@@ -163,7 +174,10 @@ func getFetchAuthenticatedUserRepos() (bool, error) {
 func getSSHAuth() (useSSHAgent bool, privKeyPath string, err error) {
 	sshAuth, err := gitconfig.Entire("ogit.sshAuth")
 	if err != nil {
-		return false, "", fmt.Errorf("missing ogit.sshAuth in git config: %s", err)
+		if strings.Contains(err.Error(), "not found") {
+			return true, "", nil
+		}
+		return false, "", err
 	}
 
 	if strings.TrimSpace(sshAuth) == "ssh-agent" {

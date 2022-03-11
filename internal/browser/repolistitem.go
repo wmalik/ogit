@@ -29,7 +29,8 @@ func (i repoItem) StoragePath() string {
 	return i.repoStoragePath
 }
 func (i repoItem) Cloned() bool {
-	return gitutils.Cloned(i.StoragePath())
+	cloned, _ := gitutils.Cloned(i.StoragePath())
+	return cloned
 }
 
 func (i *repoItem) SetTitle(title string) { i.Repository.Title = title }
