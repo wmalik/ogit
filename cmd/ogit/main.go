@@ -14,20 +14,24 @@ import (
 func main() {
 	app := &cli.App{
 		Usage: "Organize git repositories",
-		Flags: []cli.Flag{
-			&cli.BoolFlag{
-				Name:  "cached",
-				Usage: "Disable syncing of repositories metadata at startup",
-				Value: false,
-			},
-		},
 		Action: func(c *cli.Context) error {
-			if err := browser.HandleCommandDefault(c.Bool("cached")); err != nil {
+			if err := browser.HandleCommandDefault(); err != nil {
 				log.Fatalln(err)
 			}
 			return nil
 		},
 		Commands: []*cli.Command{
+			{
+				Name:    "fetch",
+				Aliases: []string{"f"},
+				Usage:   "Fetch repository metadata",
+				Action: func(c *cli.Context) error {
+					if err := browser.HandleCommandFetch(); err != nil {
+						log.Fatalln(err)
+					}
+					return nil
+				},
+			},
 			{
 				Name:    "clone",
 				Aliases: []string{"c"},
