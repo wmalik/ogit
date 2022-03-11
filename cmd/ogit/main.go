@@ -14,9 +14,9 @@ import (
 
 // ldflags populated by goreleaser
 var (
-	version = "development"
-	commit  = "unknown"
-	date    = "unknown"
+	version = ""
+	commit  = ""
+	date    = ""
 )
 
 func main() {
