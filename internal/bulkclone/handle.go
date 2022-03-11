@@ -41,7 +41,7 @@ func HandleCommandClone(org, filter string) error {
 
 	cloneFailed := false
 	for _, repo := range repos {
-		clonePath := path.Join(gitConf.StoragePath(), repo.Owner, repo.Name)
+		clonePath := path.Join(gitConf.StoragePath(), repo.Provider, repo.Owner, repo.Name)
 
 		if gitutils.Cloned(clonePath) {
 			printMsgDimmed(fmt.Sprintf("[already cloned] %s/%s", repo.Owner, repo.Name))
