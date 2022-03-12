@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/charmbracelet/bubbles v0.10.3
 	github.com/charmbracelet/bubbletea v0.20.0
-	github.com/charmbracelet/lipgloss v0.4.0
+	github.com/charmbracelet/lipgloss v0.5.0
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/gorilla/mux v1.8.0
@@ -49,7 +49,6 @@ require (
 	github.com/muesli/reflow v0.3.0 // indirect
 	github.com/muesli/termenv v0.11.1-0.20220212125758-44cd13922739 // indirect
 	github.com/nxadm/tail v1.4.8 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/russross/blackfriday/v2 v2.0.1 // indirect
 	github.com/sahilm/fuzzy v0.1.0 // indirect
