@@ -74,13 +74,17 @@ func HandleCommandDefault() error {
 	defer f.Close()
 
 	model := NewModelWithItems(repos, gitConf.StoragePath(), gu)
-	if err := tea.NewProgram(model, tea.WithAltScreen()).Start(); err != nil {
-		log.Fatalln(err)
-	}
+	for {
+		if err := tea.NewProgram(model, tea.WithAltScreen()).Start(); err != nil {
+			log.Fatalln(err)
+		}
 
-	if model.spawnShell {
-		if err := shell.Spawn(model.selectedItemStoragePath); err != nil {
-			return err
+		if model.spawnShell {
+			if err := shell.Spawn(model.selectedItemStoragePath); err != nil {
+				return err
+			}
+		} else {
+			break
 		}
 	}
 
