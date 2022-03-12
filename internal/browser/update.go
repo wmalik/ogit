@@ -109,16 +109,15 @@ func handleKeyMsg(msg tea.Msg, m *model, selected repoItem) tea.Cmd {
 			return tea.Batch(tea.HideCursor)
 
 		case "enter":
-			if selected.Cloned() {
-				m.spawnShell = true
-				cmds = append(cmds, tea.Quit)
-				break
+			if !selected.Cloned() {
+				return func() tea.Msg {
+					return updateBottomStatusBarMsg(
+						statusError("Not cloned yet, press c to clone"),
+					)
+				}
 			}
-			cmds = append(cmds, func() tea.Msg {
-				return updateBottomStatusBarMsg(
-					statusError("Not cloned yet, press c to clone"),
-				)
-			})
+			m.spawnShell = true
+			cmds = append(cmds, tea.Quit)
 		case "c":
 			cmds = append(cmds, tea.Batch(
 				m.list.StartSpinner(),
