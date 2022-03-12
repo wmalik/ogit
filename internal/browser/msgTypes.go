@@ -7,5 +7,6 @@ type updateBottomStatusBarMsg string
 type openURLMsg string
 
 type cloneRepoMsg struct {
-	repo repoItem
+	repo  repoItem
+	index int
 }

@@ -47,18 +47,18 @@ func handleMsg(msg tea.Msg, m *model, selected repoItem) tea.Cmd {
 	case cloneRepoMsg:
 		cmds = append(cmds, func() tea.Msg {
 			defer m.list.StopSpinner()
-			if selected.Cloned() {
-				return updateBottomStatusBarMsg(statusMessageStyle("[Already Cloned] " + selected.StoragePath()))
+			if msg.repo.Cloned() {
+				return updateBottomStatusBarMsg(statusMessageStyle("[Already Cloned] " + msg.repo.StoragePath()))
 			}
 
-			repoString, err := selected.Clone(context.Background(), m.gu)
+			repoString, err := msg.repo.Clone(context.Background(), m.gu)
 			if err != nil {
 				return updateBottomStatusBarMsg(statusError(err.Error()))
 			}
 
-			selected.SetTitle(brightStyle.Render(selected.Repository.Title))
+			msg.repo.SetTitle(brightStyle.Render(msg.repo.Repository.Title))
 
-			m.list.SetItem(m.list.Index(), selected)
+			m.list.SetItem(msg.index, msg.repo)
 			return updateBottomStatusBarMsg(statusMessageStyle("[Cloned] " + repoString))
 		})
 
@@ -100,7 +100,7 @@ func handleKeyMsg(msg tea.Msg, m *model, selected repoItem) tea.Cmd {
 			cmds = append(cmds, tea.Batch(
 				m.list.StartSpinner(),
 				func() tea.Msg {
-					return cloneRepoMsg{selected}
+					return cloneRepoMsg{selected, m.list.Index()}
 				},
 			))
 		case "w":
