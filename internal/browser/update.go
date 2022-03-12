@@ -2,7 +2,10 @@ package browser
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"os"
+	"os/exec"
 
 	"github.com/wmalik/ogit/internal/utils"
 
@@ -84,18 +87,37 @@ func handleKeyMsg(msg tea.Msg, m *model, selected repoItem) tea.Cmd {
 	cmds := []tea.Cmd{}
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		switch string(msg.Runes) {
-		case "o":
-			if selected.Cloned() {
-				m.spawnShell = true
-				cmds = append(cmds, tea.Quit)
-				break
+		switch msg.String() {
+		case "v":
+			if !selected.Cloned() {
+				return func() tea.Msg {
+					return updateBottomStatusBarMsg(
+						statusError("Not cloned yet, press c to clone"),
+					)
+				}
 			}
-			cmds = append(cmds, func() tea.Msg {
-				return updateBottomStatusBarMsg(
-					statusError("Not cloned yet, press c to clone"),
-				)
-			})
+			vimCmd := exec.Command("vim", selected.StoragePath())
+			vimCmd.Stdin = os.Stdin
+			vimCmd.Stdout = os.Stdout
+			if err := vimCmd.Run(); err != nil {
+				return func() tea.Msg {
+					return updateBottomStatusBarMsg(
+						statusError(fmt.Sprintf("Unable to run vim: %s", err)),
+					)
+				}
+			}
+			return tea.Batch(tea.HideCursor)
+
+		case "enter":
+			if !selected.Cloned() {
+				return func() tea.Msg {
+					return updateBottomStatusBarMsg(
+						statusError("Not cloned yet, press c to clone"),
+					)
+				}
+			}
+			m.spawnShell = true
+			cmds = append(cmds, tea.Quit)
 		case "c":
 			cmds = append(cmds, tea.Batch(
 				m.list.StartSpinner(),
