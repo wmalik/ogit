@@ -84,8 +84,8 @@ func handleKeyMsg(msg tea.Msg, m *model, selected repoItem) tea.Cmd {
 	cmds := []tea.Cmd{}
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		switch string(msg.Runes) {
-		case "o":
+		switch msg.String() {
+		case "enter":
 			if selected.Cloned() {
 				m.spawnShell = true
 				cmds = append(cmds, tea.Quit)

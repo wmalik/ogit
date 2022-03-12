@@ -57,8 +57,8 @@ func availableKeyBindingsCB() []key.Binding {
 			key.WithHelp("c", "clone a repository (shallow)"),
 		),
 		key.NewBinding(
-			key.WithKeys("o"),
-			key.WithHelp("o", "open cloned directory"),
+			key.WithKeys("enter"),
+			key.WithHelp("enter", "open with shell"),
 		),
 		key.NewBinding(
 			key.WithKeys("w"),
