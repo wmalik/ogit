@@ -54,27 +54,27 @@ func availableKeyBindingsCB() []key.Binding {
 	return []key.Binding{
 		key.NewBinding(
 			key.WithKeys("c"),
-			key.WithHelp("c", "clone a repository (shallow)"),
+			key.WithHelp("c", "clone"),
 		),
 		key.NewBinding(
 			key.WithKeys("o"),
-			key.WithHelp("o", "open with xdg-open"),
+			key.WithHelp("o", "open"),
 		),
 		key.NewBinding(
 			key.WithKeys("v"),
-			key.WithHelp("v", "open with vim"),
+			key.WithHelp("v", "vim"),
 		),
 		key.NewBinding(
 			key.WithKeys("enter"),
-			key.WithHelp("enter", "open with shell"),
+			key.WithHelp("enter", "shell"),
 		),
 		key.NewBinding(
 			key.WithKeys("w"),
-			key.WithHelp("w", "browse home page"),
+			key.WithHelp("w", "web"),
 		),
 		key.NewBinding(
 			key.WithKeys("p"),
-			key.WithHelp("p", "browse pull requests"),
+			key.WithHelp("p", "pulls"),
 		),
 	}
 }
