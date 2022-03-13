@@ -126,7 +126,7 @@ func handleKeyMsg(msg tea.Msg, m *model, selected repoItem) tea.Cmd {
 					)
 				}
 			}
-			return tea.Batch(tea.HideCursor)
+			return tea.HideCursor
 
 		case "enter":
 			if !selected.Cloned() {
