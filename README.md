@@ -103,9 +103,10 @@ The tokens can be generated [here](https://github.com/settings/tokens/new) and
 
 ### Usage
 
-#### Export tokens for API authentication
+#### Setup credentials
 
 ```
+ssh-add ~/.ssh/your_private_key
 export GITHUB_TOKEN="yourpersonalaccesstoken_with_full_repo_access"
 export GITLAB_TOKEN="yourtoken_with_read_api_scope"
 ```
