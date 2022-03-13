@@ -57,6 +57,10 @@ func availableKeyBindingsCB() []key.Binding {
 			key.WithHelp("c", "clone a repository (shallow)"),
 		),
 		key.NewBinding(
+			key.WithKeys("o"),
+			key.WithHelp("o", "open with xdg-open"),
+		),
+		key.NewBinding(
 			key.WithKeys("v"),
 			key.WithHelp("v", "open with vim"),
 		),

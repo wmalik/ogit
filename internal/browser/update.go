@@ -88,6 +88,26 @@ func handleKeyMsg(msg tea.Msg, m *model, selected repoItem) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
+		case "o":
+			if !selected.Cloned() {
+				return func() tea.Msg {
+					return updateBottomStatusBarMsg(
+						statusError("Not cloned yet, press c to clone"),
+					)
+				}
+			}
+			rangerCmd := exec.Command("xdg-open", selected.StoragePath())
+			rangerCmd.Stdin = os.Stdin
+			rangerCmd.Stdout = os.Stdout
+			if err := rangerCmd.Run(); err != nil {
+				return func() tea.Msg {
+					return updateBottomStatusBarMsg(
+						statusError(fmt.Sprintf("Unable to run xdg-open: %s", err)),
+					)
+				}
+			}
+			return tea.HideCursor
+
 		case "v":
 			if !selected.Cloned() {
 				return func() tea.Msg {
