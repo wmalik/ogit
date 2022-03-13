@@ -38,7 +38,7 @@ func (r *GitlabProject) GetBrowserHomepageURL() string {
 }
 
 func (r *GitlabProject) GetBrowserPullRequestsURL() string {
-	return r.Project.HTTPURLToRepo + "/merge_requests"
+	return r.Project.WebURL + "/merge_requests"
 }
 
 func (r *GitlabProject) GetHTTPSCloneURL() string {
