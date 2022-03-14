@@ -15,6 +15,11 @@ type Repository struct {
 	BrowserPullRequestsURL string
 	HTTPSCloneURL          string
 	SSHCloneURL            string
+	OrgURL                 string
+	IssuesURL              string
+	CIURL                  string
+	ReleasesURL            string
+	SettingsURL            string
 }
 
 type Repositories []Repository
@@ -50,6 +55,11 @@ func (r *RepositoryService) GetRepositoriesByOwners(ctx context.Context, owners 
 		res[i].Description = repo.GetDescription()
 		res[i].BrowserHomepageURL = repo.GetBrowserHomepageURL()
 		res[i].BrowserPullRequestsURL = repo.GetBrowserPullRequestsURL()
+		res[i].OrgURL = repo.GetOrgURL()
+		res[i].IssuesURL = repo.GetIssuesURL()
+		res[i].CIURL = repo.GetCIURL()
+		res[i].ReleasesURL = repo.GetReleasesURL()
+		res[i].SettingsURL = repo.GetSettingsURL()
 		res[i].HTTPSCloneURL = repo.GetHTTPSCloneURL()
 		res[i].SSHCloneURL = repo.GetSSHCloneURL()
 

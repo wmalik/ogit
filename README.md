@@ -128,3 +128,19 @@ ogit clone --org tpope
 ```
 ogit clone --org tpope --filter vim
 ```
+
+#### Open repository specific urls in your web browser
+
+```
+cd /your_ogit_storage_path/github/charmbracelet/bubbletea
+```
+
+```
+ogit pulls
+ogit web
+ogit org
+ogit issues
+ogit actions
+ogit releases
+ogit settings
+```

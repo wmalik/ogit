@@ -4,6 +4,8 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"net/url"
+	"path/filepath"
 	"strconv"
 	"sync"
 
@@ -44,6 +46,32 @@ func (r *GithubRepository) GetBrowserHomepageURL() string {
 
 func (r *GithubRepository) GetBrowserPullRequestsURL() string {
 	return r.GetHTMLURL() + "/pulls"
+}
+
+func (r *GithubRepository) GetOrgURL() string {
+	parsed, err := url.Parse(r.GetHTMLURL())
+	if err != nil {
+		log.Println("unable to parse org url")
+		return ""
+	}
+	parsed.Path = filepath.Dir(parsed.Path)
+	return parsed.String()
+}
+
+func (r *GithubRepository) GetIssuesURL() string {
+	return r.GetHTMLURL() + "/issues"
+}
+
+func (r *GithubRepository) GetCIURL() string {
+	return r.GetHTMLURL() + "/actions"
+}
+
+func (r *GithubRepository) GetReleasesURL() string {
+	return r.GetHTMLURL() + "/releases"
+}
+
+func (r *GithubRepository) GetSettingsURL() string {
+	return r.GetHTMLURL() + "/settings"
 }
 
 func (r *GithubRepository) GetHTTPSCloneURL() string {

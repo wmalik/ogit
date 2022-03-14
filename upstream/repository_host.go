@@ -18,6 +18,11 @@ type HostRepository interface {
 	GetBrowserPullRequestsURL() string
 	GetHTTPSCloneURL() string
 	GetSSHCloneURL() string
+	GetOrgURL() string
+	GetIssuesURL() string
+	GetCIURL() string
+	GetReleasesURL() string
+	GetSettingsURL() string
 }
 
 type HostRepositories []HostRepository

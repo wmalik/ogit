@@ -8,6 +8,7 @@ import (
 	"github.com/wmalik/ogit/internal/browser"
 	"github.com/wmalik/ogit/internal/bulkclone"
 	"github.com/wmalik/ogit/internal/clear"
+	"github.com/wmalik/ogit/internal/repocommands"
 
 	"github.com/urfave/cli/v2"
 )
@@ -32,9 +33,8 @@ func main() {
 		},
 		Commands: []*cli.Command{
 			{
-				Name:    "fetch",
-				Aliases: []string{"f"},
-				Usage:   "Fetch repository metadata",
+				Name:  "fetch",
+				Usage: "Fetch all repository metadata from provider APIs (e.g. GitHub/GitLab)",
 				Action: func(c *cli.Context) error {
 					if err := browser.HandleCommandFetch(); err != nil {
 						log.Fatalln(err)
@@ -43,9 +43,8 @@ func main() {
 				},
 			},
 			{
-				Name:    "clone",
-				Aliases: []string{"c"},
-				Usage:   "Clone repositories in bulk",
+				Name:  "clone",
+				Usage: "Clone repositories of an organization",
 				Flags: []cli.Flag{
 					&cli.StringFlag{
 						Name:     "org",
@@ -69,6 +68,79 @@ func main() {
 				Usage: "Clear all local repository metadata (not the repository contents)",
 				Action: func(c *cli.Context) error {
 					if err := clear.HandleCommandDefault(c.Context); err != nil {
+						log.Fatalln(err)
+					}
+					return nil
+				},
+			},
+			{
+				Name:    "pulls",
+				Aliases: []string{"prs", "mrs"},
+				Usage:   "Open repository pull requests in web browser",
+				Action: func(c *cli.Context) error {
+					if err := repocommands.HandleURLCommands(c.Context, repocommands.Pulls); err != nil {
+						log.Fatalln(err)
+					}
+					return nil
+				},
+			},
+			{
+				Name:    "web",
+				Aliases: []string{"home"},
+				Usage:   "Open repository home page in web browser",
+				Action: func(c *cli.Context) error {
+					if err := repocommands.HandleURLCommands(c.Context, repocommands.Web); err != nil {
+						log.Fatalln(err)
+					}
+					return nil
+				},
+			},
+			{
+				Name:  "org",
+				Usage: "Open repository org in web browser",
+				Action: func(c *cli.Context) error {
+					if err := repocommands.HandleURLCommands(c.Context, repocommands.Org); err != nil {
+						log.Fatalln(err)
+					}
+					return nil
+				},
+			},
+			{
+				Name:  "issues",
+				Usage: "Open repository issues in web browser",
+				Action: func(c *cli.Context) error {
+					if err := repocommands.HandleURLCommands(c.Context, repocommands.Issues); err != nil {
+						log.Fatalln(err)
+					}
+					return nil
+				},
+			},
+			{
+				Name:    "ci",
+				Aliases: []string{"actions"},
+				Usage:   "Open repository CI/actions in web browser",
+				Action: func(c *cli.Context) error {
+					if err := repocommands.HandleURLCommands(c.Context, repocommands.CI); err != nil {
+						log.Fatalln(err)
+					}
+					return nil
+				},
+			},
+			{
+				Name:  "releases",
+				Usage: "Open repository releases in web browser",
+				Action: func(c *cli.Context) error {
+					if err := repocommands.HandleURLCommands(c.Context, repocommands.Releases); err != nil {
+						log.Fatalln(err)
+					}
+					return nil
+				},
+			},
+			{
+				Name:  "settings",
+				Usage: "Open repository settings in web browser",
+				Action: func(c *cli.Context) error {
+					if err := repocommands.HandleURLCommands(c.Context, repocommands.Settings); err != nil {
 						log.Fatalln(err)
 					}
 					return nil
