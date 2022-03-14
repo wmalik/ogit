@@ -3,6 +3,8 @@ package upstream
 import (
 	"context"
 	"log"
+	"net/url"
+	"path/filepath"
 	"sync"
 
 	"github.com/xanzy/go-gitlab"
@@ -39,6 +41,32 @@ func (r *GitlabProject) GetBrowserHomepageURL() string {
 
 func (r *GitlabProject) GetBrowserPullRequestsURL() string {
 	return r.Project.WebURL + "/merge_requests"
+}
+
+func (r *GitlabProject) GetOrgURL() string {
+	parsed, err := url.Parse(r.Project.WebURL)
+	if err != nil {
+		log.Println("unable to parse org url")
+		return ""
+	}
+	parsed.Path = filepath.Dir(parsed.Path)
+	return parsed.String()
+}
+
+func (r *GitlabProject) GetIssuesURL() string {
+	return r.Project.WebURL + "/issues"
+}
+
+func (r *GitlabProject) GetCIURL() string {
+	return r.Project.WebURL + "/pipelines"
+}
+
+func (r *GitlabProject) GetReleasesURL() string {
+	return r.Project.WebURL + "/releases"
+}
+
+func (r *GitlabProject) GetSettingsURL() string {
+	return r.Project.WebURL + "/edit"
 }
 
 func (r *GitlabProject) GetHTTPSCloneURL() string {

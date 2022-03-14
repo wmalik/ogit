@@ -13,6 +13,11 @@ type MockRepository struct {
 	BrowserPullRequestsURL string
 	HTTPSCloneURL          string
 	SSHCloneURL            string
+	OrgURL                 string
+	IssuesURL              string
+	CIURL                  string
+	ReleasesURL            string
+	SettingsURL            string
 }
 
 func (r *MockRepository) GetProvider() string {
@@ -37,6 +42,26 @@ func (r *MockRepository) GetBrowserHomepageURL() string {
 
 func (r *MockRepository) GetBrowserPullRequestsURL() string {
 	return r.BrowserPullRequestsURL
+}
+
+func (r *MockRepository) GetOrgURL() string {
+	return r.OrgURL
+}
+
+func (r *MockRepository) GetIssuesURL() string {
+	return r.IssuesURL
+}
+
+func (r *MockRepository) GetCIURL() string {
+	return r.CIURL
+}
+
+func (r *MockRepository) GetReleasesURL() string {
+	return r.ReleasesURL
+}
+
+func (r *MockRepository) GetSettingsURL() string {
+	return r.SettingsURL
 }
 
 func (r *MockRepository) GetHTTPSCloneURL() string {

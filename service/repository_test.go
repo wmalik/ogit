@@ -40,6 +40,11 @@ var _ = Describe("Repository service", func() {
 					BrowserPullRequestsURL: "https://gitlab.com/wmalik/ogit/pulls",
 					HTTPSCloneURL:          "https://gitlab.com/wmalik/ogit.git",
 					SSHCloneURL:            "git@gitlab.com/wmalik/ogit.git",
+					OrgURL:                 "https://gitlab.com/wmalik",
+					IssuesURL:              "https://gitlab.com/wmalik/ogit/issues",
+					CIURL:                  "https://gitlab.com/wmalik/ogit/actions",
+					ReleasesURL:            "https://gitlab.com/wmalik/ogit/releases",
+					SettingsURL:            "https://gitlab.com/wmalik/ogit/settings",
 				},
 				{
 					Provider:               "gitlab",
@@ -50,6 +55,11 @@ var _ = Describe("Repository service", func() {
 					BrowserPullRequestsURL: "https://gitlab.com/wmalik/dotfiles/pulls",
 					HTTPSCloneURL:          "https://gitlab.com/wmalik/dotfiles.git",
 					SSHCloneURL:            "git@gitlab.com/wmalik/dotfiles.git",
+					OrgURL:                 "https://gitlab.com/wmalik",
+					IssuesURL:              "https://gitlab.com/wmalik/dotfiles/issues",
+					CIURL:                  "https://gitlab.com/wmalik/dotfiles/pipelines",
+					ReleasesURL:            "https://gitlab.com/wmalik/dotfiles/releases",
+					SettingsURL:            "https://gitlab.com/wmalik/dotfiles/edit",
 				},
 				{
 					Provider:               "gitlab",
@@ -60,6 +70,11 @@ var _ = Describe("Repository service", func() {
 					BrowserPullRequestsURL: "https://gitlab.com/padawin/dotfiles/pulls",
 					HTTPSCloneURL:          "https://gitlab.com/padawin/dotfiles.git",
 					SSHCloneURL:            "git@gitlab.com/padawin/dotfiles.git",
+					OrgURL:                 "https://gitlab.com/padawin",
+					IssuesURL:              "https://gitlab.com/padawin/dotfiles/issues",
+					CIURL:                  "https://gitlab.com/padawin/dotfiles/pipelines",
+					ReleasesURL:            "https://gitlab.com/padawin/dotfiles/releases",
+					SettingsURL:            "https://gitlab.com/padawin/dotfiles/edit",
 				},
 			})
 			client := upstream.NewMockClient().WithRepositories([]upstream.MockRepository{
@@ -72,6 +87,11 @@ var _ = Describe("Repository service", func() {
 					BrowserPullRequestsURL: "https://github.com/wmalik/ogit/pulls",
 					HTTPSCloneURL:          "https://github.com/wmalik/ogit.git",
 					SSHCloneURL:            "git@github.com/wmalik/ogit.git",
+					OrgURL:                 "https://github.com/wmalik",
+					IssuesURL:              "https://github.com/wmalik/ogit/issues",
+					CIURL:                  "https://github.com/wmalik/ogit/actions",
+					ReleasesURL:            "https://github.com/wmalik/ogit/releases",
+					SettingsURL:            "https://github.com/wmalik/ogit/settings",
 				},
 				{
 					Provider:               "github",
@@ -82,6 +102,11 @@ var _ = Describe("Repository service", func() {
 					BrowserPullRequestsURL: "https://github.com/wmalik/dotfiles/pulls",
 					HTTPSCloneURL:          "https://github.com/wmalik/dotfiles.git",
 					SSHCloneURL:            "git@github.com/wmalik/dotfiles.git",
+					OrgURL:                 "https://github.com/wmalik",
+					IssuesURL:              "https://github.com/wmalik/dotfiles/issues",
+					CIURL:                  "https://github.com/wmalik/dotfiles/actions",
+					ReleasesURL:            "https://github.com/wmalik/dotfiles/releases",
+					SettingsURL:            "https://github.com/wmalik/dotfiles/settings",
 				},
 				{
 					Provider:               "github",
@@ -92,6 +117,11 @@ var _ = Describe("Repository service", func() {
 					BrowserPullRequestsURL: "https://github.com/padawin/dotfiles/pulls",
 					HTTPSCloneURL:          "https://github.com/padawin/dotfiles.git",
 					SSHCloneURL:            "git@github.com/padawin/dotfiles.git",
+					OrgURL:                 "https://github.com/padawin",
+					IssuesURL:              "https://github.com/padawin/dotfiles/issues",
+					CIURL:                  "https://github.com/padawin/dotfiles/actions",
+					ReleasesURL:            "https://github.com/padawin/dotfiles/releases",
+					SettingsURL:            "https://github.com/padawin/dotfiles/settings",
 				},
 			})
 			repoService = service.NewRepositoryService(client, gitlabClient, false)
