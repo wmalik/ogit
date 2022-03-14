@@ -3,6 +3,8 @@
 TUI and CLI for organizing git repositories across multiple providers (e.g.
 GitHub, GitLab).
 
+<img src="./usage.svg" width="750">
+
 ### Install
 
 #### Install via go-install
