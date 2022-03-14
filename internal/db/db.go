@@ -60,6 +60,18 @@ func (d *Database) SelectAllRepositories(ctx context.Context) ([]Repository, err
 	return repos, nil
 }
 
+func (d *Database) FindRepository(ctx context.Context, provider, org, name string) (*Repository, error) {
+	var repo Repository
+	if result := d.DB.WithContext(ctx).
+		Where("provider = ?", provider).
+		Where("owner = ?", org).
+		Where("name = ?", name).
+		First(&repo); result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &repo, nil
+}
 func (d *Database) SelectRepositories(ctx context.Context, org, filter string) ([]Repository, error) {
 	var repos []Repository
 	if result := d.DB.WithContext(ctx).
