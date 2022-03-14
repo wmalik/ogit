@@ -34,7 +34,7 @@ func main() {
 		Commands: []*cli.Command{
 			{
 				Name:  "fetch",
-				Usage: "Fetch repository metadata",
+				Usage: "Fetch all repository metadata from provider APIs (e.g. GitHub/GitLab)",
 				Action: func(c *cli.Context) error {
 					if err := browser.HandleCommandFetch(); err != nil {
 						log.Fatalln(err)
@@ -44,7 +44,7 @@ func main() {
 			},
 			{
 				Name:  "clone",
-				Usage: "Clone repositories in bulk",
+				Usage: "Clone repositories of an organization",
 				Flags: []cli.Flag{
 					&cli.StringFlag{
 						Name:     "org",
