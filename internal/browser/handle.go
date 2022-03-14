@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"path/filepath"
 
 	"github.com/wmalik/ogit/internal/db"
 	"github.com/wmalik/ogit/internal/gitconfig"
@@ -67,7 +68,7 @@ func HandleCommandDefault() error {
 		log.Fatalln(err)
 	}
 
-	f, err := tea.LogToFile("/tmp/ogit.log", "debug")
+	f, err := tea.LogToFile(filepath.Join(os.TempDir(), "ogit.log"), "ogit")
 	if err != nil {
 		log.Fatalln(err)
 	}
