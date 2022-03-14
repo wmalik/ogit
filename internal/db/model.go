@@ -11,6 +11,11 @@ type Repository struct {
 	Description            string
 	BrowserHomepageURL     string
 	BrowserPullRequestsURL string
+	OrgURL                 string
+	IssuesURL              string
+	CIURL                  string
+	ReleasesURL            string
+	SettingsURL            string
 	HTTPSCloneURL          string
 	SSHCloneURL            string
 }
@@ -23,6 +28,11 @@ func NewRepository(
 	description,
 	browserHomepageURL,
 	browserPullRequestsURL,
+	orgURL,
+	issuesURL,
+	ciURL,
+	releasesURL,
+	settingsURL,
 	httpsCloneURL,
 	sshCloneURL string,
 ) Repository {
@@ -34,6 +44,11 @@ func NewRepository(
 		Description:            description,
 		BrowserHomepageURL:     browserHomepageURL,
 		BrowserPullRequestsURL: browserPullRequestsURL,
+		OrgURL:                 orgURL,
+		IssuesURL:              issuesURL,
+		CIURL:                  ciURL,
+		ReleasesURL:            releasesURL,
+		SettingsURL:            settingsURL,
 		HTTPSCloneURL:          httpsCloneURL,
 		SSHCloneURL:            sshCloneURL,
 	}
