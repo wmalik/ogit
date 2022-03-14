@@ -33,9 +33,8 @@ func main() {
 		},
 		Commands: []*cli.Command{
 			{
-				Name:    "fetch",
-				Aliases: []string{"f"},
-				Usage:   "Fetch repository metadata",
+				Name:  "fetch",
+				Usage: "Fetch repository metadata",
 				Action: func(c *cli.Context) error {
 					if err := browser.HandleCommandFetch(); err != nil {
 						log.Fatalln(err)
@@ -44,9 +43,8 @@ func main() {
 				},
 			},
 			{
-				Name:    "clone",
-				Aliases: []string{"c"},
-				Usage:   "Clone repositories in bulk",
+				Name:  "clone",
+				Usage: "Clone repositories in bulk",
 				Flags: []cli.Flag{
 					&cli.StringFlag{
 						Name:     "org",
