@@ -1,4 +1,6 @@
 # ogit
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fwmalik%2Fogit.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fwmalik%2Fogit?ref=badge_shield)
+
 
 TUI and CLI for organizing git repositories across multiple providers (e.g.
 GitHub, GitLab).
@@ -146,3 +148,7 @@ ogit actions
 ogit releases
 ogit settings
 ```
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fwmalik%2Fogit.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fwmalik%2Fogit?ref=badge_large)
