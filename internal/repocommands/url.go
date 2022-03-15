@@ -29,6 +29,10 @@ const (
 func HandleURLCommands(ctx context.Context, command Command) error {
 	repo, err := findRepositoryCWD(ctx)
 	if err != nil {
+		if err.Error() == "record not found" {
+			fmt.Println("error: repository not managed by ogit")
+			return nil
+		}
 		return err
 	}
 
