@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"path"
+	"strings"
 
 	"github.com/wmalik/ogit/internal/db"
 	"github.com/wmalik/ogit/internal/gitutils"
@@ -23,7 +24,7 @@ func newRepoItem(repo *db.Repository, storageBasePath string) repoItem {
 }
 
 func (i repoItem) Title() string       { return i.Repository.Title }
-func (i repoItem) Description() string { return i.Repository.Description }
+func (i repoItem) Description() string { return strings.TrimSpace(i.Repository.Description) }
 func (i repoItem) FilterValue() string { return i.Repository.Title + i.Repository.Description }
 func (i repoItem) StoragePath() string {
 	return i.repoStoragePath

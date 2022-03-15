@@ -170,7 +170,7 @@ func listItemDelegate(storagePath string) list.DefaultDelegate {
 	d.SetSpacing(0)
 	d.UpdateFunc = func(msg tea.Msg, m *list.Model) tea.Cmd {
 		if selected, ok := m.SelectedItem().(repoItem); ok {
-			return m.NewStatusMessage(selected.Repository.Description)
+			return m.NewStatusMessage(selected.Description())
 		}
 		return nil
 	}
