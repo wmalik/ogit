@@ -13,7 +13,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// ldflags populated by goreleaser
+// ldflags populated by goreleaser.
 var (
 	version = ""
 	commit  = ""

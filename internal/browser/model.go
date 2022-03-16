@@ -13,7 +13,7 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 )
 
-// The state of browser
+// The state of browser.
 type model struct {
 	// the list of repositories
 	list list.Model

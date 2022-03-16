@@ -16,7 +16,7 @@ func Spawn(dir string) error {
 	return runProcess(shell, dir, "-i")
 }
 
-// runProcess starts a process in a certain directory, and waits for it to exit
+// runProcess starts a process in a certain directory, and waits for it to exit.
 func runProcess(name string, dir string, args ...string) error {
 	proc, err := os.StartProcess(
 		name,

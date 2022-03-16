@@ -28,9 +28,8 @@ func defaultGitConfig() *GitConfig {
 	}
 }
 
-// readGitConfig loads the value of ogit.orgs from ~/.gitconfig
+// readGitConfig loads the value of ogit.orgs from ~/.gitconfig.
 func ReadGitConfig() (*GitConfig, error) {
-
 	conf := defaultGitConfig()
 
 	orgs, err := getOrgs()

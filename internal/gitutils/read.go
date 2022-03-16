@@ -33,5 +33,4 @@ func ReadRepository(path string) (*Repository, error) {
 			When:        commitObject.Author.When,
 		},
 	}, nil
-
 }

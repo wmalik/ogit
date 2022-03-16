@@ -14,7 +14,7 @@ import (
 )
 
 // Sync fetches the repository metadata from upstream and stores it in the local
-// database (on disk)
+// database (on disk).
 func Sync(ctx context.Context, gitConf *gitconfig.GitConfig) error {
 	gitlabClient, err := upstream.NewGitlabClientWithToken(os.Getenv("GITLAB_TOKEN"))
 	if err != nil {

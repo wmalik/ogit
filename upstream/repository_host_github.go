@@ -227,7 +227,7 @@ func (c *GithubClient) getRepositoriesForOrg(ctx context.Context, org string, st
 	return repos, nil
 }
 
-// setUserInfo fetches the authenticated user's information and stores it
+// setUserInfo fetches the authenticated user's information and stores it.
 func (c *GithubClient) setUserInfo(ctx context.Context) error {
 	user, _, err := c.client.Users.Get(ctx, "")
 	if err != nil {

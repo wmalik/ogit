@@ -217,7 +217,7 @@ func (c *GitlabClient) getProjectsForGroup(ctx context.Context, group string) ([
 	return repos, nil
 }
 
-// setUserInfo fetches the authenticated user's information and stores it
+// setUserInfo fetches the authenticated user's information and stores it.
 func (c *GitlabClient) setUserInfo(ctx context.Context) error {
 	user, _, err := c.client.Users.CurrentUser()
 	if err != nil {
