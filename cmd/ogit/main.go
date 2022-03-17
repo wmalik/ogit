@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/wmalik/ogit/internal/browser"
 	"github.com/wmalik/ogit/internal/bulkclone"
 	"github.com/wmalik/ogit/internal/clear"
