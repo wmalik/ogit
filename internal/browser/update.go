@@ -95,7 +95,7 @@ func handleKeyMsg(msg tea.Msg, m *Model, selected repoItem) tea.Cmd {
 					)
 				}
 			}
-			rangerCmd := exec.Command("xdg-open", selected.StoragePath())
+			rangerCmd := exec.Command("xdg-open", selected.StoragePath()) //nolint:gosec
 			rangerCmd.Stdin = os.Stdin
 			rangerCmd.Stdout = os.Stdout
 			if err := rangerCmd.Run(); err != nil {
@@ -115,7 +115,7 @@ func handleKeyMsg(msg tea.Msg, m *Model, selected repoItem) tea.Cmd {
 					)
 				}
 			}
-			vimCmd := exec.Command("vim", selected.StoragePath())
+			vimCmd := exec.Command("vim", selected.StoragePath()) //nolint:gosec
 			vimCmd.Stdin = os.Stdin
 			vimCmd.Stdout = os.Stdout
 			if err := vimCmd.Run(); err != nil {
