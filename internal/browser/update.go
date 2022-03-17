@@ -13,7 +13,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	cmds := []tea.Cmd{}
 	selected, ok := m.list.SelectedItem().(repoItem)
 	if !ok && len(m.list.VisibleItems()) > 0 {
@@ -31,7 +31,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, tea.Batch(append(cmds, cmd)...)
 }
 
-func handleMsg(msg tea.Msg, m *model) tea.Cmd {
+func handleMsg(msg tea.Msg, m *Model) tea.Cmd {
 	cmds := []tea.Cmd{}
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
@@ -82,7 +82,7 @@ func handleMsg(msg tea.Msg, m *model) tea.Cmd {
 	return tea.Batch(cmds...)
 }
 
-func handleKeyMsg(msg tea.Msg, m *model, selected repoItem) tea.Cmd {
+func handleKeyMsg(msg tea.Msg, m *Model, selected repoItem) tea.Cmd {
 	cmds := []tea.Cmd{}
 	switch msg := msg.(type) {
 	case tea.KeyMsg:

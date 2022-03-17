@@ -13,7 +13,7 @@ import (
 )
 
 // The state of browser.
-type model struct {
+type Model struct {
 	// the list of repositories
 	list list.Model
 	// list of organisations or users (currently only public users or organisations)
@@ -38,7 +38,7 @@ func NewModelWithItems(repos []db.Repository, storagePath string, gu *gitutils.G
 	m.AdditionalShortHelpKeys = availableKeyBindingsCB
 	m.SetShowStatusBar(false)
 
-	return &model{
+	return &Model{
 		list:            m,
 		storagePath:     storagePath,
 		bottomStatusBar: "-",
