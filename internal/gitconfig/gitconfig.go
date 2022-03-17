@@ -28,9 +28,8 @@ func defaultGitConfig() *GitConfig {
 	}
 }
 
-// readGitConfig loads the value of ogit.orgs from ~/.gitconfig
+// readGitConfig loads the value of ogit.orgs from ~/.gitconfig.
 func ReadGitConfig() (*GitConfig, error) {
-
 	conf := defaultGitConfig()
 
 	orgs, err := getOrgs()
@@ -61,7 +60,7 @@ func ReadGitConfig() (*GitConfig, error) {
 	if err != nil {
 		return nil, err
 	}
-	if fetchUserRepos == false {
+	if !fetchUserRepos {
 		conf.fetchUserRepos = false
 	}
 
@@ -69,7 +68,7 @@ func ReadGitConfig() (*GitConfig, error) {
 	if err != nil {
 		return nil, err
 	}
-	if useSSHAgent != true {
+	if !useSSHAgent {
 		conf.useSSHAgent = useSSHAgent
 	}
 	if privKeyPath != "" {

@@ -14,7 +14,7 @@ import (
 
 type Command int32
 
-// Various command types supported by HandleURLCommands
+// Various command types supported by HandleURLCommands.
 const (
 	Pulls Command = iota
 	Web
@@ -25,7 +25,7 @@ const (
 	Settings
 )
 
-// HandleURLCommands opens the relevant URL in the web browser
+// HandleURLCommands opens the relevant URL in the web browser.
 func HandleURLCommands(ctx context.Context, command Command) error {
 	repo, err := findRepositoryCWD(ctx)
 	if err != nil {

@@ -20,19 +20,19 @@ type HTTPClient struct {
 	routesFinalized bool
 }
 
-// roundTripperMocked is a mocked RoundTripper for mocking responses from external services
+// roundTripperMocked is a mocked RoundTripper for mocking responses from external services.
 type roundTripperMocked struct {
 	mux *mux.Router
 }
 
-// NewHTTPClient returns an HTTPClient with no routes defined
+// NewHTTPClient returns an HTTPClient with no routes defined.
 func NewHTTPClient() *HTTPClient {
 	return &HTTPClient{
 		roundTripper: &roundTripperMocked{mux.NewRouter()},
 	}
 }
 
-// Client returns the mocked HTTP Client instance
+// Client returns the mocked HTTP Client instance.
 func (hc *HTTPClient) Client() *http.Client {
 	if !hc.routesFinalized {
 		// Register a wildcard route to warn for calls to unknown routes
@@ -45,14 +45,14 @@ func (hc *HTTPClient) Client() *http.Client {
 	return &http.Client{Transport: hc.roundTripper}
 }
 
-// RoundTrip implements the RoundTrip method of RoundTripper for mocking purposes
+// RoundTrip implements the RoundTrip method of RoundTripper for mocking purposes.
 func (rt roundTripperMocked) RoundTrip(r *http.Request) (*http.Response, error) {
 	w := httptest.NewRecorder()
 	rt.mux.ServeHTTP(w, r)
 	return w.Result(), nil
 }
 
-// Mock registers an HTTP handler for the provided method and path
+// Mock registers an HTTP handler for the provided method and path.
 func (hc *HTTPClient) Mock(method, path string, handler http.HandlerFunc) *HTTPClient {
 	if hc.routesFinalized {
 		panic("http_client: Mock() cannot be called after Client()")

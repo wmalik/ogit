@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/wmalik/ogit/internal/browser"
 	"github.com/wmalik/ogit/internal/bulkclone"
 	"github.com/wmalik/ogit/internal/clear"
@@ -13,7 +14,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// ldflags populated by goreleaser
+// ldflags populated by goreleaser.
 var (
 	version = ""
 	commit  = ""
@@ -149,8 +150,7 @@ func main() {
 		},
 	}
 
-	err := app.Run(os.Args)
-	if err != nil {
+	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err)
 	}
 }

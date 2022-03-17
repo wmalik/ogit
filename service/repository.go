@@ -62,7 +62,6 @@ func (r *RepositoryService) GetRepositoriesByOwners(ctx context.Context, owners 
 		res[i].SettingsURL = repo.GetSettingsURL()
 		res[i].HTTPSCloneURL = repo.GetHTTPSCloneURL()
 		res[i].SSHCloneURL = repo.GetSSHCloneURL()
-
 	}
 	return &res, nil
 }

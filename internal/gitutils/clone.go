@@ -15,7 +15,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/transport/ssh"
 )
 
-var ErrRepoAlreadyCloned error = errors.New("Repository already cloned")
+var ErrRepoAlreadyCloned = errors.New("Repository already cloned")
 
 type commitInfo struct {
 	AuthorName  string
@@ -88,7 +88,7 @@ func (r *Repository) LastCommit() string {
 // a fully cloned repository.
 // If an authentication method has been configured, the repository is cloned
 // using sshURL, otherwise it is cloned using httpsURL.  The progress of the
-// clone operation is streamed to the progress io.Writer
+// clone operation is streamed to the progress io.Writer.
 func (gu *GitUtils) CloneToDisk(ctx context.Context, httpsURL, sshURL, path string, progress io.Writer) (string, error) {
 	cloneURL := sshURL
 	if gu.cloneOverHTTPS {
@@ -147,7 +147,7 @@ func (gu *GitUtils) CloneToDisk(ctx context.Context, httpsURL, sshURL, path stri
 	return repository.String(), nil
 }
 
-// Cloned checks if a path contains a .git directory
+// Cloned checks if a path contains a .git directory.
 func Cloned(dir string) (bool, error) {
 	if _, err := os.Stat(path.Join(dir, ".git")); err != nil {
 		if errors.Is(err, os.ErrNotExist) {
