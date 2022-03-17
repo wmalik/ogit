@@ -15,7 +15,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/transport/ssh"
 )
 
-var ErrRepoAlreadyCloned error = errors.New("Repository already cloned")
+var ErrRepoAlreadyCloned = errors.New("Repository already cloned")
 
 type commitInfo struct {
 	AuthorName  string
