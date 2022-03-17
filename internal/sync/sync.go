@@ -72,5 +72,4 @@ func toDatabaseRepositories(repos *service.Repositories) []db.Repository {
 	}
 
 	return dbRepos
-
 }

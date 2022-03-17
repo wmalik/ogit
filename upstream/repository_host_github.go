@@ -133,7 +133,6 @@ func (c *GithubClient) GetRepositories(ctx context.Context, owners []string, fet
 					if err.Error() != "not found" {
 						return err
 					}
-
 				}
 
 				if len(repos) == 0 {

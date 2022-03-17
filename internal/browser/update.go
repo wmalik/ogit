@@ -78,7 +78,6 @@ func handleMsg(msg tea.Msg, m *model) tea.Cmd {
 			}
 			return nil
 		})
-
 	}
 	return tea.Batch(cmds...)
 }

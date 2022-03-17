@@ -29,8 +29,7 @@ type model struct {
 	gu *gitutils.GitUtils
 }
 
-func NewModelWithItems(repos []db.Repository, storagePath string, gu *gitutils.GitUtils) *model {
-
+func NewModelWithItems(repos []db.Repository, storagePath string, gu *gitutils.GitUtils) *Model {
 	listItems := sortItemsCloned(toItems(repos, storagePath))
 	m := list.NewModel(listItems, listItemDelegate(), 0, 0)
 	m.StatusMessageLifetime = time.Second * 60
