@@ -160,7 +160,7 @@ func (c *GitlabClient) getProjectsForAuthUser(userID int, username string) ([]Ho
 		// Get the first page with projects.
 		projects, resp, err := c.client.Projects.ListUserProjects(userID, opt)
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 
 		logPaginationStatus(gitlabUpstream, username, len(projects), resp.TotalPages-resp.NextPage-1, resp.Header.Get("RateLimit-Remaining"))
