@@ -7,7 +7,6 @@ import (
 
 	"github.com/wmalik/ogit/internal/db"
 	"github.com/wmalik/ogit/internal/gitutils"
-	"github.com/wmalik/ogit/service"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
@@ -18,7 +17,6 @@ type model struct {
 	// the list of repositories
 	list list.Model
 	// list of organisations or users (currently only public users or organisations)
-	orgs []string
 	// the path on disk where repositories should be cloned
 	storagePath string
 	// A status bar to show useful information e.g. Github API usage
@@ -29,13 +27,12 @@ type model struct {
 	spawnShell bool
 
 	gu *gitutils.GitUtils
-	rs *service.RepositoryService
 }
 
 func NewModelWithItems(repos []db.Repository, storagePath string, gu *gitutils.GitUtils) *model {
 
 	listItems := sortItemsCloned(toItems(repos, storagePath))
-	m := list.NewModel(listItems, listItemDelegate(storagePath), 0, 0)
+	m := list.NewModel(listItems, listItemDelegate(), 0, 0)
 	m.StatusMessageLifetime = time.Second * 60
 	m.Title = fmt.Sprintf("[ogit] [%s]", storagePath)
 	m.Styles.Title = titleBarStyle

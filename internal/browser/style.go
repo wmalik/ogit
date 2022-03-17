@@ -9,8 +9,6 @@ var appStyle = lipgloss.NewStyle().Align(lipgloss.Center).PaddingLeft(5).Padding
 
 var bottomStatusBarStyle = lipgloss.NewStyle().Height(1).Faint(true)
 
-var spinnerStyle = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#0000ff", Dark: "#000099"})
-
 var brightStyle = lipgloss.NewStyle().
 	Foreground(lipgloss.AdaptiveColor{Light: "#1a1a1a", Dark: "#dddddd"})
 

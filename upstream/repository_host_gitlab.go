@@ -100,7 +100,7 @@ func (c *GitlabClient) GetRepositories(ctx context.Context, groups []string, fet
 	res := HostRepositories{}
 	var m sync.Map
 
-	if err := c.setUserInfo(ctx); err != nil {
+	if err := c.setUserInfo(); err != nil {
 		return nil, err
 	}
 
@@ -108,9 +108,9 @@ func (c *GitlabClient) GetRepositories(ctx context.Context, groups []string, fet
 
 	var g errgroup.Group
 	if fetchUserRepos {
-		g.Go(func(ctx context.Context) func() error {
+		g.Go(func() func() error {
 			return func() error {
-				userProjects, err := c.getProjectsForAuthUser(ctx, c.userID, c.username)
+				userProjects, err := c.getProjectsForAuthUser(c.userID, c.username)
 				if err != nil {
 					return err
 				}
@@ -118,13 +118,13 @@ func (c *GitlabClient) GetRepositories(ctx context.Context, groups []string, fet
 				m.Store(c.username, userProjects)
 				return nil
 			}
-		}(ctx))
+		}())
 	}
 
 	for _, group := range groups {
 		g.Go(func(group string) func() error {
 			return func() error {
-				repos, err := c.getProjectsForGroup(ctx, group)
+				repos, err := c.getProjectsForGroup(group)
 				if err != nil {
 					return err
 				}
@@ -147,7 +147,7 @@ func (c *GitlabClient) GetRepositories(ctx context.Context, groups []string, fet
 	return res.DeDuplicate(), nil
 }
 
-func (c *GitlabClient) getProjectsForAuthUser(ctx context.Context, userID int, username string) ([]HostRepository, error) {
+func (c *GitlabClient) getProjectsForAuthUser(userID int, username string) ([]HostRepository, error) {
 	opt := &gitlab.ListProjectsOptions{
 		ListOptions: gitlab.ListOptions{
 			PerPage: gitlabPageSize,
@@ -181,7 +181,7 @@ func (c *GitlabClient) getProjectsForAuthUser(ctx context.Context, userID int, u
 	return repos, nil
 }
 
-func (c *GitlabClient) getProjectsForGroup(ctx context.Context, group string) ([]HostRepository, error) {
+func (c *GitlabClient) getProjectsForGroup(group string) ([]HostRepository, error) {
 	opt := &gitlab.ListGroupProjectsOptions{
 		ListOptions: gitlab.ListOptions{
 			PerPage: gitlabPageSize,
@@ -218,7 +218,7 @@ func (c *GitlabClient) getProjectsForGroup(ctx context.Context, group string) ([
 }
 
 // setUserInfo fetches the authenticated user's information and stores it.
-func (c *GitlabClient) setUserInfo(ctx context.Context) error {
+func (c *GitlabClient) setUserInfo() error {
 	user, _, err := c.client.Users.CurrentUser()
 	if err != nil {
 		return err

@@ -22,7 +22,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	if m.list.FilterState() != list.Filtering {
 		cmds = append(cmds, handleKeyMsg(msg, m, selected))
-		cmds = append(cmds, handleMsg(msg, m, selected))
+		cmds = append(cmds, handleMsg(msg, m))
 	}
 
 	newListModel, cmd := m.list.Update(msg)
@@ -31,7 +31,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, tea.Batch(append(cmds, cmd)...)
 }
 
-func handleMsg(msg tea.Msg, m *model, selected repoItem) tea.Cmd {
+func handleMsg(msg tea.Msg, m *model) tea.Cmd {
 	cmds := []tea.Cmd{}
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
@@ -162,7 +162,7 @@ func handleKeyMsg(msg tea.Msg, m *model, selected repoItem) tea.Cmd {
 }
 
 // listItemDelegate configures general behaviour/styling of the list items.
-func listItemDelegate(storagePath string) list.DefaultDelegate {
+func listItemDelegate() list.DefaultDelegate {
 	d := list.NewDefaultDelegate()
 	d.Styles.NormalTitle = d.Styles.NormalTitle.Foreground(dimmedColor)
 	d.Styles.SelectedTitle = d.Styles.SelectedTitle.UnsetForeground().Background(selectedColor)
