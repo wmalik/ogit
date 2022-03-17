@@ -13,7 +13,8 @@ var clonedRepoStyle = lipgloss.NewStyle().
 	Foreground(lipgloss.AdaptiveColor{Light: "#030303", Dark: "#dddddd"})
 
 var dimmedColor = lipgloss.AdaptiveColor{Light: "#A49FA5", Dark: "#7F7C82"}
-var selectedColor = lipgloss.AdaptiveColor{Light: "#A49FA5", Dark: "#777777"}
+var selectedColorBg = lipgloss.AdaptiveColor{Light: "#A49FA5", Dark: "#333333"}
+var selectedColorFg = lipgloss.AdaptiveColor{Light: "#79787a", Dark: "#7F7C82"}
 var titleBarStyle = list.DefaultStyles().TitleBar.Background(lipgloss.Color("#52006A")).Padding(0, 1)
 
 func statusMessageStyle(str string) string {

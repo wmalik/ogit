@@ -164,7 +164,7 @@ func handleKeyMsg(msg tea.Msg, m *Model, selected repoItem) tea.Cmd {
 func listItemDelegate() list.DefaultDelegate {
 	d := list.NewDefaultDelegate()
 	d.Styles.NormalTitle = d.Styles.NormalTitle.Foreground(dimmedColor)
-	d.Styles.SelectedTitle = d.Styles.SelectedTitle.UnsetForeground().Background(selectedColor)
+	d.Styles.SelectedTitle = d.Styles.SelectedTitle.Background(selectedColorBg).Foreground(selectedColorFg)
 	d.ShowDescription = false
 	d.SetSpacing(0)
 	d.UpdateFunc = func(msg tea.Msg, m *list.Model) tea.Cmd {
