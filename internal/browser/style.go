@@ -9,8 +9,8 @@ var appStyle = lipgloss.NewStyle().Align(lipgloss.Center).PaddingLeft(5).Padding
 
 var bottomStatusBarStyle = lipgloss.NewStyle().Height(1).Faint(true)
 
-var brightStyle = lipgloss.NewStyle().
-	Foreground(lipgloss.AdaptiveColor{Light: "#1a1a1a", Dark: "#dddddd"})
+var clonedRepoStyle = lipgloss.NewStyle().
+	Foreground(lipgloss.AdaptiveColor{Light: "#030303", Dark: "#dddddd"})
 
 var dimmedColor = lipgloss.AdaptiveColor{Light: "#A49FA5", Dark: "#7F7C82"}
 var selectedColor = lipgloss.AdaptiveColor{Light: "#A49FA5", Dark: "#777777"}

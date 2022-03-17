@@ -59,7 +59,7 @@ func handleMsg(msg tea.Msg, m *Model) tea.Cmd {
 				return updateBottomStatusBarMsg(statusError(err.Error()))
 			}
 
-			msg.repo.SetTitle(brightStyle.Render(msg.repo.Repository.Title))
+			msg.repo.SetTitle(clonedRepoStyle.Render(msg.repo.Repository.Title))
 
 			m.list.SetItem(msg.index, msg.repo)
 			return updateBottomStatusBarMsg(statusMessageStyle("[Cloned] " + repoString))
