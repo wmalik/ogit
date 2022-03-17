@@ -60,7 +60,7 @@ func ReadGitConfig() (*GitConfig, error) {
 	if err != nil {
 		return nil, err
 	}
-	if fetchUserRepos == false {
+	if !fetchUserRepos {
 		conf.fetchUserRepos = false
 	}
 
@@ -68,7 +68,7 @@ func ReadGitConfig() (*GitConfig, error) {
 	if err != nil {
 		return nil, err
 	}
-	if useSSHAgent != true {
+	if !useSSHAgent {
 		conf.useSSHAgent = useSSHAgent
 	}
 	if privKeyPath != "" {
