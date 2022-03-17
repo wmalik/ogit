@@ -5,7 +5,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-var appStyle = lipgloss.NewStyle().Align(lipgloss.Center).PaddingLeft(5).PaddingTop(5).PaddingBottom(5).PaddingRight(5)
+var appStyle = lipgloss.NewStyle().Align(lipgloss.Center).PaddingLeft(2).PaddingTop(2).PaddingBottom(2).PaddingRight(2)
 
 var bottomStatusBarStyle = lipgloss.NewStyle().Height(1).Faint(true)
 
