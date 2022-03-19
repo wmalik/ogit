@@ -3,7 +3,6 @@ package sync
 import (
 	"context"
 	"fmt"
-	"log"
 	"path"
 
 	"github.com/wmalik/ogit/internal/db"
@@ -17,7 +16,7 @@ import (
 func Sync(ctx context.Context, gitConf *gitconfig.GitConfig, githubToken string, gitlabToken string) error {
 	gitlabClient, err := upstream.NewGitlabClientWithToken(gitlabToken)
 	if err != nil {
-		log.Fatalln(err)
+		return err
 	}
 
 	rs := service.NewRepositoryService(
@@ -26,23 +25,23 @@ func Sync(ctx context.Context, gitConf *gitconfig.GitConfig, githubToken string,
 		gitConf.FetchUserRepos(),
 	)
 
-	log.Println("Syncing repositories")
+	fmt.Println("Syncing repositories")
 	repos, err := rs.GetRepositoriesByOwners(ctx, gitConf.Orgs(), gitConf.GitlabGroups())
 	if err != nil {
-		log.Fatalln(err)
+		return err
 	}
 
 	localDB, err := db.NewDB(path.Join(gitConf.StoragePath(), "ogit.db"))
 	if err != nil {
-		log.Fatalln(err)
+		return err
 	}
 
 	if err := localDB.Init(); err != nil {
-		log.Fatalln(err)
+		return err
 	}
 
 	if err := localDB.UpsertRepositories(ctx, toDatabaseRepositories(repos)); err != nil {
-		log.Fatalln(err)
+		return err
 	}
 
 	return nil

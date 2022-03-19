@@ -42,7 +42,7 @@ func HandleCommandFetch() error {
 		os.Getenv("GITHUB_TOKEN"),
 		os.Getenv("GITLAB_TOKEN"),
 	); err != nil {
-		log.Fatalln(err)
+		return err
 	}
 
 	return nil
