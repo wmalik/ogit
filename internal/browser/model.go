@@ -81,7 +81,7 @@ func toItems(repos []db.Repository, storagePath string) []list.Item {
 	for i := range repos {
 		repoItem := newRepoItem(&repos[i], storagePath)
 		if repoItem.Cloned() {
-			repoItem.SetTitle(brightStyle.Render(repoItem.Repository.Title))
+			repoItem.SetTitle(clonedRepoStyle.Render(repoItem.Repository.Title))
 		}
 		items[i] = repoItem
 	}
