@@ -14,6 +14,14 @@ import (
 // Sync fetches the repository metadata from upstream and stores it in the local
 // database (on disk).
 func Sync(ctx context.Context, gitConf *gitconfig.GitConfig, githubToken string, gitlabToken string) error {
+	if len(gitConf.GitlabGroups()) > 0 && gitlabToken == "" {
+		return fmt.Errorf("GITLAB_TOKEN is required")
+	}
+
+	if len(gitConf.Orgs()) > 0 && githubToken == "" {
+		return fmt.Errorf("GITHUB_TOKEN is required")
+	}
+
 	gitlabClient, err := upstream.NewGitlabClientWithToken(gitlabToken)
 	if err != nil {
 		return err
