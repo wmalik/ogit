@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -28,7 +27,8 @@ func main() {
 		HideVersion: false,
 		Action: func(c *cli.Context) error {
 			if err := browser.HandleCommandDefault(); err != nil {
-				log.Fatalln(err)
+				fmt.Println(err)
+				os.Exit(1)
 			}
 			return nil
 		},
@@ -38,7 +38,8 @@ func main() {
 				Usage: "Fetch all repository metadata from provider APIs (e.g. GitHub/GitLab)",
 				Action: func(c *cli.Context) error {
 					if err := browser.HandleCommandFetch(); err != nil {
-						log.Fatalln(err)
+						fmt.Println(err)
+						os.Exit(1)
 					}
 					return nil
 				},
@@ -59,7 +60,8 @@ func main() {
 				},
 				Action: func(c *cli.Context) error {
 					if err := bulkclone.HandleCommandClone(c.String("org"), c.String("filter")); err != nil {
-						log.Fatalln(err)
+						fmt.Println(err)
+						os.Exit(1)
 					}
 					return nil
 				},
@@ -69,7 +71,8 @@ func main() {
 				Usage: "Clear all local repository metadata (not the repository contents)",
 				Action: func(c *cli.Context) error {
 					if err := clear.HandleCommandDefault(c.Context); err != nil {
-						log.Fatalln(err)
+						fmt.Println(err)
+						os.Exit(1)
 					}
 					return nil
 				},
@@ -80,7 +83,8 @@ func main() {
 				Usage:   "Open repository pull requests in web browser",
 				Action: func(c *cli.Context) error {
 					if err := repocommands.HandleURLCommands(c.Context, repocommands.Pulls); err != nil {
-						log.Fatalln(err)
+						fmt.Println(err)
+						os.Exit(1)
 					}
 					return nil
 				},
@@ -91,7 +95,8 @@ func main() {
 				Usage:   "Open repository home page in web browser",
 				Action: func(c *cli.Context) error {
 					if err := repocommands.HandleURLCommands(c.Context, repocommands.Web); err != nil {
-						log.Fatalln(err)
+						fmt.Println(err)
+						os.Exit(1)
 					}
 					return nil
 				},
@@ -101,7 +106,8 @@ func main() {
 				Usage: "Open repository org in web browser",
 				Action: func(c *cli.Context) error {
 					if err := repocommands.HandleURLCommands(c.Context, repocommands.Org); err != nil {
-						log.Fatalln(err)
+						fmt.Println(err)
+						os.Exit(1)
 					}
 					return nil
 				},
@@ -111,7 +117,8 @@ func main() {
 				Usage: "Open repository issues in web browser",
 				Action: func(c *cli.Context) error {
 					if err := repocommands.HandleURLCommands(c.Context, repocommands.Issues); err != nil {
-						log.Fatalln(err)
+						fmt.Println(err)
+						os.Exit(1)
 					}
 					return nil
 				},
@@ -122,7 +129,8 @@ func main() {
 				Usage:   "Open repository CI/actions in web browser",
 				Action: func(c *cli.Context) error {
 					if err := repocommands.HandleURLCommands(c.Context, repocommands.CI); err != nil {
-						log.Fatalln(err)
+						fmt.Println(err)
+						os.Exit(1)
 					}
 					return nil
 				},
@@ -132,7 +140,8 @@ func main() {
 				Usage: "Open repository releases in web browser",
 				Action: func(c *cli.Context) error {
 					if err := repocommands.HandleURLCommands(c.Context, repocommands.Releases); err != nil {
-						log.Fatalln(err)
+						fmt.Println(err)
+						os.Exit(1)
 					}
 					return nil
 				},
@@ -142,7 +151,8 @@ func main() {
 				Usage: "Open repository settings in web browser",
 				Action: func(c *cli.Context) error {
 					if err := repocommands.HandleURLCommands(c.Context, repocommands.Settings); err != nil {
-						log.Fatalln(err)
+						fmt.Println(err)
+						os.Exit(1)
 					}
 					return nil
 				},
@@ -151,6 +161,7 @@ func main() {
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 }

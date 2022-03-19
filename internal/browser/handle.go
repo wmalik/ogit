@@ -36,8 +36,13 @@ func HandleCommandFetch() error {
 		log.Fatalln(err)
 	}
 
-	if err := sync.Sync(ctx, gitConf); err != nil {
-		log.Fatalln(err)
+	if err := sync.Sync(
+		ctx,
+		gitConf,
+		os.Getenv("GITHUB_TOKEN"),
+		os.Getenv("GITLAB_TOKEN"),
+	); err != nil {
+		return err
 	}
 
 	return nil

@@ -3,8 +3,6 @@ package sync
 import (
 	"context"
 	"fmt"
-	"log"
-	"os"
 	"path"
 
 	"github.com/wmalik/ogit/internal/db"
@@ -15,35 +13,42 @@ import (
 
 // Sync fetches the repository metadata from upstream and stores it in the local
 // database (on disk).
-func Sync(ctx context.Context, gitConf *gitconfig.GitConfig) error {
-	gitlabClient, err := upstream.NewGitlabClientWithToken(os.Getenv("GITLAB_TOKEN"))
+func Sync(ctx context.Context, gitConf *gitconfig.GitConfig, githubToken string, gitlabToken string) error {
+	if len(gitConf.GitlabGroups()) > 0 && gitlabToken == "" {
+		return fmt.Errorf("GITLAB_TOKEN is required")
+	}
+
+	if len(gitConf.Orgs()) > 0 && githubToken == "" {
+		return fmt.Errorf("GITHUB_TOKEN is required")
+	}
+
+	gitlabClient, err := upstream.NewGitlabClientWithToken(gitlabToken)
 	if err != nil {
-		log.Fatalln(err)
+		return err
 	}
 
 	rs := service.NewRepositoryService(
-		upstream.NewGithubClientWithToken(os.Getenv("GITHUB_TOKEN")),
+		upstream.NewGithubClientWithToken(githubToken),
 		gitlabClient,
 		gitConf.FetchUserRepos(),
 	)
 
-	log.Println("Syncing repositories")
 	repos, err := rs.GetRepositoriesByOwners(ctx, gitConf.Orgs(), gitConf.GitlabGroups())
 	if err != nil {
-		log.Fatalln(err)
+		return err
 	}
 
 	localDB, err := db.NewDB(path.Join(gitConf.StoragePath(), "ogit.db"))
 	if err != nil {
-		log.Fatalln(err)
+		return err
 	}
 
 	if err := localDB.Init(); err != nil {
-		log.Fatalln(err)
+		return err
 	}
 
 	if err := localDB.UpsertRepositories(ctx, toDatabaseRepositories(repos)); err != nil {
-		log.Fatalln(err)
+		return err
 	}
 
 	return nil
