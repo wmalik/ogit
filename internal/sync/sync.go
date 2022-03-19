@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 	"path"
 
 	"github.com/wmalik/ogit/internal/db"
@@ -15,14 +14,14 @@ import (
 
 // Sync fetches the repository metadata from upstream and stores it in the local
 // database (on disk).
-func Sync(ctx context.Context, gitConf *gitconfig.GitConfig) error {
-	gitlabClient, err := upstream.NewGitlabClientWithToken(os.Getenv("GITLAB_TOKEN"))
+func Sync(ctx context.Context, gitConf *gitconfig.GitConfig, githubToken string, gitlabToken string) error {
+	gitlabClient, err := upstream.NewGitlabClientWithToken(gitlabToken)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	rs := service.NewRepositoryService(
-		upstream.NewGithubClientWithToken(os.Getenv("GITHUB_TOKEN")),
+		upstream.NewGithubClientWithToken(githubToken),
 		gitlabClient,
 		gitConf.FetchUserRepos(),
 	)
