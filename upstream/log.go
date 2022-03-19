@@ -1,22 +1,19 @@
 package upstream
 
-import (
-	"log"
-)
+import "fmt"
 
-func logPaginationStatus(upstream string, owner string, numRepos, remainingPages int, remainingAPILimit string) {
+func logPaginationStatus(upstream string, owner string, numRepos int, remainingAPILimit string) {
 	if owner == "" {
 		owner = "current_user"
 	}
-	log.Printf("[%s:%s] fetched %d repositories, remaining pages %d, remaining API calls: %s",
+	fmt.Printf("    [%s/%s] fetched %d repositories, remaining api calls: %s\n",
 		upstream,
 		owner,
 		numRepos,
-		remainingPages,
 		remainingAPILimit,
 	)
 }
 
 func logAuthenticatedUser(upstream string, username string) {
-	log.Printf("Authenticated with %s as %s", upstream, username)
+	fmt.Printf("\nAuthenticated with %s as %s\n", upstream, username)
 }

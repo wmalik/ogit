@@ -33,7 +33,6 @@ func Sync(ctx context.Context, gitConf *gitconfig.GitConfig, githubToken string,
 		gitConf.FetchUserRepos(),
 	)
 
-	fmt.Println("Syncing repositories")
 	repos, err := rs.GetRepositoriesByOwners(ctx, gitConf.Orgs(), gitConf.GitlabGroups())
 	if err != nil {
 		return err

@@ -176,7 +176,7 @@ func (c *GithubClient) getRepositoriesForOwner(ctx context.Context, owner string
 			return nil, err
 		}
 
-		logPaginationStatus(githubUpstream, owner, len(repos), resp.LastPage-resp.NextPage, strconv.Itoa(resp.Remaining))
+		logPaginationStatus(githubUpstream, owner, len(repos), strconv.Itoa(resp.Remaining))
 
 		reposAcc = append(reposAcc, repos...)
 		if resp.NextPage == 0 {
@@ -210,7 +210,7 @@ func (c *GithubClient) getRepositoriesForOrg(ctx context.Context, org string, st
 			return []HostRepository{}, nil
 		}
 
-		logPaginationStatus(githubUpstream, org, len(repos), resp.LastPage-resp.NextPage, strconv.Itoa(resp.Remaining))
+		logPaginationStatus(githubUpstream, org, len(repos), strconv.Itoa(resp.Remaining))
 
 		reposAcc = append(reposAcc, repos...)
 		if resp.NextPage == 0 {

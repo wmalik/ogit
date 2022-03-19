@@ -163,7 +163,7 @@ func (c *GitlabClient) getProjectsForAuthUser(userID int, username string) ([]Ho
 			return nil, err
 		}
 
-		logPaginationStatus(gitlabUpstream, username, len(projects), resp.TotalPages-resp.NextPage-1, resp.Header.Get("RateLimit-Remaining"))
+		logPaginationStatus(gitlabUpstream, username, len(projects), resp.Header.Get("RateLimit-Remaining"))
 
 		allProjects = append(allProjects, projects...)
 
@@ -199,7 +199,7 @@ func (c *GitlabClient) getProjectsForGroup(group string) ([]HostRepository, erro
 			return nil, err
 		}
 
-		logPaginationStatus(gitlabUpstream, group, len(groupProjects), resp.TotalPages-resp.NextPage-1, resp.Header.Get("RateLimit-Remaining"))
+		logPaginationStatus(gitlabUpstream, group, len(groupProjects), resp.Header.Get("RateLimit-Remaining"))
 
 		allProjects = append(allProjects, groupProjects...)
 
