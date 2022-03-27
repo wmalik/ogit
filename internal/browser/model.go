@@ -38,6 +38,8 @@ func NewModelWithItems(repos []db.Repository, storagePath string, gu *gitutils.G
 	m.Title = fmt.Sprintf("[ogit] [%s]", storagePath)
 	m.Styles.Title = titleBarStyle
 	m.AdditionalShortHelpKeys = availableKeyBindingsCB
+	m.KeyMap.GoToStart.SetKeys("home")
+	m.KeyMap.GoToStart.SetHelp("home", "go to start")
 	m.SetShowStatusBar(false)
 
 	return &Model{
