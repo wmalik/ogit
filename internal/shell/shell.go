@@ -2,6 +2,7 @@ package shell
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 )
 
@@ -36,4 +37,13 @@ func runProcess(name string, dir string, args ...string) error {
 	}
 
 	return nil
+}
+
+// CommandExists if the command name is available on the host (uses `which`).
+func CommandExists(name string) bool {
+	if err := exec.Command("which", name).Run(); err != nil {
+		return false
+	}
+
+	return true
 }
