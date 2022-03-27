@@ -21,10 +21,12 @@ type Model struct {
 	storagePath string
 	// A status bar to show useful information e.g. Github API usage
 	bottomStatusBar string
-	// the storage path of the selected item
-	selectedItemStoragePath string
 	// whether a shell should be spawned after the TUI exits
 	spawnShell bool
+	// the arguments to be passed to the shell
+	shellArgs []string
+	// the Working dir of the shell process
+	shellDir string
 
 	gu *gitutils.GitUtils
 }
@@ -36,6 +38,8 @@ func NewModelWithItems(repos []db.Repository, storagePath string, gu *gitutils.G
 	m.Title = fmt.Sprintf("[ogit] [%s]", storagePath)
 	m.Styles.Title = titleBarStyle
 	m.AdditionalShortHelpKeys = availableKeyBindingsCB
+	m.KeyMap.GoToStart.SetKeys("home")
+	m.KeyMap.GoToStart.SetHelp("home", "go to start")
 	m.SetShowStatusBar(false)
 
 	return &Model{
@@ -53,6 +57,10 @@ func availableKeyBindingsCB() []key.Binding {
 			key.WithHelp("c", "clone"),
 		),
 		key.NewBinding(
+			key.WithKeys("enter"),
+			key.WithHelp("enter", "shell"),
+		),
+		key.NewBinding(
 			key.WithKeys("o"),
 			key.WithHelp("o", "open"),
 		),
@@ -61,8 +69,8 @@ func availableKeyBindingsCB() []key.Binding {
 			key.WithHelp("v", "vim"),
 		),
 		key.NewBinding(
-			key.WithKeys("enter"),
-			key.WithHelp("enter", "shell"),
+			key.WithKeys("g"),
+			key.WithHelp("g", "gitty"),
 		),
 		key.NewBinding(
 			key.WithKeys("w"),

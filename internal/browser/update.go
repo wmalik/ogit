@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 
+	"github.com/wmalik/ogit/internal/shell"
 	"github.com/wmalik/ogit/internal/utils"
 
 	"github.com/charmbracelet/bubbles/list"
@@ -27,7 +27,6 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	newListModel, cmd := m.list.Update(msg)
 	m.list = newListModel
-	m.selectedItemStoragePath = selected.repoStoragePath
 	return m, tea.Batch(append(cmds, cmd)...)
 }
 
@@ -95,17 +94,32 @@ func handleKeyMsg(msg tea.Msg, m *Model, selected repoItem) tea.Cmd {
 					)
 				}
 			}
-			rangerCmd := exec.Command("xdg-open", selected.StoragePath()) //nolint:gosec
-			rangerCmd.Stdin = os.Stdin
-			rangerCmd.Stdout = os.Stdout
-			if err := rangerCmd.Run(); err != nil {
+			if !shell.CommandExists("xdg-open") {
 				return func() tea.Msg {
 					return updateBottomStatusBarMsg(
-						statusError(fmt.Sprintf("Unable to run xdg-open: %s", err)),
+						statusError("xdg-open not found"),
 					)
 				}
 			}
-			return tea.HideCursor
+
+			m.spawnShell = true
+			m.shellArgs = []string{"-c", fmt.Sprintf("xdg-open %s", selected.repoStoragePath)}
+			m.shellDir = selected.repoStoragePath
+			cmds = append(cmds, tea.Quit)
+
+		case "g":
+			if !shell.CommandExists("gitty") {
+				return func() tea.Msg {
+					return updateBottomStatusBarMsg(
+						statusError("gitty not available, install here: https://github.com/muesli/gitty"),
+					)
+				}
+			}
+
+			m.spawnShell = true
+			m.shellArgs = []string{"-c", fmt.Sprintf("clear && gitty %s && read -n1", selected.BrowserHomepageURL)}
+			m.shellDir = os.TempDir()
+			cmds = append(cmds, tea.Quit)
 
 		case "v":
 			if !selected.Cloned() {
@@ -115,17 +129,19 @@ func handleKeyMsg(msg tea.Msg, m *Model, selected repoItem) tea.Cmd {
 					)
 				}
 			}
-			vimCmd := exec.Command("vim", selected.StoragePath()) //nolint:gosec
-			vimCmd.Stdin = os.Stdin
-			vimCmd.Stdout = os.Stdout
-			if err := vimCmd.Run(); err != nil {
+
+			if !shell.CommandExists("vim") {
 				return func() tea.Msg {
 					return updateBottomStatusBarMsg(
-						statusError(fmt.Sprintf("Unable to run vim: %s", err)),
+						statusError("vim not found"),
 					)
 				}
 			}
-			return tea.HideCursor
+
+			m.spawnShell = true
+			m.shellArgs = []string{"-c", fmt.Sprintf("vim %s", selected.repoStoragePath)}
+			m.shellDir = selected.repoStoragePath
+			cmds = append(cmds, tea.Quit)
 
 		case "enter":
 			if !selected.Cloned() {
@@ -136,6 +152,8 @@ func handleKeyMsg(msg tea.Msg, m *Model, selected repoItem) tea.Cmd {
 				}
 			}
 			m.spawnShell = true
+			m.shellDir = selected.repoStoragePath
+			m.shellArgs = []string{"-i"}
 			cmds = append(cmds, tea.Quit)
 		case "c":
 			cmds = append(cmds, tea.Batch(

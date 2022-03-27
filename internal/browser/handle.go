@@ -87,7 +87,7 @@ func HandleCommandDefault() error {
 
 		if model.spawnShell {
 			model.spawnShell = false
-			if err := shell.Spawn(model.selectedItemStoragePath); err != nil {
+			if err := shell.Spawn(model.shellDir, model.shellArgs...); err != nil {
 				return err
 			}
 		} else {
