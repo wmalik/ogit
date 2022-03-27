@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 
 	"github.com/wmalik/ogit/internal/shell"
 	"github.com/wmalik/ogit/internal/utils"
@@ -95,17 +94,18 @@ func handleKeyMsg(msg tea.Msg, m *Model, selected repoItem) tea.Cmd {
 					)
 				}
 			}
-			rangerCmd := exec.Command("xdg-open", selected.StoragePath()) //nolint:gosec
-			rangerCmd.Stdin = os.Stdin
-			rangerCmd.Stdout = os.Stdout
-			if err := rangerCmd.Run(); err != nil {
+			if !shell.CommandExists("xdg-open") {
 				return func() tea.Msg {
 					return updateBottomStatusBarMsg(
-						statusError(fmt.Sprintf("Unable to run xdg-open: %s", err)),
+						statusError("xdg-open not found"),
 					)
 				}
 			}
-			return tea.HideCursor
+
+			m.spawnShell = true
+			m.shellArgs = []string{"-c", fmt.Sprintf("xdg-open %s", selected.repoStoragePath)}
+			m.shellDir = selected.repoStoragePath
+			cmds = append(cmds, tea.Quit)
 
 		case "g":
 			if !shell.CommandExists("gitty") {
