@@ -57,6 +57,10 @@ func availableKeyBindingsCB() []key.Binding {
 			key.WithHelp("c", "clone"),
 		),
 		key.NewBinding(
+			key.WithKeys("enter"),
+			key.WithHelp("enter", "shell"),
+		),
+		key.NewBinding(
 			key.WithKeys("o"),
 			key.WithHelp("o", "open"),
 		),
@@ -65,8 +69,8 @@ func availableKeyBindingsCB() []key.Binding {
 			key.WithHelp("v", "vim"),
 		),
 		key.NewBinding(
-			key.WithKeys("enter"),
-			key.WithHelp("enter", "shell"),
+			key.WithKeys("g"),
+			key.WithHelp("g", "gitty"),
 		),
 		key.NewBinding(
 			key.WithKeys("w"),

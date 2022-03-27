@@ -107,6 +107,20 @@ func handleKeyMsg(msg tea.Msg, m *Model, selected repoItem) tea.Cmd {
 			}
 			return tea.HideCursor
 
+		case "g":
+			if !shell.CommandExists("gitty") {
+				return func() tea.Msg {
+					return updateBottomStatusBarMsg(
+						statusError("gitty not available, install here: https://github.com/muesli/gitty"),
+					)
+				}
+			}
+
+			m.spawnShell = true
+			m.shellArgs = []string{"-c", fmt.Sprintf("clear && gitty %s && read -n1", selected.BrowserHomepageURL)}
+			m.shellDir = os.TempDir()
+			cmds = append(cmds, tea.Quit)
+
 		case "v":
 			if !selected.Cloned() {
 				return func() tea.Msg {
