@@ -129,17 +129,19 @@ func handleKeyMsg(msg tea.Msg, m *Model, selected repoItem) tea.Cmd {
 					)
 				}
 			}
-			vimCmd := exec.Command("vim", selected.StoragePath()) //nolint:gosec
-			vimCmd.Stdin = os.Stdin
-			vimCmd.Stdout = os.Stdout
-			if err := vimCmd.Run(); err != nil {
+
+			if !shell.CommandExists("vim") {
 				return func() tea.Msg {
 					return updateBottomStatusBarMsg(
-						statusError(fmt.Sprintf("Unable to run vim: %s", err)),
+						statusError("vim not found"),
 					)
 				}
 			}
-			return tea.HideCursor
+
+			m.spawnShell = true
+			m.shellArgs = []string{"-c", fmt.Sprintf("vim %s", selected.repoStoragePath)}
+			m.shellDir = selected.repoStoragePath
+			cmds = append(cmds, tea.Quit)
 
 		case "enter":
 			if !selected.Cloned() {
