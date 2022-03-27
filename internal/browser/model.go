@@ -21,12 +21,12 @@ type Model struct {
 	storagePath string
 	// A status bar to show useful information e.g. Github API usage
 	bottomStatusBar string
-	// the storage path of the selected item
-	selectedItemStoragePath string
 	// whether a shell should be spawned after the TUI exits
 	spawnShell bool
 	// the arguments to be passed to the shell
 	shellArgs []string
+	// the Working dir of the shell process
+	shellDir string
 
 	gu *gitutils.GitUtils
 }

@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/wmalik/ogit/internal/shell"
 	"github.com/wmalik/ogit/internal/utils"
 
 	"github.com/charmbracelet/bubbles/list"
@@ -27,7 +28,6 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	newListModel, cmd := m.list.Update(msg)
 	m.list = newListModel
-	m.selectedItemStoragePath = selected.repoStoragePath
 	return m, tea.Batch(append(cmds, cmd)...)
 }
 
@@ -136,6 +136,7 @@ func handleKeyMsg(msg tea.Msg, m *Model, selected repoItem) tea.Cmd {
 				}
 			}
 			m.spawnShell = true
+			m.shellDir = selected.repoStoragePath
 			m.shellArgs = []string{"-i"}
 			cmds = append(cmds, tea.Quit)
 		case "c":
