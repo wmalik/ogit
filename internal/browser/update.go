@@ -136,6 +136,7 @@ func handleKeyMsg(msg tea.Msg, m *Model, selected repoItem) tea.Cmd {
 				}
 			}
 			m.spawnShell = true
+			m.shellArgs = []string{"-i"}
 			cmds = append(cmds, tea.Quit)
 		case "c":
 			cmds = append(cmds, tea.Batch(

@@ -25,6 +25,8 @@ type Model struct {
 	selectedItemStoragePath string
 	// whether a shell should be spawned after the TUI exits
 	spawnShell bool
+	// the arguments to be passed to the shell
+	shellArgs []string
 
 	gu *gitutils.GitUtils
 }
