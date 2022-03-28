@@ -21,8 +21,23 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	if m.list.FilterState() != list.Filtering {
-		cmds = append(cmds, handleKeyMsg(msg, m, selected))
-		cmds = append(cmds, handleMsg(msg, m))
+		switch msg := msg.(type) {
+		case tea.KeyMsg:
+			cmds = append(cmds, handleKeyMsg(msg, m, selected))
+		case tea.MouseMsg:
+			switch msg.Type {
+			case tea.MouseWheelUp:
+				m.list.CursorUp()
+			case tea.MouseWheelDown:
+				m.list.CursorDown()
+			}
+		case tea.WindowSizeMsg:
+			topGap, rightGap, bottomGap, leftGap := appStyle.GetPadding()
+			bottomGap = bottomGap + bottomStatusBarStyle.GetHeight()
+			m.list.SetSize(msg.Width-leftGap-rightGap, msg.Height-topGap-bottomGap)
+		default:
+			cmds = append(cmds, handleMsg(msg, m))
+		}
 	}
 
 	newListModel, cmd := m.list.Update(msg)
@@ -33,11 +48,6 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func handleMsg(msg tea.Msg, m *Model) tea.Cmd {
 	cmds := []tea.Cmd{}
 	switch msg := msg.(type) {
-	case tea.WindowSizeMsg:
-		topGap, rightGap, bottomGap, leftGap := appStyle.GetPadding()
-		bottomGap = bottomGap + bottomStatusBarStyle.GetHeight()
-		m.list.SetSize(msg.Width-leftGap-rightGap, msg.Height-topGap-bottomGap)
-
 	case updateBottomStatusBarMsg:
 		m.list.StopSpinner()
 		m.bottomStatusBar = string(msg)
@@ -81,98 +91,95 @@ func handleMsg(msg tea.Msg, m *Model) tea.Cmd {
 	return tea.Batch(cmds...)
 }
 
-func handleKeyMsg(msg tea.Msg, m *Model, selected repoItem) tea.Cmd {
+func handleKeyMsg(msg tea.KeyMsg, m *Model, selected repoItem) tea.Cmd {
 	cmds := []tea.Cmd{}
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch msg.String() {
-		case "o":
-			if !selected.Cloned() {
-				return func() tea.Msg {
-					return updateBottomStatusBarMsg(
-						statusError("Not cloned yet, press c to clone"),
-					)
-				}
+	switch msg.String() {
+	case "o":
+		if !selected.Cloned() {
+			return func() tea.Msg {
+				return updateBottomStatusBarMsg(
+					statusError("Not cloned yet, press c to clone"),
+				)
 			}
-			if !shell.CommandExists("xdg-open") {
-				return func() tea.Msg {
-					return updateBottomStatusBarMsg(
-						statusError("xdg-open not found"),
-					)
-				}
-			}
-
-			m.spawnShell = true
-			m.shellArgs = []string{"-c", fmt.Sprintf("xdg-open %s", selected.repoStoragePath)}
-			m.shellDir = selected.repoStoragePath
-			cmds = append(cmds, tea.Quit)
-
-		case "g":
-			if !shell.CommandExists("gitty") {
-				return func() tea.Msg {
-					return updateBottomStatusBarMsg(
-						statusError("gitty not available, install here: https://github.com/muesli/gitty"),
-					)
-				}
-			}
-
-			m.spawnShell = true
-			m.shellArgs = []string{"-c", fmt.Sprintf("clear && gitty %s && read -n1", selected.BrowserHomepageURL)}
-			m.shellDir = os.TempDir()
-			cmds = append(cmds, tea.Quit)
-
-		case "v":
-			if !selected.Cloned() {
-				return func() tea.Msg {
-					return updateBottomStatusBarMsg(
-						statusError("Not cloned yet, press c to clone"),
-					)
-				}
-			}
-
-			if !shell.CommandExists("vim") {
-				return func() tea.Msg {
-					return updateBottomStatusBarMsg(
-						statusError("vim not found"),
-					)
-				}
-			}
-
-			m.spawnShell = true
-			m.shellArgs = []string{"-c", fmt.Sprintf("vim %s", selected.repoStoragePath)}
-			m.shellDir = selected.repoStoragePath
-			cmds = append(cmds, tea.Quit)
-
-		case "enter":
-			if !selected.Cloned() {
-				return func() tea.Msg {
-					return updateBottomStatusBarMsg(
-						statusError("Not cloned yet, press c to clone"),
-					)
-				}
-			}
-			m.spawnShell = true
-			m.shellDir = selected.repoStoragePath
-			m.shellArgs = []string{"-i"}
-			cmds = append(cmds, tea.Quit)
-		case "c":
-			cmds = append(cmds, tea.Batch(
-				m.list.StartSpinner(),
-				func() tea.Msg {
-					return cloneRepoMsg{selected, m.list.Index()}
-				},
-			))
-		case "w":
-			cmds = append(cmds, func() tea.Msg {
-				return openURLMsg(selected.Repository.BrowserHomepageURL)
-			})
-		case "p":
-			cmds = append(cmds, func() tea.Msg {
-				return openURLMsg(selected.Repository.BrowserPullRequestsURL)
-			})
-		default:
-			log.Println("Key Pressed", string(msg.Runes))
 		}
+		if !shell.CommandExists("xdg-open") {
+			return func() tea.Msg {
+				return updateBottomStatusBarMsg(
+					statusError("xdg-open not found"),
+				)
+			}
+		}
+
+		m.spawnShell = true
+		m.shellArgs = []string{"-c", fmt.Sprintf("xdg-open %s", selected.repoStoragePath)}
+		m.shellDir = selected.repoStoragePath
+		cmds = append(cmds, tea.Quit)
+
+	case "g":
+		if !shell.CommandExists("gitty") {
+			return func() tea.Msg {
+				return updateBottomStatusBarMsg(
+					statusError("gitty not available, install here: https://github.com/muesli/gitty"),
+				)
+			}
+		}
+
+		m.spawnShell = true
+		m.shellArgs = []string{"-c", fmt.Sprintf("clear && gitty %s && read -n1", selected.BrowserHomepageURL)}
+		m.shellDir = os.TempDir()
+		cmds = append(cmds, tea.Quit)
+
+	case "v":
+		if !selected.Cloned() {
+			return func() tea.Msg {
+				return updateBottomStatusBarMsg(
+					statusError("Not cloned yet, press c to clone"),
+				)
+			}
+		}
+
+		if !shell.CommandExists("vim") {
+			return func() tea.Msg {
+				return updateBottomStatusBarMsg(
+					statusError("vim not found"),
+				)
+			}
+		}
+
+		m.spawnShell = true
+		m.shellArgs = []string{"-c", fmt.Sprintf("vim %s", selected.repoStoragePath)}
+		m.shellDir = selected.repoStoragePath
+		cmds = append(cmds, tea.Quit)
+
+	case "enter":
+		if !selected.Cloned() {
+			return func() tea.Msg {
+				return updateBottomStatusBarMsg(
+					statusError("Not cloned yet, press c to clone"),
+				)
+			}
+		}
+		m.spawnShell = true
+		m.shellDir = selected.repoStoragePath
+		m.shellArgs = []string{"-i"}
+		cmds = append(cmds, tea.Quit)
+	case "c":
+		cmds = append(cmds, tea.Batch(
+			m.list.StartSpinner(),
+			func() tea.Msg {
+				return cloneRepoMsg{selected, m.list.Index()}
+			},
+		))
+	case "w":
+		cmds = append(cmds, func() tea.Msg {
+			return openURLMsg(selected.Repository.BrowserHomepageURL)
+		})
+	case "p":
+		cmds = append(cmds, func() tea.Msg {
+			return openURLMsg(selected.Repository.BrowserPullRequestsURL)
+		})
+	default:
+		log.Println("Key Pressed", string(msg.Runes))
 	}
 
 	return tea.Batch(cmds...)
