@@ -81,7 +81,7 @@ func HandleCommandDefault() error {
 
 	model := NewModelWithItems(repos, gitConf.StoragePath(), gu)
 	for {
-		if err := tea.NewProgram(model, tea.WithAltScreen()).Start(); err != nil {
+		if err := tea.NewProgram(model, tea.WithAltScreen(), tea.WithMouseAllMotion()).Start(); err != nil {
 			log.Fatalln(err)
 		}
 

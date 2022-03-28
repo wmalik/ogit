@@ -24,6 +24,13 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg := msg.(type) {
 		case tea.KeyMsg:
 			cmds = append(cmds, handleKeyMsg(msg, m, selected))
+		case tea.MouseMsg:
+			switch msg.Type {
+			case tea.MouseWheelUp:
+				m.list.CursorUp()
+			case tea.MouseWheelDown:
+				m.list.CursorDown()
+			}
 		case tea.WindowSizeMsg:
 			topGap, rightGap, bottomGap, leftGap := appStyle.GetPadding()
 			bottomGap = bottomGap + bottomStatusBarStyle.GetHeight()
