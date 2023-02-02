@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/wmalik/ogit/internal/config"
 	"github.com/wmalik/ogit/internal/shell"
 	"github.com/wmalik/ogit/internal/utils"
 
@@ -186,8 +187,11 @@ func handleKeyMsg(msg tea.KeyMsg, m *Model, selected repoItem) tea.Cmd {
 }
 
 // listItemDelegate configures general behaviour/styling of the list items.
-func listItemDelegate() list.DefaultDelegate {
+func listItemDelegate(cfg config.Config) list.DefaultDelegate {
 	d := list.NewDefaultDelegate()
+	dimmedColor := getColor(cfg.Colors.DimmedColorFG, defaultDimmedColorFg)
+	selectedColorFg := getColor(cfg.Colors.SelectedColorFG, defaultSelectedColorFg)
+	selectedColorBg := getColor(cfg.Colors.SelectedColorBG, defaultSelectedColorBg)
 	d.Styles.NormalTitle = d.Styles.NormalTitle.Foreground(dimmedColor)
 	d.Styles.SelectedTitle = d.Styles.SelectedTitle.Background(selectedColorBg).Foreground(selectedColorFg)
 	d.ShowDescription = false

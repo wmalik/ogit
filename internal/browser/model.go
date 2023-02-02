@@ -5,6 +5,7 @@ import (
 	"sort"
 	"time"
 
+	"github.com/wmalik/ogit/internal/config"
 	"github.com/wmalik/ogit/internal/db"
 	"github.com/wmalik/ogit/internal/gitutils"
 
@@ -31,12 +32,15 @@ type Model struct {
 	gu *gitutils.GitUtils
 }
 
-func NewModelWithItems(repos []db.Repository, storagePath string, gu *gitutils.GitUtils) *Model {
+func NewModelWithItems(repos []db.Repository, storagePath string, gu *gitutils.GitUtils, cfg config.Config) *Model {
 	listItems := sortItemsCloned(toItems(repos, storagePath))
-	m := list.NewModel(listItems, listItemDelegate(), 0, 0)
+	m := list.NewModel(listItems, listItemDelegate(cfg), 0, 0)
 	m.StatusMessageLifetime = time.Second * 60
 	m.Title = fmt.Sprintf("[ogit] [%s]", storagePath)
-	m.Styles.Title = titleBarStyle
+	m.Styles.Title = list.DefaultStyles().TitleBar.
+		Foreground(getColor(cfg.Colors.TitleBarFG, defaultTitleFg)).
+		Background(getColor(cfg.Colors.TitleBarBG, defaultTitleBg)).
+		Padding(0, 1)
 	m.AdditionalShortHelpKeys = availableKeyBindingsCB
 	m.KeyMap.GoToStart.SetKeys("home")
 	m.KeyMap.GoToStart.SetHelp("home", "go to start")

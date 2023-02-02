@@ -55,7 +55,12 @@ func HandleCommandDefault() error {
 		log.Fatalln(err)
 	}
 
-	cfg, err := config.ReadConfig()
+	cfgPath, err := config.GetConfigPath()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	cfg, err := config.ReadConfig(cfgPath)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -85,7 +90,7 @@ func HandleCommandDefault() error {
 	}
 	defer f.Close()
 
-	model := NewModelWithItems(repos, gitConf.StoragePath(), gu)
+	model := NewModelWithItems(repos, gitConf.StoragePath(), gu, *cfg)
 	for {
 		if err := tea.NewProgram(model, tea.WithAltScreen(), tea.WithMouseAllMotion()).Start(); err != nil {
 			log.Fatalln(err)
