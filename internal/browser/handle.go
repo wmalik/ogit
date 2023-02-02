@@ -7,6 +7,7 @@ import (
 	"path"
 	"path/filepath"
 
+	"github.com/wmalik/ogit/internal/config"
 	"github.com/wmalik/ogit/internal/db"
 	"github.com/wmalik/ogit/internal/gitconfig"
 	"github.com/wmalik/ogit/internal/gitutils"
@@ -50,6 +51,11 @@ func HandleCommandFetch() error {
 func HandleCommandDefault() error {
 	ctx := context.Background()
 	gitConf, err := gitconfig.ReadGitConfig()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	cfg, err := config.ReadConfig()
 	if err != nil {
 		log.Fatalln(err)
 	}

@@ -1,0 +1,12 @@
+{
+	"colors": {
+		"cloned_repo_fg": { "light": "123abc", "dark": "123abc" },
+		"dimmed_color_fg": { "light": "123abc", "dark": "123abc" },
+		"selected_color_fg": { "light": "123abc", "dark": "123abc" },
+		"selected_color_bg": { "light": "123abc", "dark": "123abc" },
+		"title_bar_fg": { "light": "123abc", "dark": "123abc" },
+		"title_bar_bg": { "light": "123abc", "dark": "123abc" },
+		"status_message_fg": { "light": "123abc", "dark": "123abc" },
+		"status_error_fg": { "light": "123abc", "dark": "123abc" }
+	}
+}
